@@ -1,0 +1,48 @@
+# PrescriptionMaker
+
+> PrescriptionMaker is a digital prescription documentation tool for doctors and clinics in India.
+
+PrescriptionMaker allows healthcare professionals to create, format, and export professional prescription documents as PDFs. It is a documentation tool — not a medical advice or AI diagnostics system.
+
+## Product
+
+- Homepage: https://prescriptionmaker.in
+- Features: https://prescriptionmaker.in/features
+- Templates: https://prescriptionmaker.in/templates
+- Pricing: https://prescriptionmaker.in/pricing
+- How It Works: https://prescriptionmaker.in/how-it-works
+- Blog: https://prescriptionmaker.in/blog
+- FAQ: https://prescriptionmaker.in/faq
+- Contact: https://prescriptionmaker.in/contact
+
+## Core Features
+
+- 15+ professional prescription templates (Classic Medical, Minimal Clinical, Modern Clinic, Pediatric, Hospital, Specialist, Premium White, and more)
+- Form-filling editor with structured fields: doctor info, patient info, diagnosis, vitals, medicines (dose/frequency/duration/route), lab tests, advice, follow-up
+- Hand-mode canvas editor: write or draw prescriptions using mouse, touch, or stylus
+- A4 PDF export with selectable text
+- Autosave and draft management
+- Secure authentication with JWT + HTTP-only cookies
+- Built for Indian doctors and clinics
+
+## Pricing Plans
+
+- Free: Up to 10 prescriptions/month, 3 templates, PDF export
+- Pro: ₹299/month — Unlimited prescriptions, all templates, Hand Mode editor, custom branding
+- Enterprise: ₹999/month — All Pro features + priority support + 10 team members
+
+## Important Pages
+
+- Privacy Policy: https://prescriptionmaker.in/privacy
+- Terms of Service: https://prescriptionmaker.in/terms
+- Refund Policy: https://prescriptionmaker.in/refund-policy
+- Disclaimer: https://prescriptionmaker.in/disclaimer
+
+## Disclaimer
+
+PrescriptionMaker is a documentation tool. It does not provide medical advice, diagnoses, or treatment recommendations. All clinical decisions are made by licensed healthcare professionals.
+
+## Contact
+
+- Support: support@prescriptionmaker.in
+- Website: https://prescriptionmaker.in

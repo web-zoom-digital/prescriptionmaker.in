@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "PrescriptionMaker.in",
+  "version": "1.0.0",
+  "description": "Seamlessly draft digital prescriptions and capture data directly from any web-based EMR.",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Open PrescriptionMaker"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content.ts"]
+    }
+  ],
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost:3005/*",
+    "https://prescriptionmaker.in/*"
+  ]
+}

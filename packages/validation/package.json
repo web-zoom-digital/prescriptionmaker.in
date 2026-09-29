@@ -1,0 +1,24 @@
+{
+  "name": "@prescriptionmaker/validation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared Zod validation schemas for PrescriptionMaker",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@prescriptionmaker/types": "workspace:*",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.5.4"
+  }
+}
