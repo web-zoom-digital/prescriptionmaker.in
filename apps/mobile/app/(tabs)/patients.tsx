@@ -3,7 +3,7 @@ import { useRouter, useFocusEffect } from 'expo-router'
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Ionicons } from '@expo/vector-icons'
-import { Ionicons } from '@expo/vector-icons'
+
 
 type PatientSummary = {
   name: string

@@ -91,7 +91,7 @@ const itemVariants = {
 
 export function FeaturesSection() {
   return (
-    <section className="bg-white py-20 lg:py-28" aria-labelledby="features-heading">
+    <section id="features" className="bg-white py-20 lg:py-28" aria-labelledby="features-heading">
       <div className="container-section">
         {/* Header */}
         <div className="mx-auto mb-14 max-w-2xl text-center">

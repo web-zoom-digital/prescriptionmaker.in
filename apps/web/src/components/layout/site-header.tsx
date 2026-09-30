@@ -8,7 +8,7 @@ import { Menu, X, ChevronDown, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
-  { label: 'Features', href: '/features' },
+  { label: 'Features', href: '/#features' },
   {
     label: 'Templates',
     href: '/templates',
@@ -20,9 +20,8 @@ const NAV_LINKS = [
       { label: 'Pediatric', href: '/templates/pediatric' },
     ],
   },
-  { label: 'How It Works', href: '/how-it-works' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Blog', href: '/blog' },
+  { label: 'How It Works', href: '/#how-it-works' },
+  { label: 'Pricing', href: '/#pricing' },
 ]
 
 export function SiteHeader() {

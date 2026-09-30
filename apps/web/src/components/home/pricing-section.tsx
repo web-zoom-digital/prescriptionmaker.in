@@ -13,7 +13,7 @@ export function PricingSection() {
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly')
 
   return (
-    <section className="bg-slate-50 py-20 lg:py-28" aria-labelledby="pricing-heading">
+    <section id="pricing" className="bg-slate-50 py-20 lg:py-28" aria-labelledby="pricing-heading">
       <div className="container-section">
         {/* Header */}
         <div className="mx-auto mb-12 max-w-2xl text-center">

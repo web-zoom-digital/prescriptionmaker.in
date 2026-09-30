@@ -44,6 +44,7 @@ const STEPS = [
 export function HowItWorksSection() {
   return (
     <section
+      id="how-it-works"
       className="bg-slate-50 py-20 lg:py-28"
       aria-labelledby="how-it-works-heading"
     >
