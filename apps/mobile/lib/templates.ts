@@ -1,5 +1,5 @@
 // Template definitions for the mobile app prescription generator
-// Premium templates matching the web app catalog
+// 10 Structurally Distinct Premium Templates — matching the web app catalog
 export type TemplateStyle = {
   primaryColor: string
   accentColor: string
@@ -12,131 +12,130 @@ export type Template = {
   name: string
   description: string
   category: string
-  layout: 'classic' | 'minimal' | 'two-column' | 'modern' | 'premium'
+  layout: 'classic' | 'minimal' | 'two-column' | 'modern' | 'premium' | 'soap' | 'bilingual' | 'boxed' | 'detailed' | 'grid'
   styles: TemplateStyle
   isPremium: boolean
   emoji: string
 }
 
 export const MOBILE_TEMPLATES: Template[] = [
+  // 1. Classic Letterhead
   {
-    id: 'royal-indigo',
-    name: 'Royal Indigo',
-    description: 'Premium Rx-style with patient grid & drug table. Used by top hospital consultants.',
+    id: 'classic-letterhead',
+    name: 'Classic Letterhead',
+    description: 'Centered serif clinic letterhead with numbered Rx list. Elegant, for senior practitioners.',
     category: 'clinic',
-    layout: 'premium',
-    styles: { primaryColor: '#4338ca', accentColor: '#818cf8', bgColor: '#f5f5ff', fontFamily: 'sans-serif' },
-    isPremium: true,
-    emoji: '👑',
+    layout: 'classic',
+    styles: { primaryColor: '#1a365d', accentColor: '#2b6cb0', bgColor: '#ffffff', fontFamily: 'serif' },
+    isPremium: false,
+    emoji: '📜',
   },
+  // 2. Two-Column Sidebar
   {
-    id: 'executive-gold',
-    name: 'Executive Gold',
-    description: 'Luxury gold accent with full patient details. Trusted by senior consultants.',
+    id: 'two-column-sidebar',
+    name: 'Two-Column Sidebar',
+    description: 'Left sidebar for doctor vitals + clinic info. Right panel for patient Rx. For cardiologists.',
     category: 'specialty',
-    layout: 'premium',
-    styles: { primaryColor: '#1a1a2e', accentColor: '#c9a84c', bgColor: '#fffef7', fontFamily: 'serif' },
-    isPremium: true,
-    emoji: '🥇',
-  },
-  {
-    id: 'emerald-specialist',
-    name: 'Emerald Specialist',
-    description: 'Deep emerald for cardiology, surgery & internal medicine specialists.',
-    category: 'specialty',
-    layout: 'premium',
-    styles: { primaryColor: '#064e3b', accentColor: '#10b981', bgColor: '#f0fdf4', fontFamily: 'sans-serif' },
-    isPremium: true,
-    emoji: '💎',
-  },
-  {
-    id: 'sapphire-hospital',
-    name: 'Sapphire Hospital',
-    description: 'Institutional hospital OPD with department, MRN & dual signature block.',
-    category: 'hospital',
-    layout: 'premium',
-    styles: { primaryColor: '#1e3a8a', accentColor: '#93c5fd', bgColor: '#eff6ff', fontFamily: 'sans-serif' },
-    isPremium: true,
-    emoji: '🏨',
-  },
-  {
-    id: 'platinum-minimal',
-    name: 'Platinum Minimal',
-    description: 'Ultra-premium minimal for elite private practices. Playfair typography.',
-    category: 'clinic',
-    layout: 'minimal',
-    styles: { primaryColor: '#111827', accentColor: '#9ca3af', bgColor: '#ffffff', fontFamily: 'serif' },
-    isPremium: true,
-    emoji: '⬜',
-  },
-  {
-    id: 'crimson-cardiology',
-    name: 'Crimson Cardiology',
-    description: 'Bold high-contrast with BP/HR/SpO2 vitals section for cardiologists.',
-    category: 'specialty',
-    layout: 'premium',
-    styles: { primaryColor: '#7f1d1d', accentColor: '#f87171', bgColor: '#fff5f5', fontFamily: 'sans-serif' },
-    isPremium: true,
-    emoji: '❤️',
-  },
-  {
-    id: 'teal-modern-clinic',
-    name: 'Teal Modern Clinic',
-    description: 'Contemporary teal for urban multi-specialty clinics with card-style medicines.',
-    category: 'clinic',
-    layout: 'modern',
-    styles: { primaryColor: '#0d9488', accentColor: '#5eead4', bgColor: '#f0fdfb', fontFamily: 'sans-serif' },
+    layout: 'two-column',
+    styles: { primaryColor: '#1e3a5f', accentColor: '#3182ce', bgColor: '#f7fafc', fontFamily: 'sans-serif' },
     isPremium: true,
     emoji: '🏥',
   },
+  // 3. Hospital OPD Form
   {
-    id: 'ocean-pediatric',
-    name: 'Ocean Pediatric',
-    description: 'Professional ocean blue with weight-based dosing & immunization for pediatricians.',
+    id: 'hospital-opd',
+    name: 'Hospital OPD Form',
+    description: 'Institutional format with MRN, Ward, Bed, HOD signature. For government/private hospitals.',
+    category: 'hospital',
+    layout: 'modern',
+    styles: { primaryColor: '#155e75', accentColor: '#0ea5e9', bgColor: '#f0f9ff', fontFamily: 'sans-serif' },
+    isPremium: true,
+    emoji: '🏛️',
+  },
+  // 4. SOAP Clinical Notes
+  {
+    id: 'soap-clinical',
+    name: 'SOAP Clinical Notes',
+    description: 'Structured S/O/A/P format. For western-trained and academic doctors.',
+    category: 'specialty',
+    layout: 'soap',
+    styles: { primaryColor: '#312e81', accentColor: '#6366f1', bgColor: '#fafafa', fontFamily: 'sans-serif' },
+    isPremium: true,
+    emoji: '📋',
+  },
+  // 5. Vitals-First
+  {
+    id: 'vitals-first',
+    name: 'Vitals-First',
+    description: 'Prominent vitals grid (BP, HR, SpO₂, Temp, Weight) before Rx. For cardiologists & ICU.',
+    category: 'specialty',
+    layout: 'detailed',
+    styles: { primaryColor: '#9b2335', accentColor: '#e53e3e', bgColor: '#fff5f5', fontFamily: 'sans-serif' },
+    isPremium: true,
+    emoji: '❤️',
+  },
+  // 6. Detailed Drug Chart
+  {
+    id: 'detailed-drug-chart',
+    name: 'Detailed Drug Chart',
+    description: 'Each medicine gets its own card with route, timing, instructions. For complex regimens.',
+    category: 'specialty',
+    layout: 'detailed',
+    styles: { primaryColor: '#065f46', accentColor: '#10b981', bgColor: '#f0fdf4', fontFamily: 'sans-serif' },
+    isPremium: true,
+    emoji: '💊',
+  },
+  // 7. Multi-Section Boxed
+  {
+    id: 'multi-section-boxed',
+    name: 'Multi-Section Boxed',
+    description: 'Separate bordered boxes for Complaint, Diagnosis, Rx, Investigations, Advice. Systematic.',
     category: 'pediatric',
-    layout: 'premium',
+    layout: 'boxed',
     styles: { primaryColor: '#0c4a6e', accentColor: '#38bdf8', bgColor: '#f0f9ff', fontFamily: 'sans-serif' },
     isPremium: true,
-    emoji: '👶',
+    emoji: '📦',
   },
+  // 8. Minimal Print Ruled
   {
-    id: 'obsidian-surgeon',
-    name: 'Obsidian Surgeon',
-    description: 'Dark authority header for surgical consultants with pre/post-op sections.',
-    category: 'specialty',
-    layout: 'premium',
-    styles: { primaryColor: '#0f172a', accentColor: '#e2e8f0', bgColor: '#ffffff', fontFamily: 'sans-serif' },
-    isPremium: true,
-    emoji: '🔬',
-  },
-  {
-    id: 'violet-dermatology',
-    name: 'Violet Dermatology',
-    description: 'Sophisticated violet with topical/systemic medication split for dermatologists.',
-    category: 'specialty',
-    layout: 'premium',
-    styles: { primaryColor: '#4c1d95', accentColor: '#c4b5fd', bgColor: '#faf5ff', fontFamily: 'sans-serif' },
-    isPremium: true,
-    emoji: '✨',
-  },
-  {
-    id: 'slate-corporate',
-    name: 'Slate Corporate',
-    description: 'Corporate-grade for occupational health & fitness-for-duty assessments.',
+    id: 'minimal-print-ruled',
+    name: 'Minimal Print Ruled',
+    description: 'Ultra-minimal like a premium notepad. Hairline rules, large Rx symbol, serif. Elite clinics.',
     category: 'clinic',
-    layout: 'modern',
-    styles: { primaryColor: '#334155', accentColor: '#0ea5e9', bgColor: '#f8fafc', fontFamily: 'sans-serif' },
-    isPremium: true,
-    emoji: '🏢',
+    layout: 'minimal',
+    styles: { primaryColor: '#1a202c', accentColor: '#718096', bgColor: '#ffffff', fontFamily: 'serif' },
+    isPremium: false,
+    emoji: '✒️',
   },
+  // 9. Bilingual Indian
   {
-    id: 'rose-gynecology',
-    name: 'Rose Gynecology',
-    description: 'Elegant rose for gynecologists with obstetric history & pregnancy tracking.',
-    category: 'specialty',
-    layout: 'premium',
-    styles: { primaryColor: '#9d174d', accentColor: '#f9a8d4', bgColor: '#fff1f2', fontFamily: 'sans-serif' },
-    isPremium: true,
-    emoji: '🌸',
+    id: 'bilingual-indian',
+    name: 'Bilingual Indian',
+    description: 'English + Hindi labels side-by-side. Indian format for GPs in Tier 2-3 cities.',
+    category: 'general',
+    layout: 'bilingual',
+    styles: { primaryColor: '#7c3aed', accentColor: '#a78bfa', bgColor: '#faf5ff', fontFamily: 'sans-serif' },
+    isPremium: false,
+    emoji: '🇮🇳',
   },
+  // 10. Compartmentalized Grid
+  {
+    id: 'compartmentalized-grid',
+    name: 'Compartmentalized Grid',
+    description: '3-col patient bar, diagnosis band, grid Rx table, 2-col footer. Multi-specialty consultants.',
+    category: 'specialty',
+    layout: 'grid',
+    styles: { primaryColor: '#92400e', accentColor: '#f59e0b', bgColor: '#fffbeb', fontFamily: 'sans-serif' },
+    isPremium: true,
+    emoji: '⚕️',
+  },
+]
+
+export const TEMPLATE_CATEGORIES = [
+  { id: 'all', name: 'All', emoji: '🏥' },
+  { id: 'clinic', name: 'Clinic', emoji: '🩺' },
+  { id: 'hospital', name: 'Hospital', emoji: '🏛️' },
+  { id: 'specialty', name: 'Specialty', emoji: '⚕️' },
+  { id: 'general', name: 'General', emoji: '👨‍⚕️' },
+  { id: 'pediatric', name: 'Pediatric', emoji: '👶' },
 ]
