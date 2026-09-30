@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash2, ChevronDown, ChevronUp, Search, X, Zap } from 'lucide-react'
 import { prescriptionFormSchema, type PrescriptionFormValues } from '@prescriptionmaker/validation'
 import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '@/lib/diagnosis-templates'
+import { COMMON_LAB_TESTS, searchLabTests, TEST_PANELS } from '@/lib/lab-tests-db'
 import { cn } from '@/lib/utils'
 import type { Template } from '@prescriptionmaker/types'
 
@@ -23,6 +24,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
     doctor: true,
     patient: true,
     medicines: true,
+    labtests: true,
     advice: false,
   })
 
@@ -43,6 +45,14 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
     control,
     name: 'medicines',
   })
+
+  const { fields: testFields, append: appendTest, remove: removeTest } = useFieldArray({
+    control,
+    name: 'tests',
+  })
+
+  const [testSearch, setTestSearch] = useState('')
+  const [showTestModal, setShowTestModal] = useState(false)
 
   useEffect(() => {
     const subscription = watch((value) => {
@@ -343,6 +353,55 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
         </div>
       </EditorSection>
 
+      {/* Lab Tests & Investigations */}
+      <EditorSection
+        title={`Lab Tests & Investigations — ${testFields.length}`}
+        open={openSections['labtests']!}
+        onToggle={() => toggleSection('labtests')}
+      >
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 mb-2">
+            <button
+              type="button"
+              onClick={() => setShowTestModal(true)}
+              className="flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-bold text-teal-700 transition-colors hover:bg-teal-100 border border-teal-200"
+            >
+              <Search className="h-3.5 w-3.5" /> Find & Add Tests
+            </button>
+            <button
+              type="button"
+              onClick={() => appendTest({ id: Date.now().toString(), name: '' })}
+              className="flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-200"
+            >
+              <Plus className="h-3.5 w-3.5" /> Add Custom
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {testFields.map((field, index) => (
+              <div key={field.id} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  {...register(`tests.${index}.name`)}
+                  className="form-input flex-1"
+                  placeholder="Test Name (e.g. CBC)"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeTest(index)}
+                  className="rounded p-2 text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+          {testFields.length === 0 && (
+            <p className="text-sm text-slate-500 italic">No lab tests added.</p>
+          )}
+        </div>
+      </EditorSection>
+
       {/* Advice & Follow-up */}
       <EditorSection
         title="Advice & Follow-up"
@@ -360,17 +419,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             />
           </FormField>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <FormField id="lab-tests" label="Lab Tests / Investigations">
-              <input
-                id="lab-tests"
-                type="text"
-                {...register('tests' as any)}
-                className="form-input"
-                placeholder="CBC, Blood sugar, etc."
-              />
-            </FormField>
-
+          <div className="grid grid-cols-1 gap-3">
             <FormField id="follow-up" label="Follow-up Date / Duration">
               <input
                 id="follow-up"
@@ -432,6 +481,87 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
                   No templates found for "{templateSearch}"
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lab Tests Modal */}
+      {showTestModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+          <div className="flex h-[80vh] w-full max-w-2xl flex-col rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-border p-4">
+              <h2 className="text-lg font-bold text-slate-900">Add Lab Tests</h2>
+              <button onClick={() => setShowTestModal(false)} className="rounded-lg p-2 hover:bg-slate-100 text-slate-500">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-4 border-b border-border bg-slate-50/50">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input 
+                  type="text" 
+                  value={testSearch}
+                  onChange={(e) => setTestSearch(e.target.value)}
+                  placeholder="Search lab tests (e.g. CBC, Lipid)..."
+                  className="w-full rounded-xl border border-border bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              {/* Common Panels */}
+              {(!testSearch || testSearch.length < 2) && (
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Quick Panels</h3>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {TEST_PANELS.map(panel => (
+                      <button
+                        key={panel.name}
+                        onClick={() => {
+                          panel.tests.forEach(t => appendTest({ id: Date.now().toString() + Math.random(), name: t }))
+                          setShowTestModal(false)
+                        }}
+                        className="flex flex-col items-start gap-1 rounded-xl border border-teal-100 bg-teal-50/50 p-3 text-left transition-all hover:border-teal-300 hover:bg-teal-100"
+                      >
+                        <span className="font-bold text-teal-900">{panel.name}</span>
+                        <span className="text-xs text-teal-700">{panel.tests.length} tests</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Individual Tests */}
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                  {testSearch ? 'Search Results' : 'Common Tests'}
+                </h3>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {searchLabTests(testSearch).map(test => (
+                    <button
+                      key={test.name}
+                      onClick={() => {
+                        appendTest({ id: Date.now().toString(), name: test.name })
+                        setTestSearch('')
+                      }}
+                      className="flex items-center justify-between rounded-xl border border-border bg-white p-3 text-left transition-all hover:border-primary/40 hover:bg-slate-50"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-bold text-slate-900">{test.short}</span>
+                        <span className="text-xs text-slate-500">{test.name}</span>
+                      </div>
+                      <Plus className="h-4 w-4 text-primary" />
+                    </button>
+                  ))}
+                </div>
+                {searchLabTests(testSearch).length === 0 && (
+                  <div className="py-8 text-center text-sm text-muted-foreground">
+                    No lab tests found for "{testSearch}"
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

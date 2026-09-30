@@ -33,11 +33,12 @@ export type PrescriptionData = {
   medicines: Medicine[]
   advice: string
   followUp: string
+  labTests?: string[]
   date: string
 }
 
 export function generatePrescriptionHTML(data: PrescriptionData): string {
-  const { template, doctorInfo, patientInfo, diagnosis, medicines, advice, followUp, date } = data
+  const { template, doctorInfo, patientInfo, diagnosis, medicines, advice, followUp, labTests, date } = data
   const { primaryColor, accentColor, bgColor } = template.styles
 
   const medicineRows = medicines.map((med, i) => `
@@ -104,6 +105,8 @@ export function generatePrescriptionHTML(data: PrescriptionData): string {
       <thead><tr><th>Medicine</th><th>Frequency</th><th>Duration</th><th>Instructions</th></tr></thead>
       <tbody>${medicineRows}</tbody>
     </table>` : '<p style="color:#94a3b8; font-style:italic;">No medicines prescribed</p>'}
+    
+    ${labTests && labTests.length > 0 ? `<div class="section-title">Lab Tests & Investigations</div><ul style="padding-left: 20px; line-height:1.6; color:#374151;">${labTests.map(t => `<li>${t}</li>`).join('')}</ul>` : ''}
     
     ${advice ? `<div class="section-title">Advice & Instructions</div><div class="advice-box">${advice}</div>` : ''}
     ${followUp ? `<div class="section-title">Follow-up</div><div class="advice-box">Review after: ${followUp}</div>` : ''}

@@ -38,8 +38,12 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
   const medicines = (data['medicines'] as Medicine[] | undefined) ?? []
   const diagnosis = (data['diagnosis'] as string | undefined) ?? ''
   const advice = (data['advice'] as string | undefined) ?? ''
-  const labTests = (data['labTests'] as string | undefined) ?? ''
-  const followUpDate = (data['followUpDate'] as string | undefined) ?? ''
+  
+  // Extract tests which are stored as an array of objects
+  const rawTests = data['tests'] as { name: string }[] | undefined
+  const labTests = Array.isArray(rawTests) ? rawTests.map(t => t.name).join(', ') : ''
+  
+  const followUpDate = (data['followUp'] as string | undefined) ?? ''
 
   const today = new Date().toLocaleDateString('en-IN', {
     day: '2-digit',

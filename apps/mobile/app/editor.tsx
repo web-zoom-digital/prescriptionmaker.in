@@ -139,6 +139,7 @@ export default function PrescriptionEditor() {
   ])
   const [advice, setAdvice] = useState('')
   const [followUp, setFollowUp] = useState('')
+  const [labTests, setLabTests] = useState<string[]>([])
   const [templateSearch, setTemplateSearch] = useState('')
   const [showTemplateModal, setShowTemplateModal] = useState(false)
 
@@ -163,6 +164,9 @@ export default function PrescriptionEditor() {
       if (old.diagnosis) setDiagnosis(old.diagnosis)
       if (old.medicines?.length) {
         setMedicines(old.medicines.map((m: any, i: number) => ({ ...m, id: m.id ?? String(i + 1) })))
+      }
+      if (old.lab_tests) {
+        setLabTests(old.lab_tests.split(',').map((s: string) => s.trim()).filter(Boolean))
       }
       // Skip to patient step since template/doctor are already filled
       setStep(2)
@@ -206,6 +210,9 @@ export default function PrescriptionEditor() {
     
     if (tpl.advice) setAdvice(prev => prev ? `${prev}\n${tpl.advice}` : tpl.advice)
     if (tpl.followUp) setFollowUp(tpl.followUp)
+    if (tpl.labTests && tpl.labTests.length > 0) {
+      setLabTests(prev => Array.from(new Set([...prev, ...tpl.labTests!])))
+    }
     
     setShowTemplateModal(false)
     Alert.alert('Template Applied', `${tpl.name} template has been applied to this prescription.`)
@@ -220,6 +227,7 @@ export default function PrescriptionEditor() {
     medicines: medicines.filter(m => m.name.trim()),
     advice,
     followUp,
+    labTests,
     date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
   })
 
@@ -460,6 +468,19 @@ export default function PrescriptionEditor() {
                 <Ionicons name="add-circle-outline" size={18} color={color} />
                 <Text style={[styles.addMedText, { color }]}>Add Another Medicine</Text>
               </Pressable>
+              
+              <View style={styles.field}>
+                <Text style={[styles.label, { color }]}>Lab Tests / Investigations</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea, { borderColor: `${color}40` }]}
+                  placeholder="e.g. CBC, LFT, Chest X-Ray..."
+                  placeholderTextColor="#94a3b8"
+                  value={labTests.join(', ')}
+                  onChangeText={(val) => setLabTests(val.split(',').map(s => s.trim()).filter(s => s))}
+                  multiline numberOfLines={3}
+                />
+              </View>
+
               <View style={styles.field}>
                 <Text style={[styles.label, { color }]}>Advice & Instructions</Text>
                 <TextInput
@@ -543,6 +564,8 @@ export default function PrescriptionEditor() {
                     status: 'complete' as const, mode: 'form' as const,
                     diagnosis, patient_info: patientInfo, doctor_info: doctorInfo,
                     medicines: medicines.filter(m => m.name),
+                    lab_tests: labTests.join(', '),
+                    advice, follow_up_date: followUp
                   }
                   if (id) await updatePrescription(id, payload)
                   else await createPrescription(payload)

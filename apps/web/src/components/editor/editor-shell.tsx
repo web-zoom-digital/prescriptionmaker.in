@@ -126,17 +126,18 @@ export function EditorShell() {
       patientInfo?: Record<string, string>
       diagnosis?: string
       medicines?: Record<string, string>[]
-      labTests?: string
+      tests?: { name: string }[]
       advice?: string
       followUpDate?: string
     }
+    const labTestsStr = Array.isArray(data.tests) ? data.tests.map(t => t.name).join(', ') : ''
     exportPdf({
       templateSlug: selectedTemplate.slug,
       doctor: data.doctorInfo ?? {},
       patient: data.patientInfo ?? {},
       diagnosis: data.diagnosis,
       medicines: (data.medicines ?? []) as Record<string, string>[],
-      labTests: data.labTests,
+      labTests: labTestsStr,
       advice: data.advice,
       followUpDate: data.followUpDate,
     })
@@ -148,17 +149,18 @@ export function EditorShell() {
       patientInfo?: Record<string, string>
       diagnosis?: string
       medicines?: Record<string, string>[]
-      labTests?: string
+      tests?: { name: string }[]
       advice?: string
       followUpDate?: string
     }
+    const labTestsStr = Array.isArray(data.tests) ? data.tests.map(t => t.name).join(', ') : ''
     const result = await generatePdfBlob({
       templateSlug: selectedTemplate.slug,
       doctor: data.doctorInfo ?? {},
       patient: data.patientInfo ?? {},
       diagnosis: data.diagnosis,
       medicines: (data.medicines ?? []) as Record<string, string>[],
-      labTests: data.labTests,
+      labTests: labTestsStr,
       advice: data.advice,
       followUpDate: data.followUpDate,
     })
@@ -188,7 +190,7 @@ export function EditorShell() {
           patient: data.patientInfo ?? {},
           diagnosis: data.diagnosis,
           medicines: (data.medicines ?? []) as Record<string, string>[],
-          labTests: data.labTests,
+          labTests: labTestsStr,
           advice: data.advice,
           followUpDate: data.followUpDate,
         })
