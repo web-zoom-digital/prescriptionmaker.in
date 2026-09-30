@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FileText, Pen, ArrowLeft, Download, Save, Eye, Loader2, MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -26,6 +26,31 @@ export function EditorShell() {
   const [isSaving, setIsSaving] = useState(false)
   const [prescriptionData, setPrescriptionData] = useState<Record<string, unknown>>({})
   const [isLoading, setIsLoading] = useState(true)
+
+  const previewContainerRef = useRef<HTMLDivElement>(null)
+  const [previewScale, setPreviewScale] = useState(1)
+
+  useEffect(() => {
+    if (!showPreview) return
+    const container = previewContainerRef.current
+    if (!container) return
+
+    const observer = new ResizeObserver((entries) => {
+      const { width } = entries[0].contentRect
+      const A4_WIDTH = 794 // Approximate A4 width in pixels
+      const padding = 40 // 20px padding on each side
+      const availableWidth = width - padding
+      
+      if (availableWidth < A4_WIDTH) {
+        setPreviewScale(availableWidth / A4_WIDTH)
+      } else {
+        setPreviewScale(1)
+      }
+    })
+
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [showPreview])
 
   const id = searchParams.get('id')
   const router = useRouter()
@@ -376,13 +401,27 @@ export function EditorShell() {
 
         {/* Preview panel */}
         {showPreview && (
-          <div className="hidden border-l border-border bg-white lg:flex lg:w-1/2 lg:flex-col">
-            <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
+          <div className="hidden border-l border-border bg-slate-50/80 lg:flex lg:w-1/2 lg:flex-col">
+            <div className="flex items-center justify-between border-b border-border bg-white px-4 py-2.5 z-10 shadow-sm">
               <span className="text-xs font-semibold text-slate-900">Preview</span>
               <span className="text-xs text-muted-foreground">A4 · {selectedTemplate.name}</span>
             </div>
-            <div className="flex-1 overflow-auto p-4">
-              <PrescriptionPreview template={selectedTemplate} data={prescriptionData} />
+            <div 
+              ref={previewContainerRef}
+              className="flex-1 overflow-y-auto overflow-x-hidden p-4 flex justify-center items-start"
+            >
+              <div 
+                className="origin-top shadow-xl transition-transform duration-200"
+                style={{ 
+                  transform: `scale(${previewScale})`,
+                  width: '210mm',
+                  marginBottom: `calc((1 - ${previewScale}) * -297mm)`,
+                }}
+              >
+                <div className="bg-white">
+                  <PrescriptionPreview template={selectedTemplate} data={prescriptionData} />
+                </div>
+              </div>
             </div>
           </div>
         )}
