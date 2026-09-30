@@ -7,6 +7,7 @@ import { Plus, Trash2, ChevronDown, ChevronUp, Search, X, Zap } from 'lucide-rea
 import { prescriptionFormSchema, type PrescriptionFormValues } from '@prescriptionmaker/validation'
 import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '@/lib/diagnosis-templates'
 import { COMMON_LAB_TESTS, searchLabTests, TEST_PANELS } from '@/lib/lab-tests-db'
+import { checkInteractions } from '@/lib/medicine-interactions'
 import { cn } from '@/lib/utils'
 import type { Template } from '@prescriptionmaker/types'
 
@@ -64,6 +65,8 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
   const toggleSection = (key: string) => {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }))
   }
+
+  const activeAlerts = checkInteractions(watch('medicines') || [])
 
   const applyDiagnosisTemplate = (tpl: DiagnosisTemplate) => {
     // We use setValue from useForm to update fields directly
@@ -260,6 +263,28 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
         accent
       >
         <div className="space-y-3">
+          {activeAlerts.length > 0 && (
+            <div className="rounded-lg border border-red-300 bg-red-50 p-4 shadow-soft-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-red-600">
+                  <Zap className="h-4 w-4" />
+                </span>
+                <h3 className="text-sm font-bold text-red-700">Medicine Interaction Alerts ({activeAlerts.length})</h3>
+              </div>
+              <div className="space-y-3 pl-8">
+                {activeAlerts.map((alert, i) => (
+                  <div key={i} className="text-sm">
+                    <p className="font-semibold text-red-800">
+                      {alert.foundDrugs[0]} + {alert.foundDrugs[1]}
+                    </p>
+                    <p className="mt-0.5 text-red-700">{alert.interaction.description}</p>
+                    <p className="mt-1 font-medium text-red-600">Recommended: {alert.interaction.recommendation}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {medicineFields.map((field, index) => (
             <div
               key={field.id}

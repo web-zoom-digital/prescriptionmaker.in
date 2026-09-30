@@ -9,6 +9,7 @@ import type { Medicine, PrescriptionData } from '../lib/pdf-generator'
 import { generatePrescriptionHTML } from '../lib/pdf-generator'
 import { createPrescription, updatePrescription, getPrescription } from '../lib/prescriptions'
 import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '../lib/diagnosis-templates'
+import { checkInteractions, type ActiveAlert } from '../lib/medicine-interactions'
 import { getDoctorProfile } from '../lib/local-store'
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
@@ -174,6 +175,7 @@ export default function PrescriptionEditor() {
   }, [clone_id])
 
   const color = template.styles.primaryColor
+  const activeAlerts = checkInteractions(medicines)
 
   const addMedicine = () => {
     setMedicines(prev => [...prev, { id: Date.now().toString(), name: '', strength: '', frequency: '', duration: '', instructions: '' }])
@@ -458,6 +460,29 @@ export default function PrescriptionEditor() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>℞ Medicines</Text>
               <Text style={styles.hint}>Add all medicines for this prescription</Text>
+              
+              {activeAlerts.length > 0 && (
+                <View style={{ backgroundColor: '#fee2e2', borderRadius: 8, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: '#fca5a5' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+                    <Ionicons name="warning" size={16} color="#dc2626" />
+                    <Text style={{ fontWeight: 'bold', color: '#dc2626', marginLeft: 6, fontSize: 13 }}>Interaction Alerts ({activeAlerts.length})</Text>
+                  </View>
+                  {activeAlerts.map((alert, i) => (
+                    <View key={i} style={{ marginBottom: i < activeAlerts.length - 1 ? 8 : 0 }}>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#991b1b' }}>
+                        {alert.foundDrugs[0]} + {alert.foundDrugs[1]}
+                      </Text>
+                      <Text style={{ fontSize: 12, color: '#b91c1c', marginTop: 2 }}>
+                        {alert.interaction.description}
+                      </Text>
+                      <Text style={{ fontSize: 11, color: '#dc2626', marginTop: 2, fontWeight: '500' }}>
+                        Recommended: {alert.interaction.recommendation}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
               {medicines.map((med, idx) => (
                 <MedicineRow
                   key={med.id} med={med} index={idx} color={color}
