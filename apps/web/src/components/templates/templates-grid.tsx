@@ -69,66 +69,48 @@ export function TemplatesGrid({ templates, categories }: TemplatesGridProps) {
               className="group block overflow-hidden rounded-xl border border-border bg-white shadow-soft transition-all duration-200 hover:border-primary/25 hover:shadow-teal"
               aria-label={`Use ${template.name} template`}
             >
-              {/* Preview */}
+              {/* Preview Image */}
               <div
-                className="relative h-44 overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100"
+                className="relative h-44 overflow-hidden"
                 style={{ borderBottom: `2.5px solid ${template.styles.primaryColor}` }}
                 aria-hidden="true"
               >
-                {/* Template paper mockup */}
-                <div className="absolute inset-3 rounded-sm bg-white shadow-soft-sm p-2.5 text-[7px] leading-tight">
-                  <div
-                    className="mb-1 pb-1 font-bold"
-                    style={{
-                      color: template.styles.primaryColor,
-                      borderBottom: `1px solid ${template.styles.primaryColor}`,
-                    }}
-                  >
-                    {template.layout === 'two-column' ? (
-                      <div className="flex justify-between">
-                        <span>Dr. [Name]</span>
-                        <span style={{ color: template.styles.accentColor }}>MD</span>
-                      </div>
-                    ) : (
-                      'Dr. [Doctor Name] — [Qualifications]'
-                    )}
-                  </div>
-                  <div className="text-slate-600">
-                    {template.layout === 'two-column' ? (
-                      <div className="grid grid-cols-2 gap-1">
-                        <div>Patient: _____</div>
-                        <div>Age: __</div>
-                      </div>
-                    ) : (
-                      <div>Patient: _____________ · Age: __</div>
-                    )}
-                  </div>
-                  <div
-                    className="mt-1 text-[8px] font-bold"
-                    style={{ color: template.styles.primaryColor }}
-                  >
-                    Rx
-                  </div>
-                  <div
-                    className="mt-0.5 pl-1.5 border-l-2"
-                    style={{ borderColor: template.styles.accentColor }}
-                  >
-                    <div className="font-medium text-slate-700">Medicine name</div>
-                    <div className="text-slate-500">1-0-1 · 5 days</div>
-                  </div>
+                {/* Actual template preview image */}
+                <img
+                  src={template.preview}
+                  alt={`${template.name} prescription template preview`}
+                  className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.03]"
+                  onError={(e) => {
+                    // fallback: hide broken image and show gradient
+                    const target = e.currentTarget as HTMLImageElement
+                    target.style.display = 'none'
+                    const fallback = target.nextElementSibling as HTMLElement | null
+                    if (fallback) fallback.style.display = 'flex'
+                  }}
+                />
+                {/* Fallback gradient (hidden by default) */}
+                <div
+                  className="absolute inset-0 items-center justify-center"
+                  style={{
+                    display: 'none',
+                    background: `linear-gradient(135deg, ${template.styles.primaryColor}18, ${template.styles.accentColor}30)`,
+                  }}
+                >
+                  <span style={{ fontSize: '36px', fontFamily: 'Georgia, serif', fontWeight: 900, color: template.styles.primaryColor, opacity: 0.5 }}>℞</span>
                 </div>
 
                 {template.isPremium && (
-                  <div className="absolute right-2 top-2 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                  <div className="absolute right-2 top-2 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow">
                     Pro
                   </div>
                 )}
                 {template.isFeatured && !template.isPremium && (
-                  <div className="absolute right-2 top-2 rounded-full bg-teal-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                  <div className="absolute right-2 top-2 rounded-full bg-teal-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow">
                     Popular
                   </div>
                 )}
               </div>
+
 
               {/* Card body */}
               <div className="p-4">
