@@ -42,6 +42,7 @@ export default function SignupPage() {
           name: data.name,
           email: data.email,
           password: data.password,
+          confirmPassword: data.confirmPassword,
           phone: data.phone,
         }),
       })

@@ -32,22 +32,20 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
     },
   })
 
-  useEffect(() => {
-    if (initialData) {
-      reset(initialData)
-    }
-  }, [initialData, reset])
+  // Removed useEffect calling reset(initialData) to prevent infinite loop
+  // defaultValues is sufficient since FormEditor mounts after isLoading is false.
 
   const { fields: medicineFields, append: appendMedicine, remove: removeMedicine } = useFieldArray({
     control,
     name: 'medicines',
   })
 
-  const watchedValues = watch()
-
   useEffect(() => {
-    onDataChange(watchedValues as unknown as Record<string, unknown>)
-  }, [watchedValues, onDataChange])
+    const subscription = watch((value) => {
+      onDataChange(value as unknown as Record<string, unknown>)
+    })
+    return () => subscription.unsubscribe()
+  }, [watch, onDataChange])
 
   const toggleSection = (key: string) => {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }))

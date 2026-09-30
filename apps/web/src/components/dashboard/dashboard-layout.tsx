@@ -40,11 +40,6 @@ const SIDEBAR_LINKS = [
     icon: User,
     label: 'Profile',
   },
-  {
-    href: '/dashboard/settings',
-    icon: Settings,
-    label: 'Settings',
-  },
 ]
 
 interface DashboardLayoutProps {
