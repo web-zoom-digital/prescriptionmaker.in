@@ -4,7 +4,7 @@ import {
   KeyboardAvoidingView, Platform, ActivityIndicator, Alert, ScrollView
 } from 'react-native'
 import { router } from 'expo-router'
-import { signIn, signUp } from '../../lib/auth'
+import { signIn, signUp } from '../lib/auth'
 
 export default function LoginScreen() {
   const [tab, setTab] = useState<'login' | 'signup'>('login')

@@ -52,6 +52,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="editor" options={{ title: 'New Prescription', presentation: 'modal' }} />
+          <Stack.Screen name="hand-mode" options={{ title: 'Hand Mode', presentation: 'modal', headerShown: false }} />
         </Stack>
       </AuthGuard>
     </SafeAreaProvider>
