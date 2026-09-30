@@ -6,6 +6,20 @@ import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Template } from '@prescriptionmaker/types'
+import { PrescriptionPreview } from '@/components/editor/prescription-preview'
+
+const dummyData = {
+  doctorName: 'Full Name',
+  doctorQualifications: 'MBBS, MD',
+  doctorSpecialization: 'General Medicine',
+  clinicName: 'Name of your clinic',
+  patient: { name: 'Patient full name', age: '34', gender: 'Male' },
+  diagnosis: 'Acute Pharyngitis',
+  medicines: [
+    { name: 'Medicine Name', dosage: '1-0-1', duration: '5 days' },
+    { name: 'Second Medicine', dosage: '0-0-1', duration: '3 days' }
+  ]
+}
 
 interface TemplatesGridProps {
   templates: Omit<Template, 'id' | 'usageCount' | 'createdAt' | 'updatedAt'>[]
@@ -69,34 +83,21 @@ export function TemplatesGrid({ templates, categories }: TemplatesGridProps) {
               className="group block overflow-hidden rounded-xl border border-border bg-white shadow-soft transition-all duration-200 hover:border-primary/25 hover:shadow-teal"
               aria-label={`Use ${template.name} template`}
             >
-              {/* Preview Image */}
+              {/* Preview Image using Actual Component */}
               <div
-                className="relative h-44 overflow-hidden"
-                style={{ borderBottom: `2.5px solid ${template.styles.primaryColor}` }}
+                className="relative h-56 overflow-hidden bg-slate-50 flex justify-center items-start pt-4 border-b"
+                style={{ borderBottomColor: template.styles.primaryColor, borderBottomWidth: '2.5px' }}
                 aria-hidden="true"
               >
-                {/* Actual template preview image */}
-                <img
-                  src={template.preview}
-                  alt={`${template.name} prescription template preview`}
-                  className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.03]"
-                  onError={(e) => {
-                    // fallback: hide broken image and show gradient
-                    const target = e.currentTarget as HTMLImageElement
-                    target.style.display = 'none'
-                    const fallback = target.nextElementSibling as HTMLElement | null
-                    if (fallback) fallback.style.display = 'flex'
-                  }}
-                />
-                {/* Fallback gradient (hidden by default) */}
-                <div
-                  className="absolute inset-0 items-center justify-center"
-                  style={{
-                    display: 'none',
-                    background: `linear-gradient(135deg, ${template.styles.primaryColor}18, ${template.styles.accentColor}30)`,
+                <div 
+                  className="origin-top shadow-md bg-white pointer-events-none"
+                  style={{ 
+                    transform: 'scale(0.35)', 
+                    width: '210mm',
+                    marginBottom: '-200mm' // Prevent it from pushing height
                   }}
                 >
-                  <span style={{ fontSize: '36px', fontFamily: 'Georgia, serif', fontWeight: 900, color: template.styles.primaryColor, opacity: 0.5 }}>℞</span>
+                  <PrescriptionPreview template={template} data={dummyData} />
                 </div>
 
                 {template.isPremium && (
