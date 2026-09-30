@@ -101,6 +101,7 @@ export default function SettingsScreen() {
         <SettingRow icon="person-circle-outline" label="My Doctor Profile" value={hasProfile ? '✓ Profile saved' : 'Set up profile'} onPress={() => router.push('/doctor-profile')} />
         <SettingRow icon="people-outline" label="Patient Records" value={`${patientCount} saved patients`} onPress={() => router.push('/patients')} color="#1e40af" badge={patientCount} />
         <SettingRow icon="notifications-outline" label="Follow-up Reminders" value={pendingReminders > 0 ? `${pendingReminders} pending` : 'No pending reminders'} onPress={() => router.push('/reminders')} color="#d97706" badge={pendingReminders} />
+        <SettingRow icon="flask-outline" label="⚖️ Dosage Calculator" value="Pediatric & Adult doses" onPress={() => router.push('/dosage-calculator')} color="#0f766e" />
 
         {/* Account */}
         <Text style={styles.sectionLabel}>Account</Text>

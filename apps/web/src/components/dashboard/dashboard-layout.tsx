@@ -11,6 +11,7 @@ import {
   Settings,
   User,
   Users,
+  Scale,
   Plus,
   Menu,
   X,
@@ -35,6 +36,11 @@ const SIDEBAR_LINKS = [
     href: '/dashboard/patients',
     icon: Users,
     label: 'Patients',
+  },
+  {
+    href: '/dashboard/dosage-calculator',
+    icon: Scale,
+    label: 'Dosage Calc',
   },
   {
     href: '/dashboard/templates',

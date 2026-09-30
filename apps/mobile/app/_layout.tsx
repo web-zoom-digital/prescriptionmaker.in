@@ -57,6 +57,7 @@ export default function RootLayout() {
           <Stack.Screen name="patients" options={{ headerShown: false }} />
           <Stack.Screen name="reminders" options={{ headerShown: false }} />
           <Stack.Screen name="patient-history" options={{ headerShown: false }} />
+          <Stack.Screen name="dosage-calculator" options={{ headerShown: false }} />
         </Stack>
       </AuthGuard>
     </SafeAreaProvider>
