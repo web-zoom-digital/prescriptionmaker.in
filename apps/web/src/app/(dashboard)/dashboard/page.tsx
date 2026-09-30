@@ -1,4 +1,4 @@
-import { Plus, FileText, LayoutTemplate, Activity, ArrowRight } from 'lucide-react'
+import { Plus, FileText, LayoutTemplate, Activity, ArrowRight, Users } from 'lucide-react'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
@@ -129,6 +129,21 @@ export default async function DashboardPage() {
                 New Prescription
               </div>
               <div className="text-xs text-muted-foreground">Choose template and start</div>
+            </div>
+          </Link>
+
+          <Link
+            href="/dashboard/patients"
+            className="flex items-center gap-3 rounded-lg border border-border bg-white p-4 shadow-soft transition-all duration-200 hover:border-primary/20 hover:shadow-soft-md group"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
+              <Users className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-slate-900 group-hover:text-primary transition-colors">
+                Patient Records
+              </div>
+              <div className="text-xs text-muted-foreground">History &amp; repeat prescriptions</div>
             </div>
           </Link>
 

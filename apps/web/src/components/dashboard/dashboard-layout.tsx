@@ -10,6 +10,7 @@ import {
   LayoutTemplate,
   Settings,
   User,
+  Users,
   Plus,
   Menu,
   X,
@@ -29,6 +30,11 @@ const SIDEBAR_LINKS = [
     href: '/dashboard/prescriptions',
     icon: FileText,
     label: 'Prescriptions',
+  },
+  {
+    href: '/dashboard/patients',
+    icon: Users,
+    label: 'Patients',
   },
   {
     href: '/dashboard/templates',
