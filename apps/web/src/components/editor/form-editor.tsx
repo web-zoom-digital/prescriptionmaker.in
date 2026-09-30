@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Trash2, ChevronDown, ChevronUp, Search, X, Zap } from 'lucide-react'
 import { prescriptionFormSchema, type PrescriptionFormValues } from '@prescriptionmaker/validation'
+import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '@/lib/diagnosis-templates'
 import { cn } from '@/lib/utils'
 import type { Template } from '@prescriptionmaker/types'
 
@@ -32,6 +33,9 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
     },
   })
 
+  const [templateSearch, setTemplateSearch] = useState('')
+  const [showTemplateModal, setShowTemplateModal] = useState(false)
+
   // Removed useEffect calling reset(initialData) to prevent infinite loop
   // defaultValues is sufficient since FormEditor mounts after isLoading is false.
 
@@ -49,6 +53,50 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
 
   const toggleSection = (key: string) => {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const applyDiagnosisTemplate = (tpl: DiagnosisTemplate) => {
+    // We use setValue from useForm to update fields directly
+    control._formValues.diagnosis = tpl.diagnosis
+    
+    // Add medicines from template
+    const newMeds = tpl.medicines.map((m, i) => ({
+      id: `tpl-${Date.now()}-${i}`,
+      name: m.name,
+      strength: m.strength,
+      frequency: m.frequency,
+      timing: 'after_food', // default
+      duration: m.duration,
+      instructions: m.instructions,
+      form: 'tablet', // default
+      route: 'oral'
+    }))
+    
+    // Append or replace
+    const currentMeds = control._formValues.medicines || []
+    if (currentMeds.length === 1 && !currentMeds[0].name) {
+       control._formValues.medicines = newMeds
+    } else {
+       control._formValues.medicines = [...currentMeds, ...newMeds]
+    }
+    
+    if (tpl.advice) {
+      const prevAdvice = control._formValues.advice
+      control._formValues.advice = prevAdvice ? `${prevAdvice}\n${tpl.advice}` : tpl.advice
+    }
+    
+    if (tpl.followUp) {
+      control._formValues.followUpDate = tpl.followUp
+    }
+    
+    // Trigger re-render by doing a hard reset with the updated values
+    const { reset } = require('react-hook-form')
+    // We just trigger form update
+    const formVals = { ...control._formValues }
+    onDataChange(formVals)
+    
+    setShowTemplateModal(false)
+    setTemplateSearch('')
   }
 
   return (
@@ -167,15 +215,30 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             </select>
           </FormField>
 
-          <FormField id="patient-diagnosis" label="Diagnosis / Chief Complaint" className="sm:col-span-2" error={errors.diagnosis?.message}>
+          <div className="sm:col-span-2">
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="patient-diagnosis" className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                Diagnosis / Chief Complaint
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowTemplateModal(true)}
+                className="flex items-center gap-1.5 rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-bold text-primary transition-colors hover:bg-teal-100"
+              >
+                <Zap className="h-3 w-3" /> Use Template
+              </button>
+            </div>
             <input
               id="patient-diagnosis"
               type="text"
               {...register('diagnosis')}
-              className="form-input"
+              className={cn("form-input", errors.diagnosis?.message && 'border-red-300 bg-red-50')}
               placeholder="e.g. Acute Pharyngitis"
             />
-          </FormField>
+            {errors.diagnosis?.message && (
+              <p className="mt-1 text-xs font-medium text-red-500">{errors.diagnosis.message}</p>
+            )}
+          </div>
         </div>
       </EditorSection>
 
@@ -320,6 +383,59 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
           </div>
         </div>
       </EditorSection>
+
+      {/* Diagnosis Template Modal */}
+      {showTemplateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+          <div className="flex h-[80vh] w-full max-w-2xl flex-col rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-border p-4">
+              <h2 className="text-lg font-bold text-slate-900">Diagnosis Templates</h2>
+              <button onClick={() => setShowTemplateModal(false)} className="rounded-lg p-2 hover:bg-slate-100 text-slate-500">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-4 border-b border-border bg-slate-50/50">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input 
+                  type="text" 
+                  value={templateSearch}
+                  onChange={(e) => setTemplateSearch(e.target.value)}
+                  placeholder="Search templates (e.g. Viral Fever, Migraine)"
+                  className="w-full rounded-xl border border-border bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {searchTemplates(templateSearch).map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => applyDiagnosisTemplate(item)}
+                  className="flex w-full items-center gap-4 rounded-xl border border-border bg-white p-4 text-left transition-all hover:border-primary/40 hover:bg-teal-50/30 hover:shadow-soft-sm"
+                >
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100 text-2xl">
+                    {item.emoji}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base font-bold text-slate-900">{item.name}</h3>
+                    <p className="mt-1 text-sm text-slate-500 truncate">
+                      <span className="font-medium text-slate-700">{item.medicines.length} medicines</span> • {item.category}
+                    </p>
+                  </div>
+                  <Plus className="h-5 w-5 text-muted-foreground" />
+                </button>
+              ))}
+              {searchTemplates(templateSearch).length === 0 && (
+                <div className="py-12 text-center text-sm text-muted-foreground">
+                  No templates found for "{templateSearch}"
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -11,6 +11,7 @@ interface UsePdfExportOptions {
 
 interface UsePdfExportReturn {
   exportPdf: (data: GeneratePdfRequest) => Promise<void>
+  generatePdfBlob: (data: GeneratePdfRequest) => Promise<{ blob: Blob, filename: string } | null>
   isExporting: boolean
 }
 
@@ -23,6 +24,39 @@ interface UsePdfExportReturn {
  */
 export function usePdfExport(options: UsePdfExportOptions = {}): UsePdfExportReturn {
   const [isExporting, setIsExporting] = useState(false)
+
+  const generatePdfBlob = async (data: GeneratePdfRequest) => {
+    if (isExporting) return null
+    setIsExporting(true)
+    const toastId = toast.loading('Generating PDF…')
+    try {
+      const response = await fetch('/api/prescriptions/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        const message = (errorData as { error?: string }).error ?? 'PDF generation failed'
+        toast.error(message, { id: toastId })
+        options.onError?.(message)
+        return null
+      }
+      const disposition = response.headers.get('Content-Disposition') ?? ''
+      const filenameMatch = disposition.match(/filename="([^"]+)"/)
+      const filename = filenameMatch?.[1] ?? 'prescription.pdf'
+      const blob = await response.blob()
+      toast.success(`PDF generated`, { id: toastId })
+      return { blob, filename }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Network error'
+      toast.error('Failed to generate PDF. Please try again.', { id: toastId })
+      options.onError?.(message)
+      return null
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   const exportPdf = async (data: GeneratePdfRequest) => {
     if (isExporting) return
@@ -76,5 +110,5 @@ export function usePdfExport(options: UsePdfExportOptions = {}): UsePdfExportRet
     }
   }
 
-  return { exportPdf, isExporting }
+  return { exportPdf, generatePdfBlob, isExporting }
 }

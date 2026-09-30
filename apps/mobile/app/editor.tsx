@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-  View, Text, StyleSheet, ScrollView, Pressable, TextInput,
-  KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Switch
+  KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Switch, Modal, FlatList, Linking
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
@@ -9,6 +8,7 @@ import { MOBILE_TEMPLATES, type Template } from '../lib/templates'
 import type { Medicine, PrescriptionData } from '../lib/pdf-generator'
 import { generatePrescriptionHTML } from '../lib/pdf-generator'
 import { createPrescription, updatePrescription, getPrescription } from '../lib/prescriptions'
+import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '../lib/diagnosis-templates'
 import { getDoctorProfile } from '../lib/local-store'
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
@@ -139,6 +139,8 @@ export default function PrescriptionEditor() {
   ])
   const [advice, setAdvice] = useState('')
   const [followUp, setFollowUp] = useState('')
+  const [templateSearch, setTemplateSearch] = useState('')
+  const [showTemplateModal, setShowTemplateModal] = useState(false)
 
   // Load doctor profile on mount
   useEffect(() => {
@@ -179,6 +181,34 @@ export default function PrescriptionEditor() {
 
   const deleteMedicine = (id: string) => {
     setMedicines(prev => prev.filter(m => m.id !== id))
+  }
+
+  const applyDiagnosisTemplate = (tpl: DiagnosisTemplate) => {
+    setDiagnosis(tpl.diagnosis)
+    setSymptoms(tpl.symptoms)
+    
+    // Add medicines from template
+    const newMeds = tpl.medicines.map((m, i) => ({
+      id: `tpl-${Date.now()}-${i}`,
+      name: m.name,
+      strength: m.strength,
+      frequency: m.frequency,
+      duration: m.duration,
+      instructions: m.instructions
+    }))
+    
+    // If current medicines are empty, replace them. Otherwise append.
+    if (medicines.length === 1 && !medicines[0].name) {
+      setMedicines(newMeds)
+    } else {
+      setMedicines(prev => [...prev, ...newMeds])
+    }
+    
+    if (tpl.advice) setAdvice(prev => prev ? `${prev}\n${tpl.advice}` : tpl.advice)
+    if (tpl.followUp) setFollowUp(tpl.followUp)
+    
+    setShowTemplateModal(false)
+    Alert.alert('Template Applied', `${tpl.name} template has been applied to this prescription.`)
   }
 
   const getPrescriptionData = (): PrescriptionData => ({
@@ -241,6 +271,28 @@ export default function PrescriptionEditor() {
         recipients: [],
         attachments: [uri],
       })
+    } catch (err: any) {
+      Alert.alert('Error', err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleWhatsApp = async () => {
+    setSaving(true)
+    try {
+      const uri = await generateAndGetUri()
+      
+      // Share PDF directly using Sharing (WhatsApp usually appears in the native share sheet)
+      // Or we can construct a direct text message if preferred
+      const text = `Hello ${patientInfo.name},\n\nPlease find your digital prescription attached.\n\nDr. ${doctorInfo.name}\n${doctorInfo.clinicName}`
+      
+      if (Platform.OS === 'android') {
+         // Android allows sharing directly to WhatsApp with text
+         await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Share via WhatsApp' })
+      } else {
+         await Sharing.shareAsync(uri, { UTI: 'com.adobe.pdf', mimeType: 'application/pdf' })
+      }
     } catch (err: any) {
       Alert.alert('Error', err.message)
     } finally {
@@ -358,7 +410,16 @@ export default function PrescriptionEditor() {
                 </View>
               ))}
               <View style={styles.field}>
-                <Text style={[styles.label, { color }]}>Diagnosis *</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <Text style={[styles.label, { color, marginBottom: 0 }]}>Diagnosis *</Text>
+                  <Pressable 
+                    onPress={() => setShowTemplateModal(true)}
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: `${color}15`, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 }}
+                  >
+                    <Ionicons name="flash" size={12} color={color} />
+                    <Text style={{ fontSize: 12, fontWeight: '700', color }}>Use Template</Text>
+                  </Pressable>
+                </View>
                 <TextInput
                   style={[styles.input, styles.textArea, { borderColor: `${color}40` }]}
                   placeholder="e.g. Viral fever with upper respiratory tract infection"
@@ -461,17 +522,17 @@ export default function PrescriptionEditor() {
               {/* Export Buttons */}
               <Text style={[styles.label, { color, marginTop: 20 }]}>Export Options</Text>
               <View style={styles.exportBtns}>
+                <Pressable style={[styles.exportBtn, { backgroundColor: '#25D366' }]} onPress={handleWhatsApp} disabled={saving}>
+                  <Ionicons name="logo-whatsapp" size={20} color="#fff" />
+                  <Text style={styles.exportBtnText}>WhatsApp</Text>
+                </Pressable>
                 <Pressable style={[styles.exportBtn, { backgroundColor: color }]} onPress={handleDownload} disabled={saving}>
                   <Ionicons name="download-outline" size={20} color="#fff" />
-                  <Text style={styles.exportBtnText}>Download PDF</Text>
+                  <Text style={styles.exportBtnText}>PDF</Text>
                 </Pressable>
                 <Pressable style={[styles.exportBtn, { backgroundColor: '#1e40af' }]} onPress={handleShare} disabled={saving}>
                   <Ionicons name="share-social-outline" size={20} color="#fff" />
                   <Text style={styles.exportBtnText}>Share</Text>
-                </Pressable>
-                <Pressable style={[styles.exportBtn, { backgroundColor: '#7c3aed' }]} onPress={handleEmail} disabled={saving}>
-                  <Ionicons name="mail-outline" size={20} color="#fff" />
-                  <Text style={styles.exportBtnText}>Email</Text>
                 </Pressable>
               </View>
               <Pressable style={styles.saveFinalBtn} onPress={async () => {
@@ -495,6 +556,50 @@ export default function PrescriptionEditor() {
           )}
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Diagnosis Template Modal */}
+      <Modal visible={showTemplateModal} transparent animationType="slide" onRequestClose={() => setShowTemplateModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Diagnosis Templates</Text>
+              <Pressable onPress={() => setShowTemplateModal(false)} style={styles.modalClose}>
+                <Ionicons name="close" size={24} color="#64748b" />
+              </Pressable>
+            </View>
+            <View style={styles.searchBox}>
+              <Ionicons name="search" size={18} color="#94a3b8" />
+              <TextInput 
+                style={styles.searchInput}
+                placeholder="Search templates (e.g. Viral Fever)"
+                value={templateSearch}
+                onChangeText={setTemplateSearch}
+                placeholderTextColor="#94a3b8"
+              />
+            </View>
+            <FlatList 
+              data={searchTemplates(templateSearch)}
+              keyExtractor={item => item.id}
+              contentContainerStyle={{ padding: 16 }}
+              renderItem={({ item }) => (
+                <Pressable 
+                  style={styles.templateItem}
+                  onPress={() => applyDiagnosisTemplate(item)}
+                >
+                  <View style={styles.templateIcon}>
+                    <Text style={{ fontSize: 24 }}>{item.emoji}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.templateName}>{item.name}</Text>
+                    <Text style={styles.templateCategory}>{item.category} • {item.medicines.length} medicines</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={16} color="#cbd5e1" />
+                </Pressable>
+              )}
+            />
+          </View>
+        </View>
+      </Modal>
 
       {/* Bottom Nav */}
       {step < 4 && (

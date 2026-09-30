@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FileText, Pen, ArrowLeft, Download, Save, Eye, Loader2 } from 'lucide-react'
+import { FileText, Pen, ArrowLeft, Download, Save, Eye, Loader2, MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { TEMPLATES } from '@prescriptionmaker/config/templates'
 import { FormEditor } from './form-editor'
@@ -68,7 +68,7 @@ export function EditorShell() {
     loadData()
   }, [id])
 
-  const { exportPdf, isExporting } = usePdfExport()
+  const { exportPdf, generatePdfBlob, isExporting } = usePdfExport()
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -140,6 +140,60 @@ export function EditorShell() {
       advice: data.advice,
       followUpDate: data.followUpDate,
     })
+  }
+
+  const handleShareWhatsApp = async () => {
+    const data = prescriptionData as {
+      doctorInfo?: Record<string, string>
+      patientInfo?: Record<string, string>
+      diagnosis?: string
+      medicines?: Record<string, string>[]
+      labTests?: string
+      advice?: string
+      followUpDate?: string
+    }
+    const result = await generatePdfBlob({
+      templateSlug: selectedTemplate.slug,
+      doctor: data.doctorInfo ?? {},
+      patient: data.patientInfo ?? {},
+      diagnosis: data.diagnosis,
+      medicines: (data.medicines ?? []) as Record<string, string>[],
+      labTests: data.labTests,
+      advice: data.advice,
+      followUpDate: data.followUpDate,
+    })
+    
+    if (result) {
+      const file = new File([result.blob], result.filename, { type: 'application/pdf' })
+      const text = `Hello ${(data.patientInfo as any)?.name ?? 'Patient'},\n\nPlease find your digital prescription attached.\n\nDr. ${(data.doctorInfo as any)?.name ?? ''}`
+      
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: 'Prescription',
+            text: text,
+            files: [file]
+          })
+        } catch (err) {
+          console.error('Error sharing:', err)
+        }
+      } else {
+        // Fallback for desktop: Create a generic whatsapp link
+        const url = `https://wa.me/?text=${encodeURIComponent(text)}`
+        window.open(url, '_blank')
+        // We can't attach the PDF directly to wa.me, so we also trigger download
+        exportPdf({
+          templateSlug: selectedTemplate.slug,
+          doctor: data.doctorInfo ?? {},
+          patient: data.patientInfo ?? {},
+          diagnosis: data.diagnosis,
+          medicines: (data.medicines ?? []) as Record<string, string>[],
+          labTests: data.labTests,
+          advice: data.advice,
+          followUpDate: data.followUpDate,
+        })
+      }
+    }
   }
 
   return (
@@ -227,6 +281,23 @@ export function EditorShell() {
           >
             <Save className={cn('h-3.5 w-3.5', isSaving && 'animate-pulse')} aria-hidden="true" />
             {isSaving ? 'Saving…' : 'Save'}
+          </button>
+
+          <button
+            onClick={handleShareWhatsApp}
+            disabled={isExporting}
+            className={cn(
+              'flex items-center gap-1.5 rounded-md bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white shadow-soft-sm transition-all duration-200 hover:bg-[#128C7E]',
+              isExporting && 'opacity-70 cursor-not-allowed'
+            )}
+            aria-label="Share via WhatsApp"
+          >
+            {isExporting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            ) : (
+              <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
+            )}
+            <span className="hidden sm:inline">{isExporting ? 'Preparing…' : 'WhatsApp'}</span>
           </button>
 
           <button
