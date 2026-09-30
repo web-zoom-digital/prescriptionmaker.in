@@ -80,7 +80,7 @@ export default function PatientsScreen() {
     <View style={styles.root}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/dashboard')}>
           <Ionicons name="arrow-back" size={22} color="#fff" />
         </Pressable>
         <Text style={styles.headerTitle}>Patient Records</Text>

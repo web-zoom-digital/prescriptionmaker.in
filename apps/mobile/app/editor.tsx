@@ -220,7 +220,7 @@ export default function PrescriptionEditor() {
       }
       if (id) await updatePrescription(id, payload)
       else await createPrescription(payload)
-      Alert.alert('Saved!', 'Draft saved successfully.', [{ text: 'OK', onPress: () => router.back() }])
+      Alert.alert('Saved!', 'Draft saved successfully.', [{ text: 'OK', onPress: () => router.canGoBack() ? router.back() : router.replace('/(tabs)/dashboard') }])
     } catch (err: any) {
       Alert.alert('Save Failed', err.message)
     } finally {
@@ -234,7 +234,7 @@ export default function PrescriptionEditor() {
     <View style={styles.root}>
       {/* Top Bar */}
       <View style={[styles.topBar, { backgroundColor: color }]}>
-        <Pressable onPress={() => step > 0 ? setStep(s => s - 1) : router.back()}>
+        <Pressable onPress={() => step > 0 ? setStep(s => s - 1) : router.canGoBack() ? router.back() : router.replace('/(tabs)/dashboard')}>
           <Ionicons name={step > 0 ? 'arrow-back' : 'close'} size={22} color="#fff" />
         </Pressable>
         <View style={styles.topMid}>
@@ -443,7 +443,7 @@ export default function PrescriptionEditor() {
                   }
                   if (id) await updatePrescription(id, payload)
                   else await createPrescription(payload)
-                  Alert.alert('✅ Complete!', 'Prescription saved.', [{ text: 'OK', onPress: () => router.back() }])
+                  Alert.alert('✅ Complete!', 'Prescription saved.', [{ text: 'OK', onPress: () => router.canGoBack() ? router.back() : router.replace('/(tabs)/dashboard') }])
                 } catch (err: any) { Alert.alert('Error', err.message) }
                 finally { setSaving(false) }
               }}>
