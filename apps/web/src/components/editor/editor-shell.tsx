@@ -121,53 +121,53 @@ export function EditorShell() {
   }
 
   const handleExportPdf = () => {
-    const data = prescriptionData as {
-      doctorInfo?: Record<string, string>
-      patientInfo?: Record<string, string>
-      diagnosis?: string
-      medicines?: Record<string, string>[]
-      tests?: { name: string }[]
-      advice?: string
-      followUpDate?: string
-    }
-    const labTestsStr = Array.isArray(data.tests) ? data.tests.map(t => t.name).join(', ') : ''
+    const data = prescriptionData as any
+    const labTestsStr = Array.isArray(data.tests) ? data.tests.map((t: any) => t.name).join(', ') : ''
     exportPdf({
       templateSlug: selectedTemplate.slug,
-      doctor: data.doctorInfo ?? {},
-      patient: data.patientInfo ?? {},
+      doctor: data.doctorInfo ?? {
+        name: data.doctorName,
+        qualifications: data.doctorQualifications,
+        specialization: data.doctorSpecialization,
+        registrationNumber: data.doctorRegNumber,
+        clinicName: data.clinicName,
+        phone: data.clinicPhone,
+        address: data.clinicAddress,
+      },
+      patient: data.patientInfo ?? data.patient ?? {},
       diagnosis: data.diagnosis,
       medicines: (data.medicines ?? []) as Record<string, string>[],
       labTests: labTestsStr,
       advice: data.advice,
-      followUpDate: data.followUpDate,
+      followUpDate: data.followUp ?? data.followUpDate,
     })
   }
 
   const handleShareWhatsApp = async () => {
-    const data = prescriptionData as {
-      doctorInfo?: Record<string, string>
-      patientInfo?: Record<string, string>
-      diagnosis?: string
-      medicines?: Record<string, string>[]
-      tests?: { name: string }[]
-      advice?: string
-      followUpDate?: string
-    }
-    const labTestsStr = Array.isArray(data.tests) ? data.tests.map(t => t.name).join(', ') : ''
+    const data = prescriptionData as any
+    const labTestsStr = Array.isArray(data.tests) ? data.tests.map((t: any) => t.name).join(', ') : ''
     const result = await generatePdfBlob({
       templateSlug: selectedTemplate.slug,
-      doctor: data.doctorInfo ?? {},
-      patient: data.patientInfo ?? {},
+      doctor: data.doctorInfo ?? {
+        name: data.doctorName,
+        qualifications: data.doctorQualifications,
+        specialization: data.doctorSpecialization,
+        registrationNumber: data.doctorRegNumber,
+        clinicName: data.clinicName,
+        phone: data.clinicPhone,
+        address: data.clinicAddress,
+      },
+      patient: data.patientInfo ?? data.patient ?? {},
       diagnosis: data.diagnosis,
       medicines: (data.medicines ?? []) as Record<string, string>[],
       labTests: labTestsStr,
       advice: data.advice,
-      followUpDate: data.followUpDate,
+      followUpDate: data.followUp ?? data.followUpDate,
     })
     
     if (result) {
       const file = new File([result.blob], result.filename, { type: 'application/pdf' })
-      const text = `Hello ${(data.patientInfo as any)?.name ?? 'Patient'},\n\nPlease find your digital prescription attached.\n\nDr. ${(data.doctorInfo as any)?.name ?? ''}`
+      const text = `Hello ${(data.patientInfo ?? data.patient)?.name ?? 'Patient'},\n\nPlease find your digital prescription attached.\n\nDr. ${data.doctorName ?? ''}`
       
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         try {

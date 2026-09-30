@@ -32,8 +32,16 @@ type Medicine = {
 }
 
 export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps) {
-  const doctor = (data['doctorInfo'] as DoctorInfo | undefined) ?? {}
-  const patient = (data['patientInfo'] as PatientInfo | undefined) ?? {}
+  const doctor = (data['doctorInfo'] as DoctorInfo | undefined) ?? {
+    name: data.doctorName as string | undefined,
+    qualifications: data.doctorQualifications as string | undefined,
+    specialization: data.doctorSpecialization as string | undefined,
+    registrationNumber: data.doctorRegNumber as string | undefined,
+    clinicName: data.clinicName as string | undefined,
+    phone: data.clinicPhone as string | undefined,
+    address: data.clinicAddress as string | undefined,
+  }
+  const patient = (data['patientInfo'] as PatientInfo | undefined) ?? (data['patient'] as PatientInfo | undefined) ?? {}
   const medicines = (data['medicines'] as Medicine[] | undefined) ?? []
   const diagnosis = (data['diagnosis'] as string | undefined) ?? ''
   const advice = (data['advice'] as string | undefined) ?? ''
