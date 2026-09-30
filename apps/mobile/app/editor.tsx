@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
+  View, Text, TextInput, Pressable, StyleSheet, ScrollView,
   KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Switch, Modal, FlatList, Linking
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
@@ -207,8 +208,8 @@ export default function PrescriptionEditor() {
       if (old.medicines?.length) {
         setMedicines(old.medicines.map((m: any, i: number) => ({ ...m, id: m.id ?? String(i + 1) })))
       }
-      if (old.lab_tests) {
-        setLabTests(old.lab_tests.split(',').map((s: string) => s.trim()).filter(Boolean))
+      if ((old as any).lab_tests) {
+        setLabTests((old as any).lab_tests.split(',').map((s: string) => s.trim()).filter(Boolean))
       }
       // Skip to patient step since template/doctor are already filled
       setStep(2)
@@ -279,6 +280,7 @@ export default function PrescriptionEditor() {
     const html = generatePrescriptionHTML(getPrescriptionData())
     const { uri } = await Print.printToFileAsync({ html, base64: false })
     // Move to a named file
+    // @ts-ignore
     const dest = `${FileSystem.documentDirectory}prescription_${patientInfo.name.replace(/\s/g, '_') || 'rx'}_${Date.now()}.pdf`
     await FileSystem.moveAsync({ from: uri, to: dest })
     return dest
@@ -766,4 +768,15 @@ const styles = StyleSheet.create({
   bottomBar: { backgroundColor: '#fff', padding: 16, borderTopWidth: 1 },
   nextBtn: { paddingVertical: 15, borderRadius: 12, alignItems: 'center' },
   nextBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, height: '80%', padding: 20 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  modalTitle: { fontSize: 18, fontWeight: 'bold' },
+  modalClose: { padding: 4 },
+  searchBox: { marginBottom: 16 },
+  searchInput: { borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 12, fontSize: 16 },
+  templateItem: { flexDirection: 'row', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  templateIcon: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc', borderRadius: 8, marginRight: 12 },
+  templateName: { fontSize: 16, fontWeight: 'bold' },
+  templateCategory: { fontSize: 12, color: '#64748b' }
 })

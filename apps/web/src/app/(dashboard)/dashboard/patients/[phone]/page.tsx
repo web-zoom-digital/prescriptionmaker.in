@@ -1,4 +1,4 @@
-import { ArrowLeft, Plus, FileText, Copy, Trash2, Stethoscope, Pill, Calendar } from 'lucide-react'
+import { ArrowLeft, Plus, FileText, Copy, Trash2, Stethoscope, Pill, Calendar, Activity, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
@@ -60,6 +60,16 @@ export default async function PatientHistoryPage({
 
   const newRxHref = `/editor?prefill_name=${encodeURIComponent(patientName)}&prefill_phone=${encodeURIComponent(patientPhone)}`
 
+  // Extract vitals data (latest age, gender, and weight history)
+  const latestInfo = prescriptions[0]?.patient_info || {}
+  const weightHistory = prescriptions
+    .map(rx => ({
+      weight: parseFloat(rx.patient_info?.weight),
+      date: new Date(rx.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+    }))
+    .filter(x => !isNaN(x.weight))
+    .reverse()
+
   return (
     <div className="p-6 lg:p-8">
       {/* Header */}
@@ -90,6 +100,36 @@ export default async function PatientHistoryPage({
           New Prescription
         </Link>
       </div>
+
+      {/* Vitals Overview */}
+      {prescriptions.length > 0 && (
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-border bg-white p-4 shadow-soft-sm">
+            <div className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-1">
+              <Calendar className="h-4 w-4" /> Patient Age / Gender
+            </div>
+            <div className="text-lg font-bold text-slate-900">
+              {latestInfo.age ? `${latestInfo.age} Y` : 'N/A'} {latestInfo.gender ? `/ ${latestInfo.gender}` : ''}
+            </div>
+          </div>
+          <div className="rounded-xl border border-border bg-white p-4 shadow-soft-sm">
+            <div className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-1">
+              <Activity className="h-4 w-4" /> Latest Weight
+            </div>
+            <div className="text-lg font-bold text-slate-900">
+              {latestInfo.weight ? `${latestInfo.weight} kg` : 'N/A'}
+            </div>
+          </div>
+          <div className="rounded-xl border border-border bg-white p-4 shadow-soft-sm">
+            <div className="text-sm font-semibold text-muted-foreground flex items-center gap-2 mb-1">
+              <TrendingUp className="h-4 w-4" /> Total Visits
+            </div>
+            <div className="text-lg font-bold text-slate-900">
+              {prescriptions.length}
+            </div>
+          </div>
+        </div>
+      )}
 
       {prescriptions.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-white py-20 text-center">

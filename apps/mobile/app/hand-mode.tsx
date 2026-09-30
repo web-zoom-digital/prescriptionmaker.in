@@ -6,6 +6,9 @@ import {
 import { router } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import Svg, { Path } from 'react-native-svg'
+import * as Print from 'expo-print'
+import * as FileSystem from 'expo-file-system'
+import * as Sharing from 'expo-sharing'
 
 const { width: SW, height: SH } = Dimensions.get('window')
 const CANVAS_W = SW - 32
@@ -133,6 +136,7 @@ export default function HandMode() {
       const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:20px;background:#fff;font-family:Arial,sans-serif;}h3{color:#0f766e;margin-bottom:10px;}.footer{color:#94a3b8;font-size:11px;margin-top:12px;}</style></head><body><h3>✍️ Hand-written Prescription</h3>${svg}<p class="footer">PrescriptionMaker.in · ${new Date().toLocaleDateString('en-IN')}</p></body></html>`
 
       const { uri } = await Print.printToFileAsync({ html, base64: false })
+      // @ts-ignore
       const dest = `${FileSystem.documentDirectory}hand_rx_${Date.now()}.pdf`
       await FileSystem.moveAsync({ from: uri, to: dest })
       await Sharing.shareAsync(dest, { mimeType: 'application/pdf', dialogTitle: 'Share Prescription PDF' })
