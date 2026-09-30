@@ -85,3 +85,33 @@ export async function deletePrescription(id: string) {
 
   if (error) throw new Error(error.message)
 }
+
+// Get all prescriptions for a specific patient (by phone number)
+export async function getPatientPrescriptions(phone: string): Promise<Prescription[]> {
+  if (!phone) return []
+  const { data, error } = await supabase
+    .from('prescriptions')
+    .select('id, title, status, mode, diagnosis, patient_info, doctor_info, medicines, created_at, updated_at')
+    .order('created_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  // Filter client-side by patient phone (stored inside patient_info JSON)
+  return (data ?? []).filter(
+    (p) => p.patient_info?.phone && p.patient_info.phone === phone
+  )
+}
+
+// Search prescriptions by patient name (partial match)
+export async function searchPrescriptionsByPatient(query: string): Promise<Prescription[]> {
+  if (!query || query.length < 2) return []
+  const { data, error } = await supabase
+    .from('prescriptions')
+    .select('id, title, status, mode, diagnosis, patient_info, doctor_info, medicines, created_at, updated_at')
+    .order('created_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  const q = query.toLowerCase()
+  return (data ?? []).filter(
+    (p) => p.patient_info?.name?.toLowerCase().includes(q)
+  )
+}

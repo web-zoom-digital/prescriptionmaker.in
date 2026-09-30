@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, Pressable, TextInput,
   KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Switch
@@ -8,7 +8,8 @@ import { Ionicons } from '@expo/vector-icons'
 import { MOBILE_TEMPLATES, type Template } from '../lib/templates'
 import type { Medicine, PrescriptionData } from '../lib/pdf-generator'
 import { generatePrescriptionHTML } from '../lib/pdf-generator'
-import { createPrescription, updatePrescription } from '../lib/prescriptions'
+import { createPrescription, updatePrescription, getPrescription } from '../lib/prescriptions'
+import { getDoctorProfile } from '../lib/local-store'
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
 import * as FileSystem from 'expo-file-system'
@@ -107,8 +108,16 @@ const medStyles = StyleSheet.create({
 
 // ─── Main Editor Screen ───────────────────────────────────────────
 export default function PrescriptionEditor() {
-  const { id } = useLocalSearchParams<{ id?: string }>()
-  const [step, setStep] = useState(0) // 0=template, 1=doctor, 2=patient, 3=rx, 4=review
+  const { id, clone_id, prefill_name, prefill_phone, prefill_age, prefill_gender, prefill_weight } = useLocalSearchParams<{
+    id?: string
+    clone_id?: string
+    prefill_name?: string
+    prefill_phone?: string
+    prefill_age?: string
+    prefill_gender?: string
+    prefill_weight?: string
+  }>()
+  const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const [template, setTemplate] = useState<Template>(MOBILE_TEMPLATES[0])
 
@@ -116,7 +125,13 @@ export default function PrescriptionEditor() {
     name: '', qualification: '', specialization: '', regNo: '',
     clinicName: '', address: '', phone: '', email: '',
   })
-  const [patientInfo, setPatientInfo] = useState({ name: '', age: '', gender: '', weight: '', phone: '' })
+  const [patientInfo, setPatientInfo] = useState({
+    name: prefill_name ?? '',
+    age: prefill_age ?? '',
+    gender: prefill_gender ?? '',
+    weight: prefill_weight ?? '',
+    phone: prefill_phone ?? '',
+  })
   const [diagnosis, setDiagnosis] = useState('')
   const [symptoms, setSymptoms] = useState('')
   const [medicines, setMedicines] = useState<Medicine[]>([
@@ -124,6 +139,33 @@ export default function PrescriptionEditor() {
   ])
   const [advice, setAdvice] = useState('')
   const [followUp, setFollowUp] = useState('')
+
+  // Load doctor profile on mount
+  useEffect(() => {
+    getDoctorProfile().then(p => {
+      if (p?.name) setDoctorInfo({
+        name: p.name, qualification: p.qualification, specialization: p.specialization,
+        regNo: p.regNo, clinicName: p.clinicName, address: p.address,
+        phone: p.phone, email: p.email,
+      })
+    })
+  }, [])
+
+  // If clone_id passed → load old prescription and pre-fill EVERYTHING
+  useEffect(() => {
+    if (!clone_id) return
+    getPrescription(clone_id).then(old => {
+      if (!old) return
+      if (old.patient_info) setPatientInfo(old.patient_info)
+      if (old.doctor_info) setDoctorInfo(old.doctor_info)
+      if (old.diagnosis) setDiagnosis(old.diagnosis)
+      if (old.medicines?.length) {
+        setMedicines(old.medicines.map((m: any, i: number) => ({ ...m, id: m.id ?? String(i + 1) })))
+      }
+      // Skip to patient step since template/doctor are already filled
+      setStep(2)
+    })
+  }, [clone_id])
 
   const color = template.styles.primaryColor
 

@@ -43,19 +43,30 @@ export default function PatientsScreen() {
     ])
   }
 
+  const handleViewHistory = (patient: SavedPatient) => {
+    setSelectedPatient(null)
+    router.push({
+      pathname: '/patient-history',
+      params: { phone: patient.phone, name: patient.name }
+    })
+  }
+
   const handleNewPrescription = (patient: SavedPatient) => {
     setSelectedPatient(null)
-    router.push({ pathname: '/editor', params: {
-      prefill_name: patient.name,
-      prefill_age: patient.age,
-      prefill_gender: patient.gender,
-      prefill_phone: patient.phone,
-      prefill_weight: patient.weight,
-    }})
+    router.push({
+      pathname: '/editor',
+      params: {
+        prefill_name: patient.name,
+        prefill_age: patient.age,
+        prefill_gender: patient.gender,
+        prefill_phone: patient.phone,
+        prefill_weight: patient.weight,
+      }
+    })
   }
 
   const renderItem = ({ item }: { item: SavedPatient }) => (
-    <Pressable style={styles.card} onPress={() => setSelectedPatient(item)}>
+    <Pressable style={styles.card} onPress={() => handleViewHistory(item)}>
       <View style={styles.cardAvatar}>
         <Text style={styles.cardAvatarText}>{item.name.charAt(0)}</Text>
       </View>
@@ -70,9 +81,10 @@ export default function PatientsScreen() {
           {item.visitCount} visit{item.visitCount !== 1 ? 's' : ''} · Last: {new Date(item.lastVisit).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
         </Text>
       </View>
-      <Pressable style={styles.rxBtn} onPress={() => handleNewPrescription(item)}>
-        <Ionicons name="add-circle" size={28} color="#0f766e" />
-      </Pressable>
+      <View style={styles.cardRight}>
+        <Ionicons name="time-outline" size={14} color="#94a3b8" />
+        <Text style={styles.historyHint}>History</Text>
+      </View>
     </Pressable>
   )
 
@@ -149,9 +161,13 @@ export default function PatientsScreen() {
                   <DetailRow icon="calendar-outline" label="Visits" value={`${selectedPatient.visitCount} visit${selectedPatient.visitCount !== 1 ? 's' : ''}`} />
                 </View>
                 <View style={styles.modalActions}>
+                  <Pressable style={styles.modalHistoryBtn} onPress={() => handleViewHistory(selectedPatient)}>
+                    <Ionicons name="time-outline" size={18} color="#0f766e" />
+                    <Text style={styles.modalHistoryText}>View History</Text>
+                  </Pressable>
                   <Pressable style={styles.modalRxBtn} onPress={() => handleNewPrescription(selectedPatient)}>
-                    <Ionicons name="document-text" size={18} color="#fff" />
-                    <Text style={styles.modalRxText}>New Prescription</Text>
+                    <Ionicons name="add" size={18} color="#fff" />
+                    <Text style={styles.modalRxText}>New Rx</Text>
                   </Pressable>
                   <Pressable style={styles.modalDeleteBtn} onPress={() => { setSelectedPatient(null); handleDelete(selectedPatient.id, selectedPatient.name) }}>
                     <Ionicons name="trash-outline" size={18} color="#ef4444" />
@@ -205,6 +221,8 @@ const styles = StyleSheet.create({
   cardMeta: { flexDirection: 'row', gap: 6, marginTop: 4 },
   metaTag: { fontSize: 11, backgroundColor: '#f1f5f9', color: '#475569', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 99, fontWeight: '600' },
   cardVisit: { fontSize: 11, color: '#94a3b8', marginTop: 4 },
+  cardRight: { alignItems: 'center', gap: 2 },
+  historyHint: { fontSize: 10, color: '#94a3b8', fontWeight: '600' },
   rxBtn: { padding: 4 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalSheet: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 36 },
@@ -215,8 +233,10 @@ const styles = StyleSheet.create({
   modalSub: { fontSize: 13, color: '#64748b', marginTop: 2 },
   modalClose: { marginLeft: 'auto', padding: 4 },
   modalBody: { backgroundColor: '#f8fafc', borderRadius: 12, padding: 12, marginBottom: 16 },
-  modalActions: { flexDirection: 'row', gap: 10 },
-  modalRxBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#0f766e', paddingVertical: 14, borderRadius: 12 },
-  modalRxText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  modalDeleteBtn: { backgroundColor: '#fff1f2', borderWidth: 1, borderColor: '#fecdd3', paddingHorizontal: 16, paddingVertical: 14, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  modalActions: { flexDirection: 'row', gap: 8 },
+  modalHistoryBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#f0fdf4', paddingVertical: 13, borderRadius: 12, borderWidth: 1.5, borderColor: '#bbf7d0' },
+  modalHistoryText: { color: '#0f766e', fontSize: 13, fontWeight: '700' },
+  modalRxBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#0f766e', paddingVertical: 13, borderRadius: 12 },
+  modalRxText: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  modalDeleteBtn: { backgroundColor: '#fff1f2', borderWidth: 1, borderColor: '#fecdd3', paddingHorizontal: 16, paddingVertical: 13, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 })
