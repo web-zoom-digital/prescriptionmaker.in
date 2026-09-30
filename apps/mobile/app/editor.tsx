@@ -11,6 +11,7 @@ import { createPrescription, updatePrescription, getPrescription } from '../lib/
 import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '../lib/diagnosis-templates'
 import { checkInteractions, type ActiveAlert } from '../lib/medicine-interactions'
 import { searchMedicines, type MedicineEntry } from '../lib/medicine-db'
+import { type LanguageCode, LANGUAGES } from '../lib/translations'
 import { getDoctorProfile } from '../lib/local-store'
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
@@ -160,6 +161,7 @@ export default function PrescriptionEditor() {
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const [template, setTemplate] = useState<Template>(MOBILE_TEMPLATES[0])
+  const [language, setLanguage] = useState<LanguageCode>('en')
 
   const [doctorInfo, setDoctorInfo] = useState({
     name: '', qualification: '', specialization: '', regNo: '',
@@ -270,6 +272,7 @@ export default function PrescriptionEditor() {
     followUp,
     labTests,
     date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
+    language,
   })
 
   const generateAndGetUri = async (): Promise<string> => {
@@ -403,6 +406,27 @@ export default function PrescriptionEditor() {
                 <Text style={styles.previewDesc}>{template.description}</Text>
                 <View style={[styles.previewBar, { backgroundColor: color }]} />
                 <Text style={styles.previewLayout}>Layout: {template.layout}</Text>
+              </View>
+
+              <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Prescription Language 🇮🇳</Text>
+              <Text style={styles.hint}>Medical instructions will be translated</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+                {LANGUAGES.map(lang => (
+                  <Pressable
+                    key={lang.code}
+                    onPress={() => setLanguage(lang.code as LanguageCode)}
+                    style={{
+                      paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20,
+                      borderWidth: 1, borderColor: language === lang.code ? color : '#e2e8f0',
+                      backgroundColor: language === lang.code ? `${color}15` : '#fff'
+                    }}
+                  >
+                    <Text style={{
+                      fontSize: 14, fontWeight: language === lang.code ? '600' : '500',
+                      color: language === lang.code ? color : '#475569'
+                    }}>{lang.label}</Text>
+                  </Pressable>
+                ))}
               </View>
             </View>
           )}

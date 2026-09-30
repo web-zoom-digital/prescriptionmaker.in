@@ -1,6 +1,5 @@
-'use client'
-
 import type { Template } from '@prescriptionmaker/types'
+import { t, type LanguageCode } from '@/lib/translations'
 
 interface PrescriptionPreviewProps {
   template: Template
@@ -54,6 +53,8 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
   const primaryColor = template.styles.primaryColor
   const accentColor = template.styles.accentColor
   const fontFamily = template.styles.fontFamily
+  
+  const lang = (data['language'] as LanguageCode) || 'en'
 
   return (
     <div
@@ -130,19 +131,19 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
         }}
       >
         <div>
-          <span style={{ color: '#64748b' }}>Patient: </span>
+          <span style={{ color: '#64748b' }}>{t('patient_name', lang)}: </span>
           <strong>{patient.name || '_____________________'}</strong>
           {(patient.age || patient.gender) && (
             <span style={{ marginLeft: '8px', color: '#64748b' }}>
-              Age: <strong>
-                {patient.age ? `${patient.age}Y` : '___'}
+              {t('age', lang)}: <strong>
+                {patient.age ? `${patient.age}` : '___'}
                 {patient.gender ? ` / ${patient.gender.charAt(0).toUpperCase()}` : ''}
               </strong>
             </span>
           )}
         </div>
         <div style={{ color: '#64748b' }}>
-          Date: <strong>{today}</strong>
+          {t('date', lang)}: <strong>{today}</strong>
         </div>
       </div>
 
@@ -157,7 +158,7 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
       {/* Rx */}
       <div style={{ marginBottom: '4px' }}>
         <div style={{ fontSize: '16px', fontWeight: 700, color: primaryColor, marginBottom: '6px' }}>
-          Rx
+          {t('rx', lang)}
         </div>
 
         {medicines.length === 0 || !medicines.some((m) => m.name) ? (
@@ -176,7 +177,11 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
                     {med.form ? ` (${med.form})` : ''}
                   </div>
                   <div style={{ color: '#475569', paddingLeft: '12px' }}>
-                    {[med.frequency, med.timing, med.duration].filter(Boolean).join(' · ')}
+                    {[
+                      med.frequency ? t(med.frequency, lang) : '', 
+                      med.timing ? t(med.timing, lang) : '', 
+                      med.duration
+                    ].filter(Boolean).join(' · ')}
                   </div>
                 </div>
               ))}
@@ -188,7 +193,7 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
       {labTests && (
         <div style={{ marginTop: '10px' }}>
           <div style={{ fontWeight: 600, color: primaryColor, marginBottom: '3px' }}>
-            Investigations:
+            {t('investigations', lang)}:
           </div>
           <div style={{ color: '#475569' }}>{labTests}</div>
         </div>
@@ -197,15 +202,15 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
       {/* Advice */}
       {advice && (
         <div style={{ marginTop: '10px' }}>
-          <div style={{ fontWeight: 600, color: primaryColor, marginBottom: '3px' }}>Advice:</div>
-          <div style={{ color: '#475569' }}>{advice}</div>
+          <div style={{ fontWeight: 600, color: primaryColor, marginBottom: '3px' }}>{t('advice', lang)}:</div>
+          <div style={{ color: '#475569', whiteSpace: 'pre-wrap' }}>{t(advice, lang)}</div>
         </div>
       )}
 
       {/* Follow-up */}
       {followUpDate && (
         <div style={{ marginTop: '8px', color: '#475569' }}>
-          <strong>Follow-up: </strong>
+          <strong>{t('follow_up', lang)}: </strong>
           {followUpDate}
         </div>
       )}

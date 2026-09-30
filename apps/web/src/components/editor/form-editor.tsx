@@ -9,6 +9,7 @@ import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '@/
 import { COMMON_LAB_TESTS, searchLabTests, TEST_PANELS } from '@/lib/lab-tests-db'
 import { searchMedicines, type MedicineEntry } from '@/lib/medicine-db'
 import { checkInteractions } from '@/lib/medicine-interactions'
+import { LANGUAGES } from '@/lib/translations'
 import { cn } from '@/lib/utils'
 import type { Template } from '@prescriptionmaker/types'
 
@@ -55,8 +56,16 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
 
   const [testSearch, setTestSearch] = useState('')
   const [showTestModal, setShowTestModal] = useState(false)
-
   const [activeMedIndex, setActiveMedIndex] = useState<number | null>(null)
+  
+  // Hardcode language options since we have translations
+  const LANGUAGES = [
+    { code: 'en', label: 'English' },
+    { code: 'hi', label: 'हिंदी (Hindi)' },
+    { code: 'mr', label: 'मराठी (Marathi)' },
+    { code: 'bn', label: 'বাংলা (Bengali)' },
+    { code: 'te', label: 'తెలుగు (Telugu)' }
+  ]
   const currentMedicines = watch('medicines') || []
 
   useEffect(() => {
@@ -494,6 +503,24 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
                 className="form-input"
                 placeholder="After 5 days / 01-10-2026"
               />
+            </FormField>
+          </div>
+
+          <div className="mt-6 border-t border-border pt-6">
+            <h3 className="mb-4 text-base font-semibold text-slate-900 flex items-center gap-2">
+              <span>Prescription Language 🇮🇳</span>
+            </h3>
+            <p className="text-sm text-slate-500 mb-4">Select language for printed instructions</p>
+            <FormField id="language" label="Language">
+              <select
+                id="language"
+                {...register('language' as any)}
+                className="form-input"
+              >
+                {LANGUAGES.map(lang => (
+                  <option key={lang.code} value={lang.code}>{lang.label}</option>
+                ))}
+              </select>
             </FormField>
           </div>
         </div>

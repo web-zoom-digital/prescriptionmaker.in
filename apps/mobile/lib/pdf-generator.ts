@@ -1,4 +1,5 @@
 import type { Template } from './templates'
+import { t, type LanguageCode } from './translations'
 
 export type Medicine = {
   id: string
@@ -35,6 +36,7 @@ export type PrescriptionData = {
   followUp: string
   labTests?: string[]
   date: string
+  language?: LanguageCode
 }
 
 export function generatePrescriptionHTML(data: PrescriptionData): string {
@@ -44,9 +46,9 @@ export function generatePrescriptionHTML(data: PrescriptionData): string {
   const medicineRows = medicines.map((med, i) => `
     <tr style="background: ${i % 2 === 0 ? '#f9fafb' : '#fff'};">
       <td style="padding:8px 12px; font-weight:600; color:#1e293b;">${i + 1}. ${med.name}${med.strength ? ` <span style="font-weight:400; color:#64748b;">${med.strength}</span>` : ''}</td>
-      <td style="padding:8px 12px; color:#475569;">${med.frequency || '-'}</td>
+      <td style="padding:8px 12px; color:#475569;">${med.frequency ? t(med.frequency, data.language) : '-'}</td>
       <td style="padding:8px 12px; color:#475569;">${med.duration || '-'}</td>
-      <td style="padding:8px 12px; color:#64748b; font-style:italic;">${med.instructions || '-'}</td>
+      <td style="padding:8px 12px; color:#64748b; font-style:italic;">${med.instructions ? t(med.instructions, data.language) : '-'}</td>
     </tr>
   `).join('')
 
@@ -88,17 +90,17 @@ export function generatePrescriptionHTML(data: PrescriptionData): string {
     <div class="clinic-info">${doctorInfo.clinicName} ${doctorInfo.address ? '| ' + doctorInfo.address : ''} ${doctorInfo.phone ? '| 📞 ' + doctorInfo.phone : ''}</div>
   </div>
   <div class="body">
-    <div class="date-label">Date: ${date}</div>
+    <div class="date-label">${t('date', data.language)} ${date}</div>
     <div class="patient-row">
-      <div class="patient-field"><div class="field-label">Patient Name</div><div class="field-value">${patientInfo.name}</div></div>
-      <div class="patient-field"><div class="field-label">Age</div><div class="field-value">${patientInfo.age}${patientInfo.gender ? ' / ' + patientInfo.gender : ''}</div></div>
-      ${patientInfo.weight ? `<div class="patient-field"><div class="field-label">Weight</div><div class="field-value">${patientInfo.weight}</div></div>` : ''}
+      <div class="patient-field"><div class="field-label">${t('patient_name', data.language)}</div><div class="field-value">${patientInfo.name}</div></div>
+      <div class="patient-field"><div class="field-label">${t('age', data.language)}</div><div class="field-value">${patientInfo.age}${patientInfo.gender ? ' / ' + patientInfo.gender : ''}</div></div>
+      ${patientInfo.weight ? `<div class="patient-field"><div class="field-label">${t('weight', data.language)}</div><div class="field-value">${patientInfo.weight}</div></div>` : ''}
       ${patientInfo.phone ? `<div class="patient-field"><div class="field-label">Phone</div><div class="field-value">${patientInfo.phone}</div></div>` : ''}
     </div>
     
     ${diagnosis ? `<div class="section-title">Diagnosis</div><div class="diagnosis-box">${diagnosis}</div>` : ''}
     
-    <div class="section-title">Rx — Prescription</div>
+    <div class="section-title">${t('rx', data.language)}</div>
     <div class="rx-symbol">℞</div>
     ${medicines.length > 0 ? `
     <table>
@@ -106,10 +108,10 @@ export function generatePrescriptionHTML(data: PrescriptionData): string {
       <tbody>${medicineRows}</tbody>
     </table>` : '<p style="color:#94a3b8; font-style:italic;">No medicines prescribed</p>'}
     
-    ${labTests && labTests.length > 0 ? `<div class="section-title">Lab Tests & Investigations</div><ul style="padding-left: 20px; line-height:1.6; color:#374151;">${labTests.map(t => `<li>${t}</li>`).join('')}</ul>` : ''}
+    ${labTests && labTests.length > 0 ? `<div class="section-title">${t('investigations', data.language)}</div><ul style="padding-left: 20px; line-height:1.6; color:#374151;">${labTests.map(t => `<li>${t}</li>`).join('')}</ul>` : ''}
     
-    ${advice ? `<div class="section-title">Advice & Instructions</div><div class="advice-box">${advice}</div>` : ''}
-    ${followUp ? `<div class="section-title">Follow-up</div><div class="advice-box">Review after: ${followUp}</div>` : ''}
+    ${advice ? `<div class="section-title">${t('advice', data.language)}</div><div class="advice-box">${t(advice, data.language)}</div>` : ''}
+    ${followUp ? `<div class="section-title">${t('follow_up', data.language)}</div><div class="advice-box">${followUp}</div>` : ''}
   </div>
   <div class="footer">
     <div class="stamp">PrescriptionMaker.in — ${template.name} Template</div>
