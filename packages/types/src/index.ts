@@ -90,6 +90,19 @@ export type TemplateLayout =
   | 'compact'
   | 'traditional'
   | 'specialty'
+  // Premium template layouts
+  | 'royal-indigo'
+  | 'executive-gold'
+  | 'emerald-specialist'
+  | 'sapphire-hospital'
+  | 'platinum-minimal'
+  | 'crimson-cardiology'
+  | 'teal-modern'
+  | 'ocean-pediatric'
+  | 'obsidian-surgeon'
+  | 'violet-dermatology'
+  | 'slate-corporate'
+  | 'rose-gynecology'
 
 export type TemplateCategory =
   | 'general'
@@ -122,13 +135,57 @@ export interface TemplatePrintSettings {
 
 export interface TemplateStyles {
   primaryColor: string
-  secondaryColor: string
+  secondaryColor?: string
   accentColor: string
+  bgColor?: string
   fontFamily: string
-  headerStyle: 'full' | 'minimal' | 'logo-left' | 'centered' | 'bordered'
-  medicineTableStyle: 'bordered' | 'striped' | 'minimal' | 'card'
-  signatureStyle: 'bottom-right' | 'bottom-left' | 'inline' | 'seal'
-  footerStyle: 'bordered' | 'minimal' | 'none'
+  headerStyle:
+    | 'full'
+    | 'minimal'
+    | 'logo-left'
+    | 'centered'
+    | 'bordered'
+    | 'two-col-divided'
+    | 'hospital-banner'
+    | 'elegant-centered'
+    | 'banner-left'
+    | 'sidebar-left'
+    | 'pediatric-banner'
+    | 'dark-banner'
+    | 'corporate-split'
+  medicineTableStyle:
+    | 'bordered'
+    | 'striped'
+    | 'minimal'
+    | 'card'
+    | 'grid'
+    | 'hairline'
+    | 'numbered-rows'
+    | 'hospital-grid'
+    | 'category-rows'
+    | 'weight-dosed'
+    | 'structured-rows'
+    | 'split-topical-systemic'
+    | 'clean-rows'
+    | 'detailed-rows'
+  signatureStyle:
+    | 'bottom-right'
+    | 'bottom-left'
+    | 'inline'
+    | 'seal'
+    | 'dual'
+    | 'inline-right'
+  footerStyle:
+    | 'bordered'
+    | 'minimal'
+    | 'none'
+    | 'colored-band'
+    | 'dark-band'
+    | 'teal-band'
+    | 'rose-band'
+    | 'hairline'
+    | 'institutional'
+    | 'corporate-band'
 }
 
 export interface Template {
