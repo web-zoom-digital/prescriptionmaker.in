@@ -91,8 +91,10 @@ export async function POST(request: NextRequest) {
     const pdfBuffer = await renderToBuffer(
       (createElement(PrescriptionDocument, {
         templateName: template.name,
+        templateSlug: template.slug,
         primaryColor: template.styles.primaryColor,
         accentColor: template.styles.accentColor,
+        bgColor: (template.styles as any).bgColor ?? '#ffffff',
         layout: template.layout,
         doctor: data.doctor,
         patient: data.patient,
