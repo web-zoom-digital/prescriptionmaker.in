@@ -349,7 +349,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
                                   e.preventDefault(); // prevent blur
                                   setValue(`medicines.${index}.name`, med.name, { shouldValidate: true })
                                   setValue(`medicines.${index}.strength`, med.commonStrengths[0] || '', { shouldValidate: true })
-                                  setValue(`medicines.${index}.frequency`, med.commonFrequency || '1-0-1', { shouldValidate: true })
+                                  setValue(`medicines.${index}.frequency`, (med.commonFrequency as any) || '1-0-1', { shouldValidate: true })
                                   setValue(`medicines.${index}.duration`, med.commonDuration || '5 days', { shouldValidate: true })
                                   setActiveMedIndex(null)
                                 }}

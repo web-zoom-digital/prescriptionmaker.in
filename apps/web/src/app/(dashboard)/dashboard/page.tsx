@@ -25,7 +25,8 @@ async function getDashboardStats() {
     { count: totalPrescriptions },
     { count: thisMonth },
     { count: draftCount },
-    { data: recentPrescriptions }
+    { data: recentPrescriptions },
+    { data: allPrescriptions }
   ] = await Promise.all([
     supabase.from('prescriptions').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
     
@@ -80,6 +81,8 @@ async function getDashboardStats() {
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats()
+  
+  if (!stats) return null
 
   return (
     <div className="p-6 lg:p-8">
@@ -308,6 +311,7 @@ export default async function DashboardPage() {
           </div>
         )}
       </div>
+    </div>
     </div>
   )
 }
