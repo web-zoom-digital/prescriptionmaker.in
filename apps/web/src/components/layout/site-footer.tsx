@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FileText, Twitter, Linkedin, Mail } from 'lucide-react'
+import { FileText, Mail } from 'lucide-react'
 
 const FOOTER_LINKS = {
   product: [
@@ -48,24 +48,7 @@ export function SiteFooter() {
               Create, manage, and export prescriptions as PDF.
             </p>
             <div className="mt-5 flex gap-3">
-              <a
-                href="https://twitter.com/prescriptionmaker"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
-                aria-label="Follow us on Twitter"
-              >
-                <Twitter className="h-4 w-4" aria-hidden="true" />
-              </a>
-              <a
-                href="https://linkedin.com/company/prescriptionmaker"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
-                aria-label="Follow us on LinkedIn"
-              >
-                <Linkedin className="h-4 w-4" aria-hidden="true" />
-              </a>
+
               <a
                 href="mailto:support@prescriptionmaker.in"
                 className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
