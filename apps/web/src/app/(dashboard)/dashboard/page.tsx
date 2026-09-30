@@ -40,14 +40,41 @@ async function getDashboardStats() {
     supabase.from('prescriptions').select('id, patient_info, diagnosis, status, created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(3)
+      .limit(3),
+      
+    supabase.from('prescriptions').select('medicines, created_at')
+      .eq('user_id', user.id)
   ])
+  
+  // Calculate top medicines
+  const medicineCounts: Record<string, number> = {}
+  let totalPatients = 0
+  const allRx = (allPrescriptions as any[]) || []
+  
+  allRx.forEach(rx => {
+    totalPatients++
+    if (Array.isArray(rx.medicines)) {
+      rx.medicines.forEach((med: any) => {
+        if (med.name) {
+          const name = med.name.trim().toUpperCase()
+          medicineCounts[name] = (medicineCounts[name] || 0) + 1
+        }
+      })
+    }
+  })
+  
+  const topMedicines = Object.entries(medicineCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([name, count]) => ({ name, count }))
 
   return {
     totalPrescriptions: totalPrescriptions ?? 0,
     thisMonth: thisMonth ?? 0,
     draftCount: draftCount ?? 0,
-    recentPrescriptions: recentPrescriptions ?? []
+    recentPrescriptions: recentPrescriptions ?? [],
+    totalPatients,
+    topMedicines
   }
 }
 
@@ -179,8 +206,37 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent prescriptions */}
-      <div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Top Medicines */}
+        <div className="lg:col-span-1 rounded-lg border border-border bg-white shadow-soft-sm overflow-hidden">
+          <div className="border-b border-border p-4 bg-slate-50/50">
+            <h2 className="text-base font-semibold text-slate-900 flex items-center gap-2">
+              <Activity className="h-4 w-4 text-primary" /> Top Prescribed Medicines
+            </h2>
+          </div>
+          <div className="p-4">
+            {stats.topMedicines.length === 0 ? (
+              <p className="text-sm text-slate-500 text-center py-4">No data available yet</p>
+            ) : (
+              <div className="space-y-4">
+                {stats.topMedicines.map((med, i) => (
+                  <div key={med.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                        {i + 1}
+                      </span>
+                      <span className="text-sm font-medium text-slate-800">{med.name}</span>
+                    </div>
+                    <span className="text-sm font-bold text-teal-600">{med.count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Recent prescriptions */}
+        <div className="lg:col-span-2">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-slate-900">Recent Prescriptions</h2>
           <Link

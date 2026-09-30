@@ -7,6 +7,7 @@ import { Plus, Trash2, ChevronDown, ChevronUp, Search, X, Zap } from 'lucide-rea
 import { prescriptionFormSchema, type PrescriptionFormValues } from '@prescriptionmaker/validation'
 import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '@/lib/diagnosis-templates'
 import { COMMON_LAB_TESTS, searchLabTests, TEST_PANELS } from '@/lib/lab-tests-db'
+import { searchMedicines, type MedicineEntry } from '@/lib/medicine-db'
 import { checkInteractions } from '@/lib/medicine-interactions'
 import { cn } from '@/lib/utils'
 import type { Template } from '@prescriptionmaker/types'
@@ -29,7 +30,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
     advice: false,
   })
 
-  const { register, control, watch, formState: { errors }, reset } = useForm<PrescriptionFormValues>({
+  const { register, control, watch, setValue, formState: { errors }, reset } = useForm<PrescriptionFormValues>({
     resolver: zodResolver(prescriptionFormSchema),
     defaultValues: initialData || {
       medicines: [{ id: '1', name: '', strength: '', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '5 days', route: 'oral' }],
@@ -54,6 +55,9 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
 
   const [testSearch, setTestSearch] = useState('')
   const [showTestModal, setShowTestModal] = useState(false)
+
+  const [activeMedIndex, setActiveMedIndex] = useState<number | null>(null)
+  const currentMedicines = watch('medicines') || []
 
   useEffect(() => {
     const subscription = watch((value) => {
@@ -305,14 +309,51 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
               </div>
 
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <FormField id={`med-name-${index}`} label="Medicine Name" className="sm:col-span-2">
-                  <input
-                    id={`med-name-${index}`}
-                    type="text"
-                    {...register(`medicines.${index}.name`)}
-                    className="form-input"
-                    placeholder="e.g. Amoxicillin"
-                  />
+                <FormField id={`med-name-${index}`} label="Medicine Name" className="sm:col-span-2 relative">
+                  {(() => {
+                    const nameReg = register(`medicines.${index}.name`)
+                    const currentValue = currentMedicines[index]?.name || ''
+                    const results = searchMedicines(currentValue)
+                    return (
+                      <>
+                        <input
+                          id={`med-name-${index}`}
+                          type="text"
+                          {...nameReg}
+                          className="form-input"
+                          placeholder="e.g. Amoxicillin"
+                          onFocus={() => setActiveMedIndex(index)}
+                          onBlur={(e) => {
+                            nameReg.onBlur(e)
+                            setTimeout(() => setActiveMedIndex(null), 200)
+                          }}
+                          autoComplete="off"
+                        />
+                        {activeMedIndex === index && results.length > 0 && (
+                          <div className="absolute top-full left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+                            {results.map((med, i) => (
+                              <button
+                                key={i}
+                                type="button"
+                                className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 focus:bg-slate-50 outline-none flex justify-between items-center"
+                                onMouseDown={(e) => {
+                                  e.preventDefault(); // prevent blur
+                                  setValue(`medicines.${index}.name`, med.name, { shouldValidate: true })
+                                  setValue(`medicines.${index}.strength`, med.commonStrengths[0] || '', { shouldValidate: true })
+                                  setValue(`medicines.${index}.frequency`, med.commonFrequency || '1-0-1', { shouldValidate: true })
+                                  setValue(`medicines.${index}.duration`, med.commonDuration || '5 days', { shouldValidate: true })
+                                  setActiveMedIndex(null)
+                                }}
+                              >
+                                <span className="font-semibold text-slate-800">{med.name}</span>
+                                <span className="text-xs text-slate-500">{med.category}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )
+                  })()}
                 </FormField>
 
                 <FormField id={`med-strength-${index}`} label="Strength / Dose">

@@ -10,6 +10,7 @@ import { generatePrescriptionHTML } from '../lib/pdf-generator'
 import { createPrescription, updatePrescription, getPrescription } from '../lib/prescriptions'
 import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '../lib/diagnosis-templates'
 import { checkInteractions, type ActiveAlert } from '../lib/medicine-interactions'
+import { searchMedicines, type MedicineEntry } from '../lib/medicine-db'
 import { getDoctorProfile } from '../lib/local-store'
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
@@ -74,6 +75,18 @@ function MedicineRow({ med, index, onUpdate, onDelete, color }: {
   med: Medicine; index: number; onUpdate: (id: string, field: keyof Medicine, val: string) => void;
   onDelete: (id: string) => void; color: string
 }) {
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  
+  const handleSelectMed = (entry: MedicineEntry) => {
+    onUpdate(med.id, 'name', entry.name)
+    onUpdate(med.id, 'strength', entry.commonStrengths[0] || '')
+    onUpdate(med.id, 'frequency', entry.commonFrequency)
+    onUpdate(med.id, 'duration', entry.commonDuration)
+    setShowSuggestions(false)
+  }
+
+  const results = showSuggestions ? searchMedicines(med.name) : []
+
   return (
     <View style={[medStyles.container, { borderLeftColor: color }]}>
       <View style={medStyles.header}>
@@ -82,8 +95,30 @@ function MedicineRow({ med, index, onUpdate, onDelete, color }: {
           <Ionicons name="trash-outline" size={16} color="#ef4444" />
         </Pressable>
       </View>
-      <TextInput style={medStyles.nameInput} placeholder="Medicine name *" value={med.name}
-        onChangeText={v => onUpdate(med.id, 'name', v)} placeholderTextColor="#94a3b8" />
+      <View style={{ zIndex: 10 }}>
+        <TextInput 
+          style={medStyles.nameInput} 
+          placeholder="Medicine name *" 
+          value={med.name}
+          onChangeText={v => {
+            onUpdate(med.id, 'name', v)
+            setShowSuggestions(true)
+          }}
+          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+          placeholderTextColor="#94a3b8" 
+        />
+        {results.length > 0 && (
+          <View style={medStyles.suggestionBox}>
+            {results.map((r, i) => (
+              <Pressable key={i} style={medStyles.suggestionItem} onPress={() => handleSelectMed(r)}>
+                <Text style={medStyles.suggName}>{r.name}</Text>
+                <Text style={medStyles.suggCat}>{r.category}</Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+      </View>
       <View style={medStyles.row}>
         <TextInput style={[medStyles.smallInput, { flex: 1 }]} placeholder="Strength (500mg)" value={med.strength}
           onChangeText={v => onUpdate(med.id, 'strength', v)} placeholderTextColor="#94a3b8" />
@@ -102,6 +137,10 @@ const medStyles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
   num: { fontSize: 13, fontWeight: '700' },
   nameInput: { borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 9, fontSize: 14, color: '#1e293b', marginBottom: 8, fontWeight: '600' },
+  suggestionBox: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, marginTop: -4, marginBottom: 8, elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4 },
+  suggestionItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  suggName: { fontSize: 14, fontWeight: '600', color: '#1e293b' },
+  suggCat: { fontSize: 11, color: '#64748b' },
   row: { flexDirection: 'row', gap: 8, marginBottom: 8 },
   smallInput: { borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 8, fontSize: 12, color: '#374151' },
   instructInput: { borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 8, fontSize: 12, color: '#374151' },
