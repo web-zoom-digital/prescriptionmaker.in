@@ -27,7 +27,7 @@
     "react-native-screens": "^4.28.0",
     "react-native-svg": "^15.15.5",
     "react-native-url-polyfill": "^4.0.0",
-    "react-native-web": "^0.21.3"
+    "react-native-web": "^0.19.13"
   },
   "devDependencies": {
     "@types/react": "~19.2.18",
