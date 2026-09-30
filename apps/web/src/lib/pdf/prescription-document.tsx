@@ -18,6 +18,7 @@ import {
   View,
   StyleSheet,
   Font,
+  Image,
 } from '@react-pdf/renderer'
 
 // Use built-in PDF fonts — avoids network font loading issues on server
@@ -161,6 +162,7 @@ export interface PrescriptionDocumentProps {
     clinicName?: string
     phone?: string
     address?: string
+    signatureUrl?: string
   }
   patient: {
     name?: string
@@ -344,8 +346,11 @@ export function PrescriptionDocument({
             {templateName} · prescriptionmaker.in · For documentation purposes only
           </Text>
           <View style={styles.signatureBox}>
-            <Text style={styles.signatureLabel}>Doctor&apos;s Signature</Text>
-            <View style={styles.signatureLine} />
+            {doctor.signatureUrl ? (
+              <Image src={doctor.signatureUrl} style={{ width: 80, height: 40, objectFit: 'contain' }} />
+            ) : null}
+            <Text style={[styles.signatureLabel, doctor.signatureUrl ? { marginTop: 4 } : {}]}>Doctor&apos;s Signature</Text>
+            {!doctor.signatureUrl && <View style={styles.signatureLine} />}
           </View>
         </View>
       </Page>

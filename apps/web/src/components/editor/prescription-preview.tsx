@@ -40,6 +40,7 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
     clinicName: data.clinicName as string | undefined,
     phone: data.clinicPhone as string | undefined,
     address: data.clinicAddress as string | undefined,
+    signatureUrl: (data.doctorInfo as any)?.signatureUrl as string | undefined,
   }
   const patient = (data['patientInfo'] as PatientInfo | undefined) ?? (data['patient'] as PatientInfo | undefined) ?? {}
   const medicines = (data['medicines'] as Medicine[] | undefined) ?? []
@@ -239,8 +240,11 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
           {template.name} · prescriptionmaker.in
         </div>
         <div style={{ textAlign: 'right' }}>
+          {doctor.signatureUrl ? (
+            <img src={doctor.signatureUrl} alt="Doctor's Signature" style={{ width: '80px', height: '40px', objectFit: 'contain', marginBottom: '4px' }} />
+          ) : null}
           <div style={{ fontWeight: 600, color: '#475569', fontSize: '9px' }}>Signature</div>
-          <div style={{ marginTop: '12px', borderTop: '1px solid #cbd5e1', width: '60px' }} />
+          {!doctor.signatureUrl && <div style={{ marginTop: '12px', borderTop: '1px solid #cbd5e1', width: '60px', marginLeft: 'auto' }} />}
         </div>
       </footer>
     </div>
