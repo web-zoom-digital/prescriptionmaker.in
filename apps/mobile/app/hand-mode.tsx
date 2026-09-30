@@ -144,79 +144,66 @@ export default function HandMode() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} scrollEnabled={false}>
-        {/* Info */}
-        <View style={styles.infoBanner}>
-          <Ionicons name="bulb-outline" size={14} color="#0369a1" />
-          <Text style={styles.infoText}>Draw naturally on the canvas below. Use undo for mistakes.</Text>
-        </View>
+      {/* Info Banner — fixed, not in scroll */}
+      <View style={styles.infoBanner}>
+        <Ionicons name="bulb-outline" size={14} color="#0369a1" />
+        <Text style={styles.infoText}>Draw on canvas below. Scroll down for pen options.</Text>
+      </View>
 
-        {/* Drawing Canvas */}
-        <View style={styles.canvasWrapper} {...panResponder.panHandlers}>
-          {/* Ruled paper background */}
-          <Svg width={CANVAS_W} height={CANVAS_H} style={StyleSheet.absoluteFill}>
-            <Path d="" />
-            {Array.from({ length: 13 }).map((_, i) => (
-              <Path
-                key={i}
-                d={`M16,${34 + i * 34} L${CANVAS_W - 16},${34 + i * 34}`}
-                stroke="#e2e8f0"
-                strokeWidth={1}
-                fill="none"
-              />
-            ))}
-            {/* Rx symbol */}
-            {paths.length === 0 && (
-              <>
-                <Path
-                  d="M14,22 Q14,8 28,8 Q42,8 42,22 Q42,30 35,34 L45,50"
-                  stroke="#0f766e"
-                  strokeWidth={3}
-                  fill="none"
-                  opacity={0.15}
-                />
-              </>
-            )}
-          </Svg>
+      {/* Drawing Canvas — fixed, touch events here only */}
+      <View style={[styles.canvasWrapper, { marginHorizontal: 16 }]} {...panResponder.panHandlers}>
+        <Svg width={CANVAS_W} height={CANVAS_H} style={StyleSheet.absoluteFill}>
+          {Array.from({ length: 13 }).map((_, i) => (
+            <Path
+              key={i}
+              d={`M16,${34 + i * 34} L${CANVAS_W - 16},${34 + i * 34}`}
+              stroke="#e2e8f0"
+              strokeWidth={1}
+              fill="none"
+            />
+          ))}
+        </Svg>
 
-          {/* Drawn paths */}
-          <Svg key={renderKey} width={CANVAS_W} height={CANVAS_H} style={StyleSheet.absoluteFill} pointerEvents="none">
-            {paths.map((p, i) => (
-              <Path
-                key={i}
-                d={p.d}
-                stroke={p.color}
-                strokeWidth={p.width}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            ))}
-            {/* Current stroke being drawn */}
-            {currentPathData.current && (
-              <Path
-                d={currentPathData.current.d}
-                stroke={currentPathData.current.color}
-                strokeWidth={currentPathData.current.width}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            )}
-          </Svg>
-
-          {/* Empty state hint */}
-          {paths.length === 0 && (
-            <View style={styles.emptyHint} pointerEvents="none">
-              <Text style={styles.emptyHintText}>✍️</Text>
-              <Text style={styles.emptyHintSub}>Start writing here</Text>
-            </View>
+        <Svg key={renderKey} width={CANVAS_W} height={CANVAS_H} style={StyleSheet.absoluteFill} pointerEvents="none">
+          {paths.map((p, i) => (
+            <Path
+              key={i}
+              d={p.d}
+              stroke={p.color}
+              strokeWidth={p.width}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
+          {currentPathData.current && (
+            <Path
+              d={currentPathData.current.d}
+              stroke={currentPathData.current.color}
+              strokeWidth={currentPathData.current.width}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           )}
-        </View>
+        </Svg>
 
-        {/* Toolbar */}
+        {paths.length === 0 && (
+          <View style={styles.emptyHint} pointerEvents="none">
+            <Text style={styles.emptyHintText}>✍️</Text>
+            <Text style={styles.emptyHintSub}>Start writing here</Text>
+          </View>
+        )}
+      </View>
+
+      {/* Scrollable Toolbar — separate from canvas, no touch conflict */}
+      <ScrollView
+        style={styles.toolbarScroll}
+        contentContainerStyle={styles.toolbarContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Pen Color */}
         <View style={styles.toolbar}>
-          {/* Pen Color */}
           <View style={styles.toolRow}>
             <Text style={styles.toolLabel}>Color</Text>
             <View style={styles.colorRow}>
@@ -284,29 +271,31 @@ const styles = StyleSheet.create({
   headerSub: { fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 1 },
   shareBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#0f766e', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 },
   shareBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
-  scroll: { padding: 16, paddingBottom: 32 },
-  infoBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: '#e0f2fe', borderRadius: 10, padding: 11,
-    borderLeftWidth: 3, borderLeftColor: '#0ea5e9', marginBottom: 14,
-  },
-  infoText: { flex: 1, fontSize: 13, color: '#0369a1' },
   canvasWrapper: {
-    width: CANVAS_W, height: CANVAS_H,
+    height: CANVAS_H,
     backgroundColor: '#fff',
     borderRadius: 14, overflow: 'hidden',
     borderWidth: 1.5, borderColor: '#e2e8f0',
     shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 10, elevation: 3,
   },
   emptyHint: {
-    position: 'absolute', inset: 0,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     justifyContent: 'center', alignItems: 'center',
   },
   emptyHintText: { fontSize: 40, opacity: 0.15 },
   emptyHintSub: { fontSize: 14, color: '#cbd5e1', marginTop: 8, fontStyle: 'italic' },
+  infoBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: '#e0f2fe', marginHorizontal: 16, marginTop: 10, marginBottom: 10,
+    borderRadius: 10, padding: 10,
+    borderLeftWidth: 3, borderLeftColor: '#0ea5e9',
+  },
+  infoText: { flex: 1, fontSize: 12, color: '#0369a1' },
+  toolbarScroll: { flex: 1 },
+  toolbarContent: { padding: 12, paddingBottom: 32 },
   toolbar: {
-    marginTop: 14, backgroundColor: '#fff',
-    borderRadius: 16, padding: 16, gap: 14,
+    backgroundColor: '#fff',
+    borderRadius: 16, padding: 14, gap: 12,
     shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 1,
   },
   toolRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
