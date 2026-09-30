@@ -19,6 +19,7 @@ export default function HandMode() {
   // Live stroke being drawn right now
   const [livePath, setLivePath] = useState<DrawnPath | null>(null)
   const [saving, setSaving] = useState(false)
+  const [scrollEnabled, setScrollEnabled] = useState(true)
 
   // Pen settings — use refs so PanResponder always reads current value
   const penColorRef = useRef('#1e293b')
@@ -26,8 +27,8 @@ export default function HandMode() {
   const [penColor, setPenColor] = useState('#1e293b')
   const [penWidth, setPenWidth] = useState(3)
 
-  // ScrollView ref for native scroll control (no re-render needed)
   const scrollRef = useRef<ScrollView>(null)
+  const scrollEnabledRef = useRef(true)
   const currentPathStr = useRef<string>('')
   const isDrawing = useRef(false)
 
@@ -51,8 +52,8 @@ export default function HandMode() {
       onShouldBlockNativeResponder: () => true,
 
       onPanResponderGrant: (evt) => {
-        // Disable scroll via native props — zero re-renders
-        scrollRef.current?.setNativeProps({ scrollEnabled: false })
+        scrollEnabledRef.current = false
+        setScrollEnabled(false)
         const { locationX, locationY } = evt.nativeEvent
         const d = `M${locationX.toFixed(1)},${locationY.toFixed(1)}`
         currentPathStr.current = d
@@ -71,8 +72,8 @@ export default function HandMode() {
 
       onPanResponderRelease: () => {
         isDrawing.current = false
-        // Re-enable scroll via native props
-        scrollRef.current?.setNativeProps({ scrollEnabled: true })
+        scrollEnabledRef.current = true
+        setScrollEnabled(true)
 
         if (currentPathStr.current) {
           const finishedPath: DrawnPath = {
@@ -89,7 +90,7 @@ export default function HandMode() {
 
       onPanResponderTerminate: () => {
         isDrawing.current = false
-        scrollRef.current?.setNativeProps({ scrollEnabled: true })
+        setScrollEnabled(true)
         setLivePath(null)
         currentPathStr.current = ''
       },
@@ -162,7 +163,7 @@ export default function HandMode() {
       </View>
 
       {/* Page scroll — controlled via native props, NOT state */}
-      <ScrollView ref={scrollRef} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <ScrollView ref={scrollRef} scrollEnabled={scrollEnabled} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
 
         <View style={styles.infoBanner}>
           <Ionicons name="pencil-outline" size={14} color="#0369a1" />
