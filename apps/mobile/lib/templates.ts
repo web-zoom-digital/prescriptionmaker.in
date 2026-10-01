@@ -16,6 +16,7 @@ export type Template = {
   styles: TemplateStyle
   isPremium: boolean
   emoji: string
+  image: any
 }
 
 export const MOBILE_TEMPLATES: Template[] = [
@@ -29,6 +30,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#1a365d', accentColor: '#2b6cb0', bgColor: '#ffffff', fontFamily: 'serif' },
     isPremium: false,
     emoji: '📜',
+    image: require('../assets/templates/classic-letterhead.jpg'),
   },
   // 2. Two-Column Sidebar
   {
@@ -40,6 +42,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#1e3a5f', accentColor: '#3182ce', bgColor: '#f7fafc', fontFamily: 'sans-serif' },
     isPremium: true,
     emoji: '🏥',
+    image: require('../assets/templates/two-column-sidebar.jpg'),
   },
   // 3. Hospital OPD Form
   {
@@ -51,6 +54,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#155e75', accentColor: '#0ea5e9', bgColor: '#f0f9ff', fontFamily: 'sans-serif' },
     isPremium: true,
     emoji: '🏛️',
+    image: require('../assets/templates/hospital-opd.jpg'),
   },
   // 4. SOAP Clinical Notes
   {
@@ -62,6 +66,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#312e81', accentColor: '#6366f1', bgColor: '#fafafa', fontFamily: 'sans-serif' },
     isPremium: true,
     emoji: '📋',
+    image: require('../assets/templates/soap-clinical.jpg'),
   },
   // 5. Vitals-First
   {
@@ -73,6 +78,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#9b2335', accentColor: '#e53e3e', bgColor: '#fff5f5', fontFamily: 'sans-serif' },
     isPremium: true,
     emoji: '❤️',
+    image: require('../assets/templates/vitals-first.jpg'),
   },
   // 6. Detailed Drug Chart
   {
@@ -84,6 +90,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#065f46', accentColor: '#10b981', bgColor: '#f0fdf4', fontFamily: 'sans-serif' },
     isPremium: true,
     emoji: '💊',
+    image: require('../assets/templates/detailed-drug-chart.jpg'),
   },
   // 7. Multi-Section Boxed
   {
@@ -95,6 +102,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#0c4a6e', accentColor: '#38bdf8', bgColor: '#f0f9ff', fontFamily: 'sans-serif' },
     isPremium: true,
     emoji: '📦',
+    image: require('../assets/templates/multi-section-boxed.jpg'),
   },
   // 8. Minimal Print Ruled
   {
@@ -106,6 +114,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#1a202c', accentColor: '#718096', bgColor: '#ffffff', fontFamily: 'serif' },
     isPremium: false,
     emoji: '✒️',
+    image: require('../assets/templates/minimal-print-ruled.jpg'),
   },
   // 9. Bilingual Indian
   {
@@ -117,6 +126,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#7c3aed', accentColor: '#a78bfa', bgColor: '#faf5ff', fontFamily: 'sans-serif' },
     isPremium: false,
     emoji: '🇮🇳',
+    image: require('../assets/templates/bilingual-indian.jpg'),
   },
   // 10. Compartmentalized Grid
   {
@@ -128,6 +138,7 @@ export const MOBILE_TEMPLATES: Template[] = [
     styles: { primaryColor: '#92400e', accentColor: '#f59e0b', bgColor: '#fffbeb', fontFamily: 'sans-serif' },
     isPremium: true,
     emoji: '⚕️',
+    image: require('../assets/templates/compartmentalized-grid.jpg'),
   },
 ]
 

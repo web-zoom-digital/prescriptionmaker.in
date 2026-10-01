@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-  View, Text, TextInput, Pressable, StyleSheet, ScrollView,
+  View, Text, TextInput, Pressable, StyleSheet, ScrollView, Image,
   KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Switch, Modal, FlatList, Linking
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
@@ -51,7 +51,7 @@ function TemplatePicker({ selected, onSelect }: { selected: Template; onSelect: 
             selected.id === t.id && { backgroundColor: t.styles.bgColor },
           ]}
         >
-          <Text style={tpStyles.emoji}>{t.emoji}</Text>
+          <Image source={t.image} style={tpStyles.image} resizeMode="cover" />
           <Text style={[tpStyles.name, selected.id === t.id && { color: t.styles.primaryColor }]}>{t.name}</Text>
           {t.isPremium && <Text style={tpStyles.pro}>PRO</Text>}
           <View style={[tpStyles.colorBar, { backgroundColor: t.styles.primaryColor }]} />
@@ -65,8 +65,9 @@ const tpStyles = StyleSheet.create({
     width: 110, padding: 12, borderRadius: 12, borderWidth: 2,
     backgroundColor: '#fff', alignItems: 'center', gap: 4,
     shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1,
+    overflow: 'hidden',
   },
-  emoji: { fontSize: 28 },
+  image: { width: '100%', height: 120, borderRadius: 8, marginBottom: 4 },
   name: { fontSize: 11, fontWeight: '700', color: '#475569', textAlign: 'center' },
   pro: { fontSize: 9, backgroundColor: '#f59e0b', color: '#fff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 99, fontWeight: '700' },
   colorBar: { height: 3, width: '80%', borderRadius: 99, marginTop: 4 },
@@ -150,18 +151,20 @@ const medStyles = StyleSheet.create({
 
 // ─── Main Editor Screen ───────────────────────────────────────────
 export default function PrescriptionEditor() {
-  const { id, clone_id, prefill_name, prefill_phone, prefill_age, prefill_gender, prefill_weight } = useLocalSearchParams<{
+  const { id, clone_id, templateId, prefill_name, prefill_phone, prefill_age, prefill_gender, prefill_weight } = useLocalSearchParams<{
     id?: string
     clone_id?: string
+    templateId?: string
     prefill_name?: string
     prefill_phone?: string
     prefill_age?: string
     prefill_gender?: string
     prefill_weight?: string
   }>()
-  const [step, setStep] = useState(0)
+  const initialTemplate = templateId ? (MOBILE_TEMPLATES.find(t => t.id === templateId) || MOBILE_TEMPLATES[0]) : MOBILE_TEMPLATES[0]
+  const [step, setStep] = useState(templateId ? 1 : 0)
   const [saving, setSaving] = useState(false)
-  const [template, setTemplate] = useState<Template>(MOBILE_TEMPLATES[0])
+  const [template, setTemplate] = useState<Template>(initialTemplate)
   const [language, setLanguage] = useState<LanguageCode>('en')
 
   const [doctorInfo, setDoctorInfo] = useState({
@@ -403,11 +406,12 @@ export default function PrescriptionEditor() {
               <Text style={styles.sectionTitle}>Choose a Template</Text>
               <Text style={styles.hint}>Select the design style for your prescription</Text>
               <TemplatePicker selected={template} onSelect={setTemplate} />
-              <View style={[styles.preview, { backgroundColor: template.styles.bgColor, borderColor: color }]}>
-                <Text style={[styles.previewTitle, { color }]}>{template.emoji} {template.name}</Text>
-                <Text style={styles.previewDesc}>{template.description}</Text>
-                <View style={[styles.previewBar, { backgroundColor: color }]} />
-                <Text style={styles.previewLayout}>Layout: {template.layout}</Text>
+              <View style={[styles.preview, { backgroundColor: '#fff', borderColor: color, padding: 0, overflow: 'hidden', aspectRatio: 1588/2246 }]}>
+                <Image 
+                  source={template.image} 
+                  style={{ width: '100%', height: '100%' }} 
+                  resizeMode="cover" 
+                />
               </View>
 
               <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Prescription Language 🇮🇳</Text>
