@@ -99,7 +99,20 @@ export function usePdfExport(options: UsePdfExportOptions = {}): UsePdfExportRet
       // Revoke the object URL after a short delay
       setTimeout(() => URL.revokeObjectURL(url), 10_000)
 
-      toast.success(`PDF downloaded — ${filename}`, { id: toastId })
+      toast.success(`PDF downloaded — ${filename}`, { 
+        id: toastId,
+        description: 'If it didn\'t download automatically, tap here.',
+        action: {
+          label: 'Download',
+          onClick: () => {
+            const a = document.createElement('a')
+            a.href = url
+            a.download = filename
+            a.click()
+          }
+        },
+        duration: 8000
+      })
       options.onSuccess?.(filename)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Network error'

@@ -248,15 +248,20 @@ export function EditorShell() {
       
       // Check if native sharing with files is supported (mostly mobile)
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            title: 'Prescription',
-            text: text,
-            files: [file]
-          })
-        } catch (err) {
-          console.error('Error sharing:', err)
-        }
+        toast('Prescription ready', {
+          description: 'Tap below to share via WhatsApp',
+          action: {
+            label: 'Share',
+            onClick: () => {
+              navigator.share({
+                title: 'Prescription',
+                text: text,
+                files: [file]
+              }).catch(err => console.error('Error sharing:', err))
+            }
+          },
+          duration: 10000,
+        })
       } else {
         // Fallback for desktop: PDF must be downloaded and manually attached.
         const url = `https://wa.me/?text=${encodeURIComponent(text)}`
