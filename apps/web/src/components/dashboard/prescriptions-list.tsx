@@ -58,7 +58,7 @@ export function PrescriptionsList() {
             placeholder="Search patients or diagnosis..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="form-input pl-9"
+            className="form-input !pl-9"
           />
         </div>
         <button className="flex items-center gap-2 rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-soft-sm hover:bg-slate-50 transition-colors">
