@@ -73,11 +73,10 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           Back to Templates
         </Link>
 
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start">
           {/* Template preview */}
-          {/* Template preview */}
-          <div>
-            <div className="overflow-hidden rounded-xl border shadow-soft-lg bg-white bg-slate-50 relative">
+          <div className="flex justify-center lg:justify-end xl:justify-center">
+            <div className="overflow-hidden rounded-xl border shadow-soft-lg bg-white bg-slate-50 relative w-full max-w-[420px]">
               <img 
                 src={template.preview || template.thumbnail} 
                 alt={`${template.name} preview`}
