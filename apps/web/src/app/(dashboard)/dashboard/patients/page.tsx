@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import type { Metadata } from 'next'
+import { verifyJWT } from '@/lib/auth/jwt'
 
 export const metadata: Metadata = {
   title: 'Patient Records | PrescriptionMaker',
@@ -22,21 +23,23 @@ type PatientSummary = {
 
 async function getPatients(): Promise<PatientSummary[]> {
   const cookieStore = await cookies()
-  const token = cookieStore.get('sb-access-token')?.value
+  const token = cookieStore.get('access_token')?.value
   if (!token) return []
+
+  const payload = await verifyJWT(token)
+  if (!payload || !payload.sub) return []
+  
+  const userId = payload.sub
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const { data: { user } } = await supabase.auth.getUser(token)
-  if (!user) return []
-
   const { data, error } = await supabase
     .from('prescriptions')
     .select('patient_info, diagnosis, created_at')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
   if (error || !data) return []
