@@ -101,6 +101,9 @@ export default function ProfilePage() {
           clinicPincode: profile.clinicPincode,
           clinicEmail: profile.clinicEmail,
           clinicWebsite: profile.clinicWebsite,
+          clinicLogoUrl: profile.clinicLogoUrl,
+          stampUrl: profile.stampUrl,
+          signatureUrl: profile.signatureUrl,
         }),
       })
       setSaved(true)
@@ -246,7 +249,7 @@ export default function ProfilePage() {
 
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
               <p className="text-sm text-amber-800">
-                <strong>⚠️ Note:</strong> Make sure the <code className="bg-amber-100 px-1 rounded">doctor-assets</code> storage bucket is created in your Supabase project (Settings → Storage → New Bucket → set to <strong>Private</strong>).
+                <strong>⚠️ Note:</strong> Make sure the <code className="bg-amber-100 px-1 rounded">doctor-assets</code> storage bucket is created in your Supabase project (Settings → Storage → New Bucket → set to <strong>Public</strong>).
               </p>
             </div>
           </div>

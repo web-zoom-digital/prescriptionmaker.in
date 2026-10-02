@@ -15,6 +15,8 @@ type DoctorInfo = {
   phone?: string
   address?: string
   signatureUrl?: string
+  logoUrl?: string
+  stampUrl?: string
 }
 
 type PatientInfo = {
@@ -33,15 +35,18 @@ type Medicine = {
 }
 
 export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps) {
-  const doctor = (data['doctorInfo'] as DoctorInfo | undefined) ?? {
-    name: data.doctorName as string | undefined,
-    qualifications: data.doctorQualifications as string | undefined,
-    specialization: data.doctorSpecialization as string | undefined,
-    registrationNumber: data.doctorRegNumber as string | undefined,
-    clinicName: data.clinicName as string | undefined,
-    phone: data.clinicPhone as string | undefined,
-    address: data.clinicAddress as string | undefined,
-    signatureUrl: (data.doctorInfo as any)?.signatureUrl as string | undefined,
+  const docInfo = data['doctorInfo'] as DoctorInfo | undefined
+  const doctor = {
+    name: docInfo?.name || (data.doctorName as string | undefined),
+    qualifications: docInfo?.qualifications || (data.doctorQualifications as string | undefined),
+    specialization: docInfo?.specialization || (data.doctorSpecialization as string | undefined),
+    registrationNumber: docInfo?.registrationNumber || (data.doctorRegNumber as string | undefined),
+    clinicName: docInfo?.clinicName || (data.clinicName as string | undefined),
+    phone: docInfo?.phone || (data.clinicPhone as string | undefined),
+    address: docInfo?.address || (data.clinicAddress as string | undefined),
+    signatureUrl: docInfo?.signatureUrl || (data.signatureDataUrl as string | undefined),
+    logoUrl: docInfo?.logoUrl || (data.clinicLogoUrl as string | undefined),
+    stampUrl: docInfo?.stampUrl || (data.stampUrl as string | undefined),
   }
   const patient = (data['patientInfo'] as PatientInfo | undefined) ?? (data['patient'] as PatientInfo | undefined) ?? {}
   const medicines = (data['medicines'] as Medicine[] | undefined) ?? []
@@ -62,14 +67,19 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
   const filledMeds = medicines.filter(m => m.name)
 
   const SignatureArea = ({ right = true }: { right?: boolean }) => (
-    <div style={{ textAlign: right ? 'right' : 'center', marginTop: '8px' }}>
-      {doctor.signatureUrl ? (
-        <img src={doctor.signatureUrl} alt="Signature" style={{ width: '90px', height: '38px', objectFit: 'contain', display: 'block', marginLeft: right ? 'auto' : 'auto', marginRight: right ? '0' : 'auto', marginBottom: '4px' }} />
-      ) : (
-        <div style={{ width: '90px', borderBottom: `1.5px solid #94a3b8`, marginLeft: right ? 'auto' : 'auto', marginRight: right ? '0' : 'auto', marginBottom: '4px', height: '32px' }} />
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: right ? 'flex-end' : 'center', gap: '16px', marginTop: '8px' }}>
+      {doctor.stampUrl && (
+        <img src={doctor.stampUrl} alt="Stamp" style={{ width: '60px', height: '60px', objectFit: 'contain', opacity: 0.8 }} />
       )}
-      <div style={{ fontSize: '8px', fontWeight: 700, color: '#475569' }}>Doctor&apos;s Signature</div>
-      {doctor.name && <div style={{ fontSize: '7.5px', color: '#64748b' }}>Dr. {doctor.name}</div>}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {doctor.signatureUrl ? (
+          <img src={doctor.signatureUrl} alt="Signature" style={{ width: '90px', height: '38px', objectFit: 'contain', marginBottom: '4px' }} />
+        ) : (
+          <div style={{ width: '90px', borderBottom: `1.5px solid #94a3b8`, height: '32px', marginBottom: '4px' }} />
+        )}
+        <div style={{ fontSize: '8px', fontWeight: 700, color: '#475569' }}>Doctor&apos;s Signature</div>
+        {doctor.name && <div style={{ fontSize: '7.5px', color: '#64748b' }}>Dr. {doctor.name}</div>}
+      </div>
     </div>
   )
 
@@ -199,9 +209,13 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
       <div style={{ width: '210mm', minHeight: '297mm', background: bg, fontFamily: ff, fontSize: '10px', boxSizing: 'border-box', display: 'flex' }}>
         {/* Left Sidebar */}
         <div style={{ width: '68mm', background: pc, color: '#fff', padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0 }}>
-          {/* Doctor photo placeholder */}
-          <div style={{ width: '60px', height: '60px', borderRadius: '50%', border: '3px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', margin: '0 auto' }}>
-            👨‍⚕️
+          {/* Doctor photo placeholder / Logo */}
+          <div style={{ width: '60px', height: '60px', borderRadius: '50%', border: '3px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', margin: '0 auto', overflow: 'hidden' }}>
+            {doctor.logoUrl ? (
+              <img src={doctor.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              '👨‍⚕️'
+            )}
           </div>
 
           <div style={{ textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.3)', paddingBottom: '10px' }}>
@@ -505,10 +519,15 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
       <div style={{ width: '210mm', minHeight: '297mm', background: bg, fontFamily: ff, fontSize: '9.5px', boxSizing: 'border-box' }}>
         {/* Header */}
         <div style={{ background: pc, color: '#fff', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ fontSize: '13px', fontWeight: 800 }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</div>
-            <div style={{ fontSize: '8.5px', opacity: 0.8 }}>{[doctor.qualifications, doctor.specialization].filter(Boolean).join(' · ')}</div>
-            {doctor.registrationNumber && <div style={{ fontSize: '8px', opacity: 0.6 }}>Reg: {doctor.registrationNumber}</div>}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {doctor.logoUrl && (
+              <img src={doctor.logoUrl} alt="Logo" style={{ width: '36px', height: '36px', objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: '2px' }} />
+            )}
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 800 }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</div>
+              <div style={{ fontSize: '8.5px', opacity: 0.8 }}>{[doctor.qualifications, doctor.specialization].filter(Boolean).join(' · ')}</div>
+              {doctor.registrationNumber && <div style={{ fontSize: '8px', opacity: 0.6 }}>Reg: {doctor.registrationNumber}</div>}
+            </div>
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '9px', fontWeight: 700, color: ac }}>{doctor.clinicName || 'Medical Centre'}</div>
@@ -773,9 +792,14 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
       <div style={{ width: '210mm', minHeight: '297mm', background: bg, fontFamily: ff, fontSize: '9.5px', boxSizing: 'border-box' }}>
         {/* Header */}
         <div style={{ background: pc, color: '#fff', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div>
-            <div style={{ fontSize: '15px', fontWeight: 800 }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</div>
-            <div style={{ fontSize: '8.5px', color: ac, marginTop: '2px' }}>{[doctor.qualifications, doctor.specialization].filter(Boolean).join(' · ')}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {doctor.logoUrl && (
+              <img src={doctor.logoUrl} alt="Logo" style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: '2px' }} />
+            )}
+            <div>
+              <div style={{ fontSize: '15px', fontWeight: 800 }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</div>
+              <div style={{ fontSize: '8.5px', color: ac, marginTop: '2px' }}>{[doctor.qualifications, doctor.specialization].filter(Boolean).join(' · ')}</div>
+            </div>
           </div>
           <div style={{ textAlign: 'right' }}>
             {doctor.clinicName && <div style={{ fontSize: '10px', fontWeight: 700 }}>{doctor.clinicName}</div>}
@@ -884,10 +908,15 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
     return (
       <div style={{ width: '210mm', minHeight: '297mm', background: bg, fontFamily: ff, fontSize: '9.5px', boxSizing: 'border-box' }}>
         {/* Header */}
-        <div style={{ background: pc, color: '#fff', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div>
-            <div style={{ fontSize: '15px', fontWeight: 800 }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</div>
-            <div style={{ fontSize: '8.5px', color: ac }}>{[doctor.qualifications, doctor.specialization].filter(Boolean).join(' · ')}</div>
+        <div style={{ background: pc, color: '#fff', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {doctor.logoUrl && (
+              <img src={doctor.logoUrl} alt="Logo" style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '50%', background: '#fff', padding: '2px' }} />
+            )}
+            <div>
+              <div style={{ fontSize: '15px', fontWeight: 800 }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</div>
+              <div style={{ fontSize: '8.5px', color: ac }}>{[doctor.qualifications, doctor.specialization].filter(Boolean).join(' · ')}</div>
+            </div>
           </div>
           <div style={{ textAlign: 'right' }}>
             {doctor.clinicName && <div style={{ fontSize: '9.5px', fontWeight: 700 }}>{doctor.clinicName}</div>}

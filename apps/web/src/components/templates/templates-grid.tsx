@@ -97,7 +97,7 @@ export function TemplatesGrid({ templates, categories }: TemplatesGridProps) {
                     marginBottom: '-200mm' // Prevent it from pushing height
                   }}
                 >
-                  <PrescriptionPreview template={template} data={dummyData} />
+                  <PrescriptionPreview template={template as any} data={dummyData} />
                 </div>
 
                 {template.isPremium && (

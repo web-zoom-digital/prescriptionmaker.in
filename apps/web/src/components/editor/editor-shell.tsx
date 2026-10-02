@@ -13,6 +13,7 @@ import { CanvasEditor } from './canvas-editor'
 import { usePdfExport } from '@/hooks/use-pdf-export'
 import { cn } from '@/lib/utils'
 import type { Template } from '@prescriptionmaker/types'
+import { toast } from 'sonner'
 
 type EditorMode = 'form' | 'hand'
 
@@ -20,7 +21,17 @@ export function EditorShell() {
   const searchParams = useSearchParams()
   const templateSlug = searchParams.get('template') ?? TEMPLATES[0]?.slug ?? 'classic-medical'
 
-  const selectedTemplate = (TEMPLATES.find((t) => t.slug === templateSlug) ?? TEMPLATES[0]!) as Template
+  const baseTemplate = (TEMPLATES.find((t) => t.slug === templateSlug) ?? TEMPLATES[0]!) as Template
+  const [customColor, setCustomColor] = useState<string | null>(null)
+  
+  const selectedTemplate = {
+    ...baseTemplate,
+    styles: {
+      ...baseTemplate.styles,
+      primaryColor: customColor ?? baseTemplate.styles.primaryColor
+    }
+  }
+
   const [mode, setMode] = useState<EditorMode>('form')
   const [showPreview, setShowPreview] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -57,34 +68,62 @@ export function EditorShell() {
 
   useEffect(() => {
     async function loadData() {
-      if (!id) {
-        setIsLoading(false)
-        return
-      }
-      try {
-        const res = await fetch(`/api/prescriptions/${id}`)
-        const json = await res.json()
-        if (json.success && json.data) {
-          const { mode: dbMode, canvas_data, doctor_info, patient_info, diagnosis, medicines, lab_tests, advice, follow_up_date } = json.data
-          if (dbMode) setMode(dbMode)
-          setPrescriptionData({
-            doctorName: doctor_info?.name,
-            doctorQualifications: doctor_info?.qualifications,
-            doctorSpecialization: doctor_info?.specialization,
-            doctorRegNumber: doctor_info?.registrationNumber,
-            clinicName: doctor_info?.clinicName,
-            clinicPhone: doctor_info?.phone,
-            clinicAddress: doctor_info?.address,
-            patient: patient_info,
-            diagnosis,
-            medicines,
-            tests: lab_tests ? lab_tests.split(',').map((t: string) => ({ name: t })) : undefined, // simplified
-            advice,
-            followUp: follow_up_date,
-            canvasData: canvas_data
-          })
+        let baseDoctorInfo: any = {}
+        try {
+          const profRes = await fetch('/api/profile')
+          const profJson = await profRes.json()
+          if (profJson.data) {
+            baseDoctorInfo = {
+              doctorName: profJson.data.doctor_name,
+              doctorQualifications: profJson.data.qualifications,
+              doctorSpecialization: profJson.data.specialization,
+              doctorRegNumber: profJson.data.registration_number,
+              clinicName: profJson.data.clinic_name,
+              clinicPhone: profJson.data.clinic_phone,
+              clinicAddress: profJson.data.clinic_address,
+              signatureDataUrl: profJson.data.signature_url,
+              clinicLogoUrl: profJson.data.clinic_logo_url,
+              stampUrl: profJson.data.stamp_url,
+            }
+          }
+        } catch (e) {
+          console.error('Failed to load profile', e)
         }
-      } catch (err) {
+
+        if (!id) {
+          setPrescriptionData(baseDoctorInfo)
+          setIsLoading(false)
+          return
+        }
+
+        try {
+          const res = await fetch(`/api/prescriptions/${id}`)
+          const json = await res.json()
+          if (json.success && json.data) {
+            const { mode: dbMode, canvas_data, doctor_info, patient_info, diagnosis, medicines, lab_tests, advice, follow_up_date } = json.data
+            if (dbMode) setMode(dbMode)
+            setPrescriptionData({
+              ...baseDoctorInfo,
+              doctorName: doctor_info?.name || baseDoctorInfo.doctorName,
+              doctorQualifications: doctor_info?.qualifications || baseDoctorInfo.doctorQualifications,
+              doctorSpecialization: doctor_info?.specialization || baseDoctorInfo.doctorSpecialization,
+              doctorRegNumber: doctor_info?.registrationNumber || baseDoctorInfo.doctorRegNumber,
+              clinicName: doctor_info?.clinicName || baseDoctorInfo.clinicName,
+              clinicPhone: doctor_info?.phone || baseDoctorInfo.clinicPhone,
+              clinicAddress: doctor_info?.address || baseDoctorInfo.clinicAddress,
+              signatureDataUrl: doctor_info?.signatureUrl || baseDoctorInfo.signatureDataUrl,
+              clinicLogoUrl: doctor_info?.logoUrl || baseDoctorInfo.clinicLogoUrl,
+              stampUrl: doctor_info?.stampUrl || baseDoctorInfo.stampUrl,
+              patient: patient_info,
+              diagnosis,
+              medicines,
+              tests: lab_tests ? lab_tests.split(',').map((t: string) => ({ name: t })) : undefined, // simplified
+              advice,
+              followUp: follow_up_date,
+              canvasData: canvas_data
+            })
+          }
+        } catch (err) {
         console.error('Failed to load prescription:', err)
       } finally {
         setIsLoading(false)
@@ -111,6 +150,9 @@ export function EditorShell() {
            clinicName: prescriptionData.clinicName,
            phone: prescriptionData.clinicPhone,
            address: prescriptionData.clinicAddress,
+           signatureUrl: prescriptionData.signatureDataUrl,
+           logoUrl: prescriptionData.clinicLogoUrl,
+           stampUrl: prescriptionData.stampUrl,
         },
         patientInfo: prescriptionData.patient,
         diagnosis: prescriptionData.diagnosis,
@@ -150,14 +192,18 @@ export function EditorShell() {
     const labTestsStr = Array.isArray(data.tests) ? data.tests.map((t: any) => t.name).join(', ') : ''
     exportPdf({
       templateSlug: selectedTemplate.slug,
-      doctor: data.doctorInfo ?? {
-        name: data.doctorName,
-        qualifications: data.doctorQualifications,
-        specialization: data.doctorSpecialization,
-        registrationNumber: data.doctorRegNumber,
-        clinicName: data.clinicName,
-        phone: data.clinicPhone,
-        address: data.clinicAddress,
+      customColor: customColor ?? undefined,
+      doctor: {
+        name: data.doctorInfo?.name ?? data.doctorName,
+        qualifications: data.doctorInfo?.qualifications ?? data.doctorQualifications,
+        specialization: data.doctorInfo?.specialization ?? data.doctorSpecialization,
+        registrationNumber: data.doctorInfo?.registrationNumber ?? data.doctorRegNumber,
+        clinicName: data.doctorInfo?.clinicName ?? data.clinicName,
+        phone: data.doctorInfo?.phone ?? data.clinicPhone,
+        address: data.doctorInfo?.address ?? data.clinicAddress,
+        signatureUrl: data.doctorInfo?.signatureUrl ?? data.signatureDataUrl,
+        logoUrl: data.doctorInfo?.logoUrl ?? data.clinicLogoUrl,
+        stampUrl: data.doctorInfo?.stampUrl ?? data.stampUrl,
       },
       patient: data.patientInfo ?? data.patient ?? {},
       diagnosis: data.diagnosis,
@@ -171,8 +217,9 @@ export function EditorShell() {
   const handleShareWhatsApp = async () => {
     const data = prescriptionData as any
     const labTestsStr = Array.isArray(data.tests) ? data.tests.map((t: any) => t.name).join(', ') : ''
-    const result = await generatePdfBlob({
+    const payload = {
       templateSlug: selectedTemplate.slug,
+      customColor: customColor ?? undefined,
       doctor: data.doctorInfo ?? {
         name: data.doctorName,
         qualifications: data.doctorQualifications,
@@ -181,6 +228,9 @@ export function EditorShell() {
         clinicName: data.clinicName,
         phone: data.clinicPhone,
         address: data.clinicAddress,
+        signatureUrl: data.signatureDataUrl,
+        logoUrl: data.clinicLogoUrl,
+        stampUrl: data.stampUrl,
       },
       patient: data.patientInfo ?? data.patient ?? {},
       diagnosis: data.diagnosis,
@@ -188,13 +238,16 @@ export function EditorShell() {
       labTests: labTestsStr,
       advice: data.advice,
       followUpDate: data.followUp ?? data.followUpDate,
-    })
+    }
+
+    const result = await generatePdfBlob(payload)
     
     if (result) {
       const file = new File([result.blob], result.filename, { type: 'application/pdf' })
       const text = `Hello ${(data.patientInfo ?? data.patient)?.name ?? 'Patient'},\n\nPlease find your digital prescription attached.\n\nDr. ${data.doctorName ?? ''}`
       
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      // Check if native sharing with files is supported (mostly mobile)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({
             title: 'Prescription',
@@ -205,20 +258,31 @@ export function EditorShell() {
           console.error('Error sharing:', err)
         }
       } else {
-        // Fallback for desktop: Create a generic whatsapp link
+        // Fallback for desktop: PDF must be downloaded and manually attached.
         const url = `https://wa.me/?text=${encodeURIComponent(text)}`
-        window.open(url, '_blank')
-        // We can't attach the PDF directly to wa.me, so we also trigger download
-        exportPdf({
-          templateSlug: selectedTemplate.slug,
-          doctor: data.doctorInfo ?? {},
-          patient: data.patientInfo ?? {},
-          diagnosis: data.diagnosis,
-          medicines: (data.medicines ?? []) as Record<string, string>[],
-          labTests: labTestsStr,
-          advice: data.advice,
-          followUpDate: data.followUpDate,
-        })
+        
+        // Trigger download
+        exportPdf(payload)
+        
+        // Try opening WhatsApp Web (might be blocked by popup blocker)
+        const newWindow = window.open(url, '_blank')
+        
+        if (!newWindow) {
+          // If popup was blocked, show a toast with a button
+          toast.success('PDF Downloaded for WhatsApp', {
+            description: 'Your browser blocked the popup. Click below to open WhatsApp Web.',
+            action: {
+              label: 'Open WhatsApp',
+              onClick: () => window.open(url, '_blank')
+            },
+            duration: 10000
+          })
+        } else {
+          toast.success('Opening WhatsApp Web', {
+            description: 'Please drag & drop the downloaded PDF into the chat.',
+            duration: 5000
+          })
+        }
       }
     }
   }
@@ -236,15 +300,25 @@ export function EditorShell() {
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           </Link>
 
-          <div className="flex items-center gap-2 border-l border-border pl-3">
-            <div
-              className="h-3 w-3 rounded-sm"
-              style={{ backgroundColor: selectedTemplate.styles.primaryColor }}
-              aria-hidden="true"
-            />
+          <div className="flex items-center gap-3 border-l border-border pl-3">
             <span className="text-sm font-semibold text-slate-900 truncate max-w-[150px] sm:max-w-none">
               {selectedTemplate.name}
             </span>
+            <label className="relative flex items-center gap-1.5 cursor-pointer rounded-md border border-slate-200 bg-slate-50 px-2 py-1 shadow-sm transition-colors hover:bg-slate-100 hover:border-slate-300">
+              <input 
+                type="color" 
+                value={selectedTemplate.styles.primaryColor}
+                onChange={(e) => setCustomColor(e.target.value)}
+                className="absolute opacity-0 w-full h-full cursor-pointer"
+                title="Change Template Color"
+              />
+              <div
+                className="h-3.5 w-3.5 rounded-full border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.1)] transition-transform hover:scale-110"
+                style={{ backgroundColor: selectedTemplate.styles.primaryColor }}
+                aria-hidden="true"
+              />
+              <span className="text-xs font-semibold text-slate-600">Change Color</span>
+            </label>
           </div>
         </div>
 
@@ -372,7 +446,7 @@ export function EditorShell() {
                   <FormEditor
                     template={selectedTemplate}
                     initialData={prescriptionData}
-                    onDataChange={setPrescriptionData}
+                    onDataChange={(newData) => setPrescriptionData(prev => ({ ...prev, ...newData }))}
                   />
                 )}
               </motion.div>

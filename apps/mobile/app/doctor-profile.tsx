@@ -1,11 +1,12 @@
 'use client'
 import {
   View, Text, StyleSheet, ScrollView, Pressable, TextInput,
-  Platform, Alert, Switch, ActivityIndicator
+  Platform, Alert, ActivityIndicator, Image
 } from 'react-native'
 import { useState, useEffect } from 'react'
 import { router } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
+import * as ImagePicker from 'expo-image-picker'
 import { getDoctorProfile, saveDoctorProfile, type DoctorProfile } from '../lib/local-store'
 
 const FIELDS: { key: keyof DoctorProfile; label: string; placeholder: string; required?: boolean }[] = [
@@ -34,6 +35,21 @@ export default function DoctorProfileScreen() {
       setLoading(false)
     })
   }, [])
+
+  const pickImage = async (field: 'logoUrl' | 'stampUrl' | 'signature') => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.8,
+      base64: true,
+    })
+
+    if (!result.canceled && result.assets[0]?.base64) {
+      const mime = result.assets[0].mimeType || 'image/png'
+      const b64 = `data:${mime};base64,${result.assets[0].base64}`
+      setProfile(prev => ({ ...prev, [field]: b64 }))
+    }
+  }
 
   const handleSave = async () => {
     if (!profile.name || !profile.qualification) {
@@ -111,6 +127,52 @@ export default function DoctorProfileScreen() {
           </View>
         ))}
 
+        <View style={styles.imageSection}>
+          <Text style={styles.sectionTitle}>Logo & Stamp</Text>
+          
+          <View style={styles.imageField}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>Clinic Logo</Text>
+              <Text style={styles.helpText}>Shown at the top of the prescription.</Text>
+            </View>
+            <Pressable onPress={() => pickImage('logoUrl')} style={styles.imagePickerBtn}>
+              {profile.logoUrl ? (
+                <Image source={{ uri: profile.logoUrl }} style={styles.imagePreview} />
+              ) : (
+                <Ionicons name="image-outline" size={24} color="#0f766e" />
+              )}
+            </Pressable>
+          </View>
+
+          <View style={styles.imageField}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>Doctor Stamp / Seal</Text>
+              <Text style={styles.helpText}>Circular stamp shown at the bottom.</Text>
+            </View>
+            <Pressable onPress={() => pickImage('stampUrl')} style={styles.imagePickerBtn}>
+              {profile.stampUrl ? (
+                <Image source={{ uri: profile.stampUrl }} style={styles.imagePreview} />
+              ) : (
+                <Ionicons name="image-outline" size={24} color="#0f766e" />
+              )}
+            </Pressable>
+          </View>
+
+          <View style={styles.imageField}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>Digital Signature</Text>
+              <Text style={styles.helpText}>Handwritten signature image.</Text>
+            </View>
+            <Pressable onPress={() => pickImage('signature')} style={styles.imagePickerBtn}>
+              {profile.signature ? (
+                <Image source={{ uri: profile.signature }} style={[styles.imagePreview, { width: 80 }]} resizeMode="contain" />
+              ) : (
+                <Ionicons name="image-outline" size={24} color="#0f766e" />
+              )}
+            </Pressable>
+          </View>
+        </View>
+
         <Pressable style={styles.saveFullBtn} onPress={handleSave} disabled={saving}>
           {saving ? <ActivityIndicator color="#fff" /> :
             <Text style={styles.saveFullText}>
@@ -155,8 +217,22 @@ const styles = StyleSheet.create({
   },
   saveFullBtn: {
     backgroundColor: '#0f766e', padding: 16, borderRadius: 14,
-    alignItems: 'center', marginTop: 8,
+    alignItems: 'center', marginTop: 16,
     shadowColor: '#0f766e', shadowOpacity: 0.3, shadowRadius: 8, elevation: 3,
   },
   saveFullText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  imageSection: {
+    backgroundColor: '#fff', borderRadius: 16, padding: 16, marginTop: 8,
+    shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1,
+    gap: 16,
+  },
+  sectionTitle: { fontSize: 15, fontWeight: '800', color: '#0f172a', marginBottom: 4 },
+  imageField: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  helpText: { fontSize: 11, color: '#94a3b8', marginTop: 2 },
+  imagePickerBtn: {
+    width: 60, height: 60, borderRadius: 12, borderWidth: 1.5, borderColor: '#e2e8f0',
+    borderStyle: 'dashed', backgroundColor: '#f8fafc', alignItems: 'center', justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  imagePreview: { width: '100%', height: '100%', resizeMode: 'cover' },
 })

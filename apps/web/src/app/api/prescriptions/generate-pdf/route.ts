@@ -21,34 +21,38 @@ import { z } from 'zod'
 
 const generatePdfSchema = z.object({
   templateSlug: z.string().min(1),
+  customColor: z.string().nullable().optional(),
   doctor: z.object({
-    name: z.string().optional(),
-    qualifications: z.string().optional(),
-    specialization: z.string().optional(),
-    registrationNumber: z.string().optional(),
-    clinicName: z.string().optional(),
-    phone: z.string().optional(),
-    address: z.string().optional(),
+    name: z.string().nullable().optional(),
+    qualifications: z.string().nullable().optional(),
+    specialization: z.string().nullable().optional(),
+    registrationNumber: z.string().nullable().optional(),
+    clinicName: z.string().nullable().optional(),
+    phone: z.string().nullable().optional(),
+    address: z.string().nullable().optional(),
+    signatureUrl: z.string().nullable().optional(),
+    logoUrl: z.string().nullable().optional(),
+    stampUrl: z.string().nullable().optional(),
   }),
   patient: z.object({
-    name: z.string().optional(),
-    age: z.string().optional(),
-    gender: z.string().optional(),
+    name: z.string().nullable().optional(),
+    age: z.string().nullable().optional(),
+    gender: z.string().nullable().optional(),
   }),
-  diagnosis: z.string().optional(),
+  diagnosis: z.string().nullable().optional(),
   medicines: z.array(
     z.object({
-      name: z.string().optional(),
-      strength: z.string().optional(),
-      form: z.string().optional(),
-      frequency: z.string().optional(),
-      timing: z.string().optional(),
-      duration: z.string().optional(),
+      name: z.string().nullable().optional(),
+      strength: z.string().nullable().optional(),
+      form: z.string().nullable().optional(),
+      frequency: z.string().nullable().optional(),
+      timing: z.string().nullable().optional(),
+      duration: z.string().nullable().optional(),
     })
   ).default([]),
-  labTests: z.string().optional(),
-  advice: z.string().optional(),
-  followUpDate: z.string().optional(),
+  labTests: z.string().nullable().optional(),
+  advice: z.string().nullable().optional(),
+  followUpDate: z.string().nullable().optional(),
 })
 
 export type GeneratePdfRequest = z.infer<typeof generatePdfSchema>
@@ -92,7 +96,7 @@ export async function POST(request: NextRequest) {
       (createElement(PrescriptionDocument, {
         templateName: template.name,
         templateSlug: template.slug,
-        primaryColor: template.styles.primaryColor,
+        primaryColor: data.customColor || template.styles.primaryColor,
         accentColor: template.styles.accentColor,
         bgColor: (template.styles as any).bgColor ?? '#ffffff',
         layout: template.layout,

@@ -53,42 +53,20 @@ export function TemplatesPreviewSection() {
                 className="group block overflow-hidden rounded-xl border border-border bg-white shadow-soft transition-all duration-200 hover:border-primary/25 hover:shadow-teal"
                 aria-label={`${template.name} prescription template`}
               >
-                {/* Template preview placeholder */}
+                {/* Template preview image */}
                 <div
-                  className="relative h-48 overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100"
+                  className="relative h-48 overflow-hidden bg-slate-100"
                   style={{ borderBottom: `3px solid ${template.styles.primaryColor}` }}
                   aria-hidden="true"
                 >
-                  {/* Prescription paper mockup */}
-                  <div className="absolute inset-4 rounded-sm bg-white shadow-soft-sm p-3 text-[8px] leading-tight">
-                    <div
-                      className="mb-1.5 border-b pb-1.5 font-bold"
-                      style={{ color: template.styles.primaryColor, borderColor: template.styles.primaryColor }}
-                    >
-                      Dr. [Doctor Name]
-                    </div>
-                    <div className="mb-1 text-slate-500">
-                      {template.styles.fontFamily.split(',')[0]}
-                    </div>
-                    <div className="space-y-0.5 text-slate-700">
-                      <div>Patient: _________ Age: __</div>
-                      <div>Date: {new Date().toLocaleDateString('en-IN')}</div>
-                    </div>
-                    <div
-                      className="mt-2 font-bold"
-                      style={{ color: template.styles.primaryColor }}
-                    >
-                      Rx
-                    </div>
-                    <div className="mt-1 pl-2 border-l-2 space-y-0.5" style={{ borderColor: template.styles.accentColor }}>
-                      <div className="font-medium text-slate-800">Medicine name 1</div>
-                      <div className="text-slate-500">1-0-1 · 5 days</div>
-                    </div>
-                  </div>
-
+                  <img
+                    src={template.thumbnail}
+                    alt={template.name}
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  />
                   {/* Premium badge */}
                   {template.isPremium && (
-                    <div className="absolute right-3 top-3 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                    <div className="absolute right-3 top-3 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm z-10">
                       Pro
                     </div>
                   )}

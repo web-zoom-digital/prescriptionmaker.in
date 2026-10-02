@@ -218,8 +218,10 @@ export const prescriptionFormSchema = z.object({
   followUp: z.string().max(200).optional(),
   referral: z.string().max(500).optional(),
 
-  // Signature
+  // Signature and Assets
   signatureDataUrl: z.string().optional(),
+  clinicLogoUrl: z.string().optional(),
+  stampUrl: z.string().optional(),
 
   // Additional
   notes: z.string().max(1000).optional(),

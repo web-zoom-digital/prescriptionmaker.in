@@ -170,6 +170,7 @@ export default function PrescriptionEditor() {
   const [doctorInfo, setDoctorInfo] = useState({
     name: '', qualification: '', specialization: '', regNo: '',
     clinicName: '', address: '', phone: '', email: '',
+    logoUrl: '', stampUrl: '', signature: ''
   })
   const [patientInfo, setPatientInfo] = useState({
     name: prefill_name ?? '',
@@ -196,6 +197,7 @@ export default function PrescriptionEditor() {
         name: p.name, qualification: p.qualification, specialization: p.specialization,
         regNo: p.regNo, clinicName: p.clinicName, address: p.address,
         phone: p.phone, email: p.email,
+        logoUrl: p.logoUrl || '', stampUrl: p.stampUrl || '', signature: p.signature || ''
       })
     })
   }, [])
@@ -281,6 +283,32 @@ export default function PrescriptionEditor() {
 
   const generateAndGetUri = async (): Promise<string> => {
     const html = generatePrescriptionHTML(getPrescriptionData())
+    
+    if (Platform.OS === 'web') {
+      // On web, expo-print might just print the current screen. 
+      // We manually create an iframe to print our custom HTML.
+      // Do NOT use display: 'none', as Chrome will print the main page instead.
+      const iframe = document.createElement('iframe')
+      iframe.style.position = 'absolute'
+      iframe.style.width = '0'
+      iframe.style.height = '0'
+      iframe.style.border = 'none'
+      iframe.style.visibility = 'hidden'
+      document.body.appendChild(iframe)
+      iframe.contentDocument?.open()
+      iframe.contentDocument?.write(html)
+      iframe.contentDocument?.close()
+      
+      return new Promise<string>((resolve) => {
+        setTimeout(() => {
+          iframe.contentWindow?.focus()
+          iframe.contentWindow?.print()
+          setTimeout(() => document.body.removeChild(iframe), 2000)
+          resolve('web-printed')
+        }, 500)
+      })
+    }
+
     const { uri } = await Print.printToFileAsync({ html, base64: false })
     // Move to a named file
     // @ts-ignore
@@ -293,7 +321,9 @@ export default function PrescriptionEditor() {
     setSaving(true)
     try {
       const uri = await generateAndGetUri()
-      await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Save Prescription PDF' })
+      if (Platform.OS !== 'web') {
+        await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Save Prescription PDF' })
+      }
     } catch (err: any) {
       Alert.alert('Error', err.message)
     } finally {
@@ -305,7 +335,9 @@ export default function PrescriptionEditor() {
     setSaving(true)
     try {
       const uri = await generateAndGetUri()
-      await Sharing.shareAsync(uri, { mimeType: 'application/pdf' })
+      if (Platform.OS !== 'web') {
+        await Sharing.shareAsync(uri, { mimeType: 'application/pdf' })
+      }
     } catch (err: any) {
       Alert.alert('Error', err.message)
     } finally {
@@ -314,6 +346,11 @@ export default function PrescriptionEditor() {
   }
 
   const handleEmail = async () => {
+    if (Platform.OS === 'web') {
+      await generateAndGetUri()
+      setSaving(false)
+      return
+    }
     const available = await MailComposer.isAvailableAsync()
     if (!available) {
       Alert.alert('Not Available', 'Email is not available on this device.')
@@ -339,6 +376,7 @@ export default function PrescriptionEditor() {
     setSaving(true)
     try {
       const uri = await generateAndGetUri()
+      if (Platform.OS === 'web') return
       
       // Share PDF directly using Sharing (WhatsApp usually appears in the native share sheet)
       // Or we can construct a direct text message if preferred
@@ -604,10 +642,15 @@ export default function PrescriptionEditor() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Review & Export</Text>
               <View style={[styles.reviewCard, { backgroundColor: template.styles.bgColor, borderColor: color }]}>
-                <View style={[styles.reviewHeader, { backgroundColor: color }]}>
-                  <Text style={styles.reviewDrName}>Dr. {doctorInfo.name || 'Your Name'}</Text>
-                  <Text style={styles.reviewDrSub}>{doctorInfo.qualification} {doctorInfo.specialization}</Text>
-                  {doctorInfo.clinicName ? <Text style={styles.reviewClinic}>{doctorInfo.clinicName}</Text> : null}
+                <View style={[styles.reviewHeader, { backgroundColor: color, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.reviewDrName}>Dr. {doctorInfo.name || 'Your Name'}</Text>
+                    <Text style={styles.reviewDrSub}>{doctorInfo.qualification} {doctorInfo.specialization}</Text>
+                    {doctorInfo.clinicName ? <Text style={styles.reviewClinic}>{doctorInfo.clinicName}</Text> : null}
+                  </View>
+                  {doctorInfo.logoUrl ? (
+                    <Image source={{ uri: doctorInfo.logoUrl }} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#fff' }} resizeMode="contain" />
+                  ) : null}
                 </View>
                 <View style={styles.reviewBody}>
                   <View style={styles.reviewRow}>
@@ -631,6 +674,23 @@ export default function PrescriptionEditor() {
                     <Text key={m.id} style={styles.medLine}>{i + 1}. {m.name} {m.strength} — {m.frequency} × {m.duration}</Text>
                   ))}
                   {advice ? <Text style={styles.adviceLine}>💡 {advice}</Text> : null}
+                </View>
+                {/* Review Signature/Stamp Preview */}
+                <View style={{ padding: 12, borderTopWidth: 1, borderTopColor: '#e2e8f0', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
+                  <Text style={{ fontSize: 10, color: '#94a3b8', flex: 1 }}>prescriptionmaker.in</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    {doctorInfo.stampUrl ? (
+                      <Image source={{ uri: doctorInfo.stampUrl }} style={{ width: 40, height: 40, opacity: 0.8 }} resizeMode="contain" />
+                    ) : null}
+                    <View style={{ alignItems: 'center' }}>
+                      {doctorInfo.signature ? (
+                        <Image source={{ uri: doctorInfo.signature }} style={{ width: 50, height: 25, marginBottom: 2 }} resizeMode="contain" />
+                      ) : (
+                        <View style={{ width: 50, height: 15, borderBottomWidth: 1, borderBottomColor: '#cbd5e1', marginBottom: 2 }} />
+                      )}
+                      <Text style={{ fontSize: 8, color: '#64748b', fontWeight: 'bold' }}>Signature</Text>
+                    </View>
+                  </View>
                 </View>
               </View>
 

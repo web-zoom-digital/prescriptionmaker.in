@@ -54,7 +54,7 @@ export async function GET(
         clinicName: profile?.clinic_name ?? '',
         clinicPhone: profile?.clinic_phone ?? '',
         clinicAddress: `${profile?.clinic_address ?? ''}, ${profile?.clinic_city ?? ''} ${profile?.clinic_pincode ?? ''}`.trim(),
-        clinicLogoUrl: profile?.clinic_logo_url ?? null,
+        logoUrl: profile?.clinic_logo_url ?? null,
         stampUrl: profile?.stamp_url ?? null,
         signatureUrl: profile?.signature_url ?? null,
       },

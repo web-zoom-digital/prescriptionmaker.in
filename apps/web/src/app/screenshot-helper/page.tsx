@@ -19,7 +19,7 @@ export default function ScreenshotHelper() {
     <div className="flex flex-col gap-20 p-10 bg-slate-100">
       {TEMPLATES.map(t => (
         <div key={t.slug} id={t.slug} className="bg-white shadow-xl w-[210mm] min-h-[297mm]">
-          <PrescriptionPreview template={t} data={dummyData} />
+          <PrescriptionPreview template={t as any} data={dummyData} />
         </div>
       ))}
     </div>

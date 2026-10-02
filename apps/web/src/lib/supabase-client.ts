@@ -19,24 +19,29 @@ export async function uploadDoctorAsset(
   type: UploadType,
   file: File
 ): Promise<string> {
-  const ext = file.name.split('.').pop()
-  const path = `${userId}/${type}.${ext}`
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('userId', userId)
+  formData.append('type', type)
 
-  // Delete old file first to avoid orphans
-  await supabase.storage.from(BUCKET).remove([path])
+  const res = await fetch('/api/upload-asset', {
+    method: 'POST',
+    body: formData,
+  })
 
-  const { error } = await supabase.storage
-    .from(BUCKET)
-    .upload(path, file, {
-      cacheControl: '3600',
-      upsert: true,
-      contentType: file.type,
-    })
+  if (!res.ok) {
+    let errorMessage = 'Upload failed'
+    try {
+      const err = await res.json()
+      errorMessage = err.error || errorMessage
+    } catch (e) {
+      // Ignore
+    }
+    throw new Error(errorMessage)
+  }
 
-  if (error) throw new Error(`Upload failed: ${error.message}`)
-
-  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path)
-  return data.publicUrl
+  const data = await res.json()
+  return data.url
 }
 
 /**

@@ -77,6 +77,9 @@ export async function PUT(request: NextRequest) {
         clinic_email: body.clinicEmail,
         clinic_website: body.clinicWebsite,
         default_template_slug: body.defaultTemplateSlug,
+        clinic_logo_url: body.clinicLogoUrl,
+        stamp_url: body.stampUrl,
+        signature_url: body.signatureUrl,
         updated_at: new Date().toISOString()
       })
       .eq('user_id', userId)

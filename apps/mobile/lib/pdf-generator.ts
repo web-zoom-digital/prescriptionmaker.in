@@ -70,7 +70,8 @@ function layoutClassic(data: PrescriptionData): string {
   const meds = medicines.map((m, i) => `<li style="margin-bottom:8px;"><b>${m.name}${m.strength ? ` <span style="font-weight:400;color:#64748b;">${m.strength}</span>` : ''}</b> — ${m.frequency ? t(m.frequency, data.language) : ''} × ${m.duration || ''} ${m.instructions ? `<i style="color:#64748b;">(${t(m.instructions, data.language)})</i>` : ''}</li>`).join('')
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
     ${baseCSS(primaryColor, accentColor, bgColor, template.styles.fontFamily)}
-    .header { text-align:center; padding:28px 24px 16px; border-bottom:3px double ${primaryColor}; }
+    .header { text-align:center; padding:28px 24px 16px; border-bottom:3px double ${primaryColor}; display:flex; flex-direction:column; align-items:center; }
+    .logo { width:56px; height:56px; object-fit:contain; margin-bottom:12px; border-radius:28px; }
     .clinic-name { font-size:26px; font-weight:800; color:${primaryColor}; font-family:Georgia,serif; letter-spacing:1px; }
     .doctor-name { font-size:16px; font-weight:700; color:#1e293b; margin-top:4px; }
     .creds { font-size:11px; color:${accentColor}; margin-top:2px; }
@@ -82,8 +83,13 @@ function layoutClassic(data: PrescriptionData): string {
     .body { padding:20px 28px; }
     .rx-sym { font-size:40px; font-weight:900; color:${primaryColor}; font-family:Georgia,serif; float:left; margin-right:12px; line-height:1; }
     ol { padding-left:20px; margin-top:10px; }
+    .footer-content { padding:16px 28px; background:#f8fafc; display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid ${primaryColor}25; }
+    .stamp { width:60px; height:60px; object-fit:contain; opacity:0.8; }
+    .sig { width:80px; height:35px; object-fit:contain; margin-bottom:4px; }
+    .sig-line-only { width:80px; border-bottom:1px solid #cbd5e1; height:20px; margin-bottom:4px; }
   </style></head><body><div class="page">
     <div class="header">
+      ${doctorInfo.logoUrl ? `<img src="${doctorInfo.logoUrl}" class="logo" />` : ''}
       <div class="clinic-name">${doctorInfo.clinicName || 'Medical Clinic'}</div>
       <div class="doctor-name">Dr. ${doctorInfo.name}</div>
       <div class="creds">${doctorInfo.qualification}${doctorInfo.specialization ? ' | ' + doctorInfo.specialization : ''}${doctorInfo.regNo ? ' | Reg: ' + doctorInfo.regNo : ''}</div>
@@ -108,7 +114,16 @@ function layoutClassic(data: PrescriptionData): string {
       ${advice ? `<div class="section-title">Advice</div><div class="advice-box">${t(advice, data.language)}</div>` : ''}
       ${followUp ? `<div class="section-title">Follow-up</div><div class="advice-box">${followUp}</div>` : ''}
     </div>
-    <div class="footer"><div class="footer-brand">prescriptionmaker.in — ${template.name}</div><div class="sig-box"><div class="sig-line">Dr. ${doctorInfo.name}<div class="sig-name">Signature &amp; Stamp</div></div></div></div>
+    <div class="footer-content">
+      <div style="font-size:9px;color:#94a3b8;">prescriptionmaker.in — ${template.name}</div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        ${doctorInfo.stampUrl ? `<img src="${doctorInfo.stampUrl}" class="stamp" />` : ''}
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          ${doctorInfo.signature ? `<img src="${doctorInfo.signature}" class="sig" />` : `<div class="sig-line-only"></div>`}
+          <div style="font-size:9px;color:#64748b;font-weight:600;">Dr. ${doctorInfo.name}</div>
+        </div>
+      </div>
+    </div>
   </div></body></html>`
 }
 
@@ -128,7 +143,7 @@ function layoutTwoColumn(data: PrescriptionData): string {
     .layout { display:flex; min-height:100vh; }
     .sidebar { width:200px; min-width:200px; background:${primaryColor}; color:#fff; padding:20px 14px; display:flex; flex-direction:column; gap:14px; }
     .sidebar h1 { font-size:16px; font-weight:800; letter-spacing:0.5px; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:10px; margin-bottom:4px; }
-    .sidebar .rx-circle { width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+    .sidebar .rx-circle { width:48px; height:48px; border-radius:24px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; margin-bottom:10px; object-fit:contain; }
     .sidebar .rx-circle span { font-size:22px; font-weight:900; font-family:Georgia,serif; }
     .sb-label { font-size:8px; text-transform:uppercase; letter-spacing:0.5px; opacity:0.6; margin-bottom:2px; }
     .sb-value { font-size:10px; font-weight:600; opacity:0.9; word-break:break-word; }
@@ -146,7 +161,7 @@ function layoutTwoColumn(data: PrescriptionData): string {
   </style></head><body><div class="page"><div class="layout">
     <!-- SIDEBAR -->
     <div class="sidebar">
-      <div class="rx-circle"><span>℞</span></div>
+      ${doctorInfo.logoUrl ? `<img src="${doctorInfo.logoUrl}" class="rx-circle" style="background:#fff;padding:2px;" />` : `<div class="rx-circle"><span>℞</span></div>`}
       <div>
         <div class="sb-label">Doctor</div>
         <div class="sb-value">Dr. ${doctorInfo.name}</div>
@@ -205,7 +220,16 @@ function layoutTwoColumn(data: PrescriptionData): string {
         ${advice ? `<div class="section-title">Advice</div><div class="advice-box">${t(advice, data.language)}</div>` : ''}
         ${followUp ? `<div class="section-title">Follow-up</div><div class="advice-box">${followUp}</div>` : ''}
       </div>
-      <div class="footer"><div class="footer-brand">prescriptionmaker.in — ${template.name}</div><div class="sig-box"><div class="sig-line">Dr. ${doctorInfo.name}<div class="sig-name">Signature &amp; Stamp</div></div></div></div>
+      <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid ${primaryColor}20;">
+        <div style="font-size:9px;color:#94a3b8;">prescriptionmaker.in — ${template.name}</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${doctorInfo.stampUrl ? `<img src="${doctorInfo.stampUrl}" style="width:50px;height:50px;object-fit:contain;opacity:0.8;" />` : ''}
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            ${doctorInfo.signature ? `<img src="${doctorInfo.signature}" style="width:70px;height:30px;object-fit:contain;margin-bottom:4px;" />` : `<div style="width:70px;height:16px;border-bottom:1px solid #cbd5e1;margin-bottom:4px;"></div>`}
+            <div style="font-size:9px;color:#64748b;font-weight:600;">Dr. ${doctorInfo.name}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div></div></body></html>`
 }
@@ -240,9 +264,12 @@ function layoutHospitalOPD(data: PrescriptionData): string {
     .diag-box b { color:${primaryColor}; }
   </style></head><body><div class="page">
     <div class="hosp-header">
-      <div>
-        <div class="hosp-name">${doctorInfo.clinicName || 'Government Hospital'}</div>
-        <div class="hosp-sub">OPD Prescription Slip</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        ${doctorInfo.logoUrl ? `<img src="${doctorInfo.logoUrl}" style="width:40px;height:40px;border-radius:20px;background:#fff;padding:2px;object-fit:contain;" />` : ''}
+        <div>
+          <div class="hosp-name">${doctorInfo.clinicName || 'Government Hospital'}</div>
+          <div class="hosp-sub">OPD Prescription Slip</div>
+        </div>
       </div>
       <div style="text-align:right;">
         <div style="font-size:13px;font-weight:700;">Dr. ${doctorInfo.name}</div>
@@ -281,7 +308,20 @@ function layoutHospitalOPD(data: PrescriptionData): string {
       ${advice ? `<div class="section-title">Advice</div><div class="advice-box">${t(advice, data.language)}</div>` : ''}
       ${followUp ? `<div class="section-title">Follow-up</div><div class="advice-box">${followUp}</div>` : ''}
     </div>
-    <div class="footer"><div class="footer-brand">prescriptionmaker.in — ${template.name}</div><div class="sig-box"><div class="sig-line">Dr. ${doctorInfo.name}<div class="sig-name">Signature &amp; Stamp</div></div></div></div>
+    <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-end;">
+      <div style="width:40%;">
+        <div style="width:100%;border-bottom:1px solid #cbd5e1;height:24px;margin-bottom:4px;"></div>
+        <div style="font-size:9px;color:#64748b;font-weight:600;">HOD SIGNATURE</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        ${doctorInfo.stampUrl ? `<img src="${doctorInfo.stampUrl}" style="width:50px;height:50px;object-fit:contain;opacity:0.8;" />` : ''}
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          ${doctorInfo.signature ? `<img src="${doctorInfo.signature}" style="width:70px;height:30px;object-fit:contain;margin-bottom:4px;" />` : `<div style="width:80px;border-bottom:1px solid #cbd5e1;height:24px;margin-bottom:4px;"></div>`}
+          <div style="font-size:9px;color:#64748b;font-weight:600;">DOCTOR SIGNATURE<br>Dr. ${doctorInfo.name}</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#f1f5f9;padding:6px 20px;font-size:8px;color:#94a3b8;text-align:center;">prescriptionmaker.in — ${template.name}</div>
   </div></body></html>`
 }
 
@@ -303,9 +343,12 @@ function layoutSOAP(data: PrescriptionData): string {
     .body { padding:18px 24px; }
   </style></head><body><div class="page">
     <div class="soap-header">
-      <div>
-        <div style="font-size:20px;font-weight:800;color:${primaryColor};">${doctorInfo.clinicName || 'Clinical Notes'}</div>
-        <div class="soap-title">SOAP Clinical Note</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        ${doctorInfo.logoUrl ? `<img src="${doctorInfo.logoUrl}" style="width:44px;height:44px;border-radius:22px;background:#fff;padding:2px;object-fit:contain;" />` : ''}
+        <div>
+          <div style="font-size:20px;font-weight:800;color:${primaryColor};">${doctorInfo.clinicName || 'Clinical Notes'}</div>
+          <div class="soap-title">SOAP Clinical Note</div>
+        </div>
       </div>
       <div style="text-align:right;">
         <div style="font-weight:700;">Dr. ${doctorInfo.name}</div>
@@ -328,7 +371,16 @@ function layoutSOAP(data: PrescriptionData): string {
       ${advice ? `<div class="section-title">Advice</div><div class="advice-box">${t(advice, data.language)}</div>` : ''}
       ${followUp ? `<div class="section-title">Follow-up</div><div class="advice-box">${followUp}</div>` : ''}
     </div>
-    <div class="footer"><div class="footer-brand">prescriptionmaker.in — ${template.name}</div><div class="sig-box"><div class="sig-line">Dr. ${doctorInfo.name}<div class="sig-name">Signature &amp; Stamp</div></div></div></div>
+    <div style="padding:16px 24px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid ${primaryColor}20;">
+      <div style="font-size:9px;color:#94a3b8;">prescriptionmaker.in — ${template.name}</div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        ${doctorInfo.stampUrl ? `<img src="${doctorInfo.stampUrl}" style="width:50px;height:50px;object-fit:contain;opacity:0.8;" />` : ''}
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          ${doctorInfo.signature ? `<img src="${doctorInfo.signature}" style="width:70px;height:30px;object-fit:contain;margin-bottom:4px;" />` : `<div style="width:70px;height:16px;border-bottom:1px solid #cbd5e1;margin-bottom:4px;"></div>`}
+          <div style="font-size:9px;color:#64748b;font-weight:600;">Dr. ${doctorInfo.name}</div>
+        </div>
+      </div>
+    </div>
   </div></body></html>`
 }
 
@@ -370,9 +422,12 @@ function layoutGeneric(data: PrescriptionData): string {
     .body { padding:0 20px; }
   </style></head><body><div class="page">
     <div class="header">
-      <div>
-        <div class="clinic-name">${doctorInfo.clinicName || 'Medical Clinic'}</div>
-        ${doctorInfo.address ? `<div style="font-size:10px;color:${accentColor};margin-top:2px;">${doctorInfo.address}</div>` : ''}
+      <div style="display:flex; align-items:center; gap:12px;">
+        ${doctorInfo.logoUrl ? `<img src="${doctorInfo.logoUrl}" style="width:48px;height:48px;border-radius:24px;background:#fff;padding:2px;object-fit:contain;" />` : ''}
+        <div>
+          <div class="clinic-name">${doctorInfo.clinicName || 'Medical Clinic'}</div>
+          ${doctorInfo.address ? `<div style="font-size:10px;color:${accentColor};margin-top:2px;">${doctorInfo.address}</div>` : ''}
+        </div>
       </div>
       <div style="text-align:right;">
         <div class="doctor-name-h">Dr. ${doctorInfo.name}</div>
@@ -408,7 +463,16 @@ function layoutGeneric(data: PrescriptionData): string {
     ${advice ? `<div class="section-title">Advice</div><div class="advice-box">${t(advice, data.language)}</div>` : ''}
     ${followUp ? `<div class="section-title">Follow-up</div><div class="advice-box">${followUp}</div>` : ''}
     </div>
-    <div class="footer"><div class="footer-brand">prescriptionmaker.in — ${template.name}</div><div class="sig-box"><div class="sig-line">Dr. ${doctorInfo.name}<div class="sig-name">Signature &amp; Stamp</div></div></div></div>
+    <div class="footer">
+      <div class="footer-brand">prescriptionmaker.in — ${template.name}</div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        ${doctorInfo.stampUrl ? `<img src="${doctorInfo.stampUrl}" style="width:60px;height:60px;object-fit:contain;opacity:0.8;" />` : ''}
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          ${doctorInfo.signature ? `<img src="${doctorInfo.signature}" style="width:80px;height:35px;object-fit:contain;margin-bottom:4px;" />` : `<div style="width:80px;border-bottom:1px solid #cbd5e1;height:24px;margin-bottom:4px;"></div>`}
+          <div style="font-size:9px;color:#94a3b8;font-weight:600;">Dr. ${doctorInfo.name}</div>
+        </div>
+      </div>
+    </div>
   </div></body></html>`
 }
 

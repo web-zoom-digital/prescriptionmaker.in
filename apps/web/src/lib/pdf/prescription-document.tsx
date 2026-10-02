@@ -67,32 +67,34 @@ export interface PrescriptionDocumentProps {
   bgColor?: string
   layout: string
   doctor: {
-    name?: string
-    qualifications?: string
-    specialization?: string
-    registrationNumber?: string
-    clinicName?: string
-    phone?: string
-    address?: string
-    signatureUrl?: string
+    name?: string | null
+    qualifications?: string | null
+    specialization?: string | null
+    registrationNumber?: string | null
+    clinicName?: string | null
+    phone?: string | null
+    address?: string | null
+    signatureUrl?: string | null
+    logoUrl?: string | null
+    stampUrl?: string | null
   }
   patient: {
-    name?: string
-    age?: string
-    gender?: string
+    name?: string | null
+    age?: string | null
+    gender?: string | null
   }
-  diagnosis?: string
+  diagnosis?: string | null
   medicines: Array<{
-    name?: string
-    strength?: string
-    form?: string
-    frequency?: string
-    timing?: string
-    duration?: string
+    name?: string | null
+    strength?: string | null
+    form?: string | null
+    frequency?: string | null
+    timing?: string | null
+    duration?: string | null
   }>
-  labTests?: string
-  advice?: string
-  followUpDate?: string
+  labTests?: string | null
+  advice?: string | null
+  followUpDate?: string | null
   date?: string
 }
 
@@ -106,12 +108,17 @@ export function PrescriptionDocument({
 
   // Shared: Signature block
   const SigBlock = () => (
-    <View style={S.sigBox}>
-      {doctor.signatureUrl
-        ? <Image src={doctor.signatureUrl} style={{ width: 75, height: 35, objectFit: 'contain' }} />
-        : <View style={S.sigLine} />}
-      <Text style={S.sigLabel}>Doctor&apos;s Signature</Text>
-      {doctor.name && <Text style={{ fontSize: 7, color: '#475569', marginTop: 1 }}>Dr. {doctor.name}</Text>}
+    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
+      {doctor.stampUrl && (
+        <Image src={doctor.stampUrl} style={{ width: 60, height: 60, objectFit: 'contain', opacity: 0.8 }} />
+      )}
+      <View style={{ alignItems: 'center' }}>
+        {doctor.signatureUrl
+          ? <Image src={doctor.signatureUrl} style={{ width: 75, height: 35, objectFit: 'contain' }} />
+          : <View style={S.sigLine} />}
+        <Text style={S.sigLabel}>Doctor&apos;s Signature</Text>
+        {doctor.name && <Text style={{ fontSize: 7, color: '#475569', marginTop: 1 }}>Dr. {doctor.name}</Text>}
+      </View>
     </View>
   )
 
@@ -161,7 +168,7 @@ export function PrescriptionDocument({
     </View>
   )
 
-  const GridRow = ({ fields }: { fields: { label: string; value?: string }[] }) => (
+  const GridRow = ({ fields }: { fields: { label: string; value?: string | null }[] }) => (
     <View style={S.gridRow}>
       {fields.map((f, i) => (
         <View key={i} style={[S.gridCell, { borderRightWidth: i < fields.length - 1 ? 0.5 : 0 }]}>
@@ -371,7 +378,11 @@ export function PrescriptionDocument({
         {/* Colored header band */}
         <View style={[S.headerBand, { backgroundColor: pc, paddingVertical: 14 }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', color: ac }}>Rx</Text>
+            {doctor.logoUrl ? (
+              <Image src={doctor.logoUrl} style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 16 }} />
+            ) : (
+              <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', color: ac }}>Rx</Text>
+            )}
             <View>
               <Text style={{ fontSize: 14, fontFamily: 'Helvetica-Bold', color: '#ffffff' }}>
                 {doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}

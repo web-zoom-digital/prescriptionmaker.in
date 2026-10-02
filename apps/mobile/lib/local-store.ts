@@ -11,6 +11,8 @@ export type DoctorProfile = {
   phone: string
   email: string
   signature: string
+  logoUrl?: string
+  stampUrl?: string
 }
 
 const PROFILE_KEY = '@doctor_profile'

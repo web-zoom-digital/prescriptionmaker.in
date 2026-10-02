@@ -127,6 +127,116 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
 
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-4">
+      {/* DEV AUTOFILL TOOLBAR */}
+      <div className="bg-teal-50/50 border border-teal-200 rounded-xl p-4 shadow-sm mb-2">
+        <div className="flex items-center gap-2 mb-3">
+          <Zap className="h-4 w-4 text-teal-600" />
+          <h3 className="text-xs font-bold text-teal-800 uppercase tracking-wide">Developer Autofill</h3>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Vatsalya Bhardwaj',
+                doctorQualifications: 'MBBS, MD (Medicine)',
+                doctorSpecialization: 'General Physician',
+                doctorRegNumber: 'MCI-12345',
+                clinicName: 'Zoom Digital Clinic',
+                clinicPhone: '+91 98765 43210',
+                clinicAddress: 'Sector 5, New Delhi',
+                patient: { name: 'Rahul Kumar', age: '34', gender: 'male' },
+                diagnosis: 'Viral Fever with URI',
+                medicines: [
+                  { id: '1', name: 'Paracetamol', strength: '650mg', form: 'tablet', frequency: 'TDS', timing: 'after_food', duration: '3 days', route: 'oral', instructions: 'Take if fever is above 100°F' },
+                  { id: '2', name: 'Azithromycin', strength: '500mg', form: 'tablet', frequency: 'OD', timing: 'after_food', duration: '3 days', route: 'oral', instructions: 'Complete the full course' },
+                  { id: '3', name: 'Levocetirizine', strength: '5mg', form: 'tablet', frequency: 'OD', timing: 'bedtime', duration: '5 days', route: 'oral', instructions: 'May cause drowsiness' }
+                ],
+                tests: [{ id: '1', name: 'Complete Blood Count (CBC)' }, { id: '2', name: 'Dengue NS1 Antigen' }],
+                advice: 'Drink plenty of warm fluids. Take complete rest.',
+                followUp: '3 days',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-3 py-1.5 bg-teal-600 text-white text-xs font-bold rounded-md hover:bg-teal-700 transition active:scale-95"
+          >
+            Adult Fever Case
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Vatsalya Bhardwaj',
+                doctorQualifications: 'MBBS, DCH',
+                doctorSpecialization: 'Pediatrician',
+                doctorRegNumber: 'MCI-67890',
+                clinicName: 'Zoom Kids Clinic',
+                clinicPhone: '+91 98765 43210',
+                clinicAddress: 'Sector 5, New Delhi',
+                patient: { name: 'Aarav Sharma', age: '4 years', gender: 'male' },
+                diagnosis: 'Acute Otitis Media (Ear Infection)',
+                medicines: [
+                  { id: '1', name: 'Amoxicillin', strength: '250mg/5ml', form: 'syrup', frequency: 'TDS', timing: 'after_food', duration: '5 days', route: 'oral', instructions: 'Take 5ml three times a day' },
+                  { id: '2', name: 'Ibuprofen', strength: '100mg/5ml', form: 'syrup', frequency: 'SOS', timing: 'after_food', duration: '3 days', route: 'oral', instructions: 'Take 5ml if pain or fever' }
+                ],
+                tests: [],
+                advice: 'Do not allow water to enter the ears during bath.',
+                followUp: '5 days',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-md hover:bg-indigo-700 transition active:scale-95"
+          >
+            Pediatric Case
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Vatsalya Bhardwaj',
+                doctorQualifications: 'MD, DM (Cardiology)',
+                doctorSpecialization: 'Cardiologist',
+                doctorRegNumber: 'MCI-11223',
+                clinicName: 'Heart Care Center',
+                clinicPhone: '+91 98765 43210',
+                clinicAddress: 'Sector 5, New Delhi',
+                patient: { name: 'Ramesh Singh', age: '58', gender: 'male' },
+                diagnosis: 'Hypertension, Dyslipidemia',
+                medicines: [
+                  { id: '1', name: 'Telmisartan', strength: '40mg', form: 'tablet', frequency: 'OD', timing: 'before_food', duration: '30 days', route: 'oral', instructions: 'Take in morning' },
+                  { id: '2', name: 'Atorvastatin', strength: '20mg', form: 'tablet', frequency: 'OD', timing: 'bedtime', duration: '30 days', route: 'oral', instructions: '' },
+                  { id: '3', name: 'Aspirin', strength: '75mg', form: 'tablet', frequency: 'OD', timing: 'after_food', duration: '30 days', route: 'oral', instructions: 'Do not take on empty stomach' }
+                ],
+                tests: [{ id: '1', name: 'Lipid Profile' }, { id: '2', name: 'ECG' }],
+                advice: 'Strictly avoid oily food and salt. 30 mins walk daily.',
+                followUp: '1 month',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-3 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-md hover:bg-rose-700 transition active:scale-95"
+          >
+            Cardiology Case
+          </button>
+          <button
+            type="button"
+            onClick={() => reset({
+              doctorName: '', doctorQualifications: '', doctorSpecialization: '', doctorRegNumber: '', clinicName: '', clinicPhone: '', clinicAddress: '',
+              patient: { name: '', age: '', gender: 'male' }, diagnosis: '', medicines: [{ id: '1', name: '', strength: '', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '5 days', route: 'oral' }], tests: [], advice: '', followUp: '',
+              signatureDataUrl: watch('signatureDataUrl')
+            })}
+            className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-md hover:bg-slate-50 transition active:scale-95 ml-auto"
+          >
+            Clear Form
+          </button>
+        </div>
+      </div>
+
       {/* Doctor Information */}
       <EditorSection
         title="Doctor Information"
@@ -202,6 +312,41 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
               className="form-input"
               placeholder="City, State"
             />
+          </FormField>
+
+          <FormField id="doctor-signature" label="Digital Signature (Upload)" className="sm:col-span-2" error={errors.signatureDataUrl?.message}>
+            <div className="flex items-center gap-4">
+              <input
+                id="doctor-signature"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    const reader = new FileReader()
+                    reader.onloadend = () => {
+                      setValue('signatureDataUrl', reader.result as string)
+                    }
+                    reader.readAsDataURL(file)
+                  }
+                }}
+                className="form-input flex-1 file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer"
+              />
+              {watch('signatureDataUrl') && (
+                <div className="relative border border-slate-200 rounded-md p-1 bg-white">
+                  <img src={watch('signatureDataUrl')} alt="Signature Preview" className="h-10 w-24 object-contain" />
+                  <button
+                    type="button"
+                    onClick={() => setValue('signatureDataUrl', '')}
+                    className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-0.5 hover:bg-red-200"
+                    title="Remove Signature"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-slate-500 mt-1">Upload a clean image of your signature (PNG/JPG with white/transparent background).</p>
           </FormField>
         </div>
       </EditorSection>
