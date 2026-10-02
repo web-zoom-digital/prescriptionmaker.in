@@ -73,7 +73,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           Back to Templates
         </Link>
 
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           {/* Template preview */}
           <div className="flex justify-center lg:justify-end xl:justify-center">
             <div className="overflow-hidden rounded-xl border shadow-soft-lg bg-white bg-slate-50 relative w-full max-w-[420px]">
@@ -86,50 +86,52 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           </div>
 
           {/* Template info */}
-          <div>
-            <div className="flex items-start gap-3 mb-2">
-              {template.isFeatured && (
-                <span className="inline-flex items-center rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-700 ring-1 ring-inset ring-teal-200">
-                  Popular
-                </span>
-              )}
-              {template.isPremium && (
-                <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
-                  Pro Plan
-                </span>
-              )}
-            </div>
+          <div className="flex flex-col justify-between h-full">
+            <div>
+              <div className="flex items-start gap-3 mb-2">
+                {template.isFeatured && (
+                  <span className="inline-flex items-center rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-700 ring-1 ring-inset ring-teal-200">
+                    Popular
+                  </span>
+                )}
+                {template.isPremium && (
+                  <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
+                    Pro Plan
+                  </span>
+                )}
+              </div>
 
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              {template.name}
-            </h1>
-            <p className="mt-3 text-base leading-relaxed text-slate-600">{template.description}</p>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                {template.name}
+              </h1>
+              <p className="mt-3 text-base leading-relaxed text-slate-600">{template.description}</p>
 
-            <dl className="mt-6 grid grid-cols-2 gap-3">
-              {[
-                { label: 'Layout', value: template.layout },
-                { label: 'Category', value: template.category },
-                { label: 'Page size', value: template.printSettings.pageSize },
-                { label: 'Font style', value: template.styles.fontFamily.split(',')[0] },
-              ].map((item) => (
-                <div key={item.label} className="rounded-lg border border-border bg-slate-50 p-3">
-                  <dt className="text-xs font-medium text-muted-foreground capitalize">{item.label}</dt>
-                  <dd className="mt-0.5 text-sm font-semibold text-slate-900 capitalize">{item.value}</dd>
-                </div>
-              ))}
-            </dl>
-
-            {/* Sections */}
-            <div className="mt-6">
-              <h2 className="mb-2 text-sm font-semibold text-slate-900">Included sections</h2>
-              <ul className="space-y-1.5">
-                {template.sections.map((section) => (
-                  <li key={section.id} className="flex items-center gap-2 text-sm text-slate-600">
-                    <Check className="h-3.5 w-3.5 text-teal-500 flex-shrink-0" aria-hidden="true" />
-                    {section.name}
-                  </li>
+              <dl className="mt-6 grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Layout', value: template.layout },
+                  { label: 'Category', value: template.category },
+                  { label: 'Page size', value: template.printSettings.pageSize },
+                  { label: 'Font style', value: template.styles.fontFamily.split(',')[0] },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-lg border border-border bg-slate-50 p-3">
+                    <dt className="text-xs font-medium text-muted-foreground capitalize">{item.label}</dt>
+                    <dd className="mt-0.5 text-sm font-semibold text-slate-900 capitalize">{item.value}</dd>
+                  </div>
                 ))}
-              </ul>
+              </dl>
+
+              {/* Sections */}
+              <div className="mt-6">
+                <h2 className="mb-2 text-sm font-semibold text-slate-900">Included sections</h2>
+                <ul className="space-y-1.5">
+                  {template.sections.map((section) => (
+                    <li key={section.id} className="flex items-center gap-2 text-sm text-slate-600">
+                      <Check className="h-3.5 w-3.5 text-teal-500 flex-shrink-0" aria-hidden="true" />
+                      {section.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* CTAs */}
