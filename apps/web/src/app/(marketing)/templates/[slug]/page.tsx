@@ -75,62 +75,14 @@ export default async function TemplateDetailPage({ params }: PageProps) {
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           {/* Template preview */}
+          {/* Template preview */}
           <div>
-            <div
-              className="overflow-hidden rounded-xl border shadow-soft-lg bg-white"
-              style={{ borderTop: `4px solid ${template.styles.primaryColor}` }}
-            >
-              {/* Mock prescription */}
-              <div className="p-8 min-h-96">
-                <div
-                  className="border-b-2 pb-4 mb-4"
-                  style={{ borderColor: template.styles.primaryColor }}
-                >
-                  <div
-                    className="text-lg font-bold"
-                    style={{ color: template.styles.primaryColor, fontFamily: template.styles.fontFamily }}
-                  >
-                    Dr. [Your Name]
-                  </div>
-                  <div className="text-sm text-slate-500 mt-0.5">
-                    [Qualifications] · [Specialization]
-                  </div>
-                  <div className="text-sm text-slate-500">Reg. No: [Your MCI Number]</div>
-                </div>
-
-                <div className="text-sm text-slate-600 mb-4">
-                  <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div><span className="text-slate-400">Patient:</span> Sample Name</div>
-                    <div><span className="text-slate-400">Age:</span> 35Y / M</div>
-                    <div><span className="text-slate-400">Date:</span> {new Date().toLocaleDateString('en-IN')}</div>
-                  </div>
-                </div>
-
-                <div
-                  className="text-xl font-bold mb-3"
-                  style={{ color: template.styles.primaryColor }}
-                >
-                  Rx
-                </div>
-
-                <div
-                  className="pl-4 border-l-4 space-y-3"
-                  style={{ borderColor: template.styles.accentColor }}
-                >
-                  {['Amoxicillin 500mg — 1-0-1 · After food · 5 days', 'Paracetamol 650mg — SOS · After food'].map((med) => (
-                    <div key={med} className="text-sm">
-                      <div className="font-semibold text-slate-800">{med.split(' — ')[0]}</div>
-                      <div className="text-slate-500 text-xs">{med.split(' — ')[1]}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 text-xs text-slate-500 border-t pt-4">
-                  <div className="font-medium text-slate-700 mb-1">Advice:</div>
-                  <div>Rest, plenty of fluids. Return if symptoms worsen.</div>
-                  <div className="mt-2"><span className="font-medium">Follow-up:</span> After 5 days</div>
-                </div>
-              </div>
+            <div className="overflow-hidden rounded-xl border shadow-soft-lg bg-white bg-slate-50 relative">
+              <img 
+                src={template.image} 
+                alt={`${template.name} preview`}
+                className="w-full h-auto object-contain"
+              />
             </div>
           </div>
 
