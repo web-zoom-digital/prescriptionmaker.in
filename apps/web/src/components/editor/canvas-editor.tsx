@@ -5,14 +5,16 @@ import * as fabric from 'fabric'
 import { Eraser, Undo, Redo, Save, Trash2, Pen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Template } from '@prescriptionmaker/types'
+import { PrescriptionPreview } from './prescription-preview'
 
 interface CanvasEditorProps {
   template: Template
   initialData?: any
+  fullData?: any
   onSave?: (canvasJSON: any) => void
 }
 
-export function CanvasEditor({ template, initialData, onSave }: CanvasEditorProps) {
+export function CanvasEditor({ template, initialData, fullData, onSave }: CanvasEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null)
   const [isDrawing, setIsDrawing] = useState(true)
@@ -29,7 +31,7 @@ export function CanvasEditor({ template, initialData, onSave }: CanvasEditorProp
     // Initialize Fabric Canvas
     const initCanvas = new fabric.Canvas(canvasRef.current, {
       isDrawingMode: true,
-      backgroundColor: '#ffffff',
+      backgroundColor: 'rgba(255,255,255,0)',
     })
 
     // Set initial brush
@@ -93,7 +95,7 @@ export function CanvasEditor({ template, initialData, onSave }: CanvasEditorProp
   const clearCanvas = () => {
     if (canvas) {
       canvas.clear()
-      canvas.backgroundColor = '#ffffff'
+      canvas.backgroundColor = 'rgba(255,255,255,0)'
       canvas.renderAll()
       saveHistory(canvas)
     }
@@ -205,18 +207,9 @@ export function CanvasEditor({ template, initialData, onSave }: CanvasEditorProp
              aspectRatio: '210/297'
            }}
         >
-          {/* Overlay Template Guidelines (Optional visual help for the doctor) */}
-          <div className="pointer-events-none absolute inset-0 opacity-10"
-               style={{
-                 backgroundImage: 'linear-gradient(#cbd5e1 1px, transparent 1px)',
-                 backgroundSize: '100% 24px',
-                 marginTop: '100px' // Leave header space blank
-               }}
-          />
-          
-          <div className="pointer-events-none absolute top-8 left-8 right-8 flex justify-between text-slate-300">
-             <div className="font-bold text-2xl">{template.name}</div>
-             <div className="text-xl">Rx</div>
+          {/* Background Template Preview */}
+          <div className="absolute inset-0 pointer-events-none opacity-40 select-none overflow-hidden">
+            <PrescriptionPreview template={template} data={fullData || {}} />
           </div>
 
           <canvas

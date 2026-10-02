@@ -468,6 +468,7 @@ export function EditorShell() {
                   <CanvasEditor 
                     template={selectedTemplate} 
                     initialData={prescriptionData.canvasData}
+                    fullData={prescriptionData}
                     onSave={(json) => {
                       setPrescriptionData(prev => ({ ...prev, canvasData: json }))
                     }}
