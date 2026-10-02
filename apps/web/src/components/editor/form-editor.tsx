@@ -357,7 +357,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
         open={openSections['patient']!}
         onToggle={() => toggleSection('patient')}
       >
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
           <FormField id="patient-name" label="Patient Name" className="sm:col-span-2" error={errors.patient?.name?.message}>
             <input
               id="patient-name"
@@ -368,7 +368,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             />
           </FormField>
 
-          <FormField id="patient-age" label="Age" error={errors.patient?.age?.message}>
+          <FormField id="patient-age" label="Age" className="sm:col-span-1" error={errors.patient?.age?.message}>
             <input
               id="patient-age"
               type="text"
@@ -378,7 +378,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             />
           </FormField>
 
-          <FormField id="patient-gender" label="Gender" error={errors.patient?.gender?.message}>
+          <FormField id="patient-gender" label="Gender" className="sm:col-span-1" error={errors.patient?.gender?.message}>
             <select id="patient-gender" {...register('patient.gender')} className="form-input">
               <option value="male">Male</option>
               <option value="female">Female</option>
@@ -386,7 +386,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             </select>
           </FormField>
 
-          <div className="sm:col-span-2">
+          <div className="sm:col-span-4">
             <div className="flex items-center justify-between mb-1">
               <label htmlFor="patient-diagnosis" className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
                 Diagnosis / Chief Complaint
@@ -446,24 +446,31 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
           {medicineFields.map((field, index) => (
             <div
               key={field.id}
-              className="relative rounded-lg border border-teal-200 bg-teal-50/30 p-4"
+              className="relative rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:border-teal-300 transition-colors flex flex-col gap-2.5"
             >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-teal-700">Medicine {index + 1}</span>
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded bg-teal-100 text-xs font-bold text-teal-700">
+                    {index + 1}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Medicine</span>
+                </div>
                 {medicineFields.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeMedicine(index)}
-                    className="rounded p-1 text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-colors"
+                    className="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                     aria-label={`Remove medicine ${index + 1}`}
                   >
-                    <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <FormField id={`med-name-${index}`} label="Medicine Name" className="sm:col-span-2 relative">
+              {/* Row 1: Name and Form */}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
                   {(() => {
                     const nameReg = register(`medicines.${index}.name`)
                     const currentValue = currentMedicines[index]?.name || ''
@@ -474,8 +481,8 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
                           id={`med-name-${index}`}
                           type="text"
                           {...nameReg}
-                          className="form-input"
-                          placeholder="e.g. Amoxicillin"
+                          className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 placeholder:font-normal placeholder:text-slate-400"
+                          placeholder="Start typing medicine name..."
                           onFocus={() => setActiveMedIndex(index)}
                           onBlur={(e) => {
                             nameReg.onBlur(e)
@@ -489,18 +496,28 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
                               <button
                                 key={i}
                                 type="button"
-                                className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 focus:bg-slate-50 outline-none flex justify-between items-center"
+                                className="w-full px-4 py-2 text-left text-sm hover:bg-teal-50 focus:bg-teal-50 outline-none flex justify-between items-center border-b border-slate-50 last:border-0"
                                 onMouseDown={(e) => {
                                   e.preventDefault(); // prevent blur
                                   setValue(`medicines.${index}.name`, med.name, { shouldValidate: true })
                                   setValue(`medicines.${index}.strength`, med.commonStrengths[0] || '', { shouldValidate: true })
                                   setValue(`medicines.${index}.frequency`, (med.commonFrequency as any) || '1-0-1', { shouldValidate: true })
                                   setValue(`medicines.${index}.duration`, med.commonDuration || '5 days', { shouldValidate: true })
+                                  
+                                  // Guess form based on name/category
+                                  const formGuessed = med.name.toLowerCase().includes('syr') || med.category.toLowerCase().includes('syrup') ? 'syrup' 
+                                                    : med.name.toLowerCase().includes('inj') ? 'injection'
+                                                    : med.name.toLowerCase().includes('cap') ? 'capsule'
+                                                    : med.name.toLowerCase().includes('drop') ? 'drops'
+                                                    : med.name.toLowerCase().includes('cream') || med.name.toLowerCase().includes('oint') ? 'cream'
+                                                    : 'tablet';
+                                  setValue(`medicines.${index}.form`, formGuessed, { shouldValidate: true })
+                                  
                                   setActiveMedIndex(null)
                                 }}
                               >
-                                <span className="font-semibold text-slate-800">{med.name}</span>
-                                <span className="text-xs text-slate-500">{med.category}</span>
+                                <span className="font-bold text-slate-700">{med.name}</span>
+                                <span className="text-[10px] uppercase tracking-wider text-teal-600 bg-teal-100 px-1.5 py-0.5 rounded">{med.category}</span>
                               </button>
                             ))}
                           </div>
@@ -508,47 +525,37 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
                       </>
                     )
                   })()}
-                </FormField>
+                </div>
 
-                <FormField id={`med-strength-${index}`} label="Strength / Dose">
-                  <input
-                    id={`med-strength-${index}`}
-                    type="text"
-                    {...register(`medicines.${index}.strength`)}
-                    className="form-input"
-                    placeholder="e.g. 500mg"
-                  />
-                </FormField>
+                <select {...register(`medicines.${index}.form`)} className="w-full sm:w-28 shrink-0 rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500">
+                  {['tablet', 'capsule', 'syrup', 'injection', 'cream', 'drops', 'inhaler', 'suspension', 'powder', 'patch'].map((f) => (
+                    <option key={f} value={f} className="capitalize">{f}</option>
+                  ))}
+                </select>
+              </div>
 
-                <FormField id={`med-form-${index}`} label="Form">
-                  <select id={`med-form-${index}`} {...register(`medicines.${index}.form`)} className="form-input">
-                    {['tablet', 'capsule', 'syrup', 'injection', 'cream', 'drops', 'inhaler', 'suspension', 'powder', 'patch'].map((f) => (
-                      <option key={f} value={f} className="capitalize">{f}</option>
-                    ))}
-                  </select>
-                </FormField>
-
-                <FormField id={`med-frequency-${index}`} label="Frequency">
-                  <select id={`med-frequency-${index}`} {...register(`medicines.${index}.frequency`)} className="form-input">
-                    {DOSE_FREQUENCIES.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
-                  </select>
-                </FormField>
-
-                <FormField id={`med-timing-${index}`} label="Timing">
-                  <select id={`med-timing-${index}`} {...register(`medicines.${index}.timing`)} className="form-input">
-                    {DOSE_TIMINGS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-                  </select>
-                </FormField>
-
-                <FormField id={`med-duration-${index}`} label="Duration">
-                  <input
-                    id={`med-duration-${index}`}
-                    type="text"
-                    {...register(`medicines.${index}.duration`)}
-                    className="form-input"
-                    placeholder="e.g. 5 days"
-                  />
-                </FormField>
+              {/* Row 2: Dose, Freq, Timing, Duration */}
+              <div className="flex flex-wrap sm:flex-nowrap gap-2 bg-slate-50 p-2 rounded-md border border-slate-100">
+                <input
+                  type="text"
+                  {...register(`medicines.${index}.strength`)}
+                  className="w-full sm:w-20 shrink-0 rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm shadow-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  placeholder="e.g. 500mg"
+                  title="Strength / Dose"
+                />
+                <select {...register(`medicines.${index}.frequency`)} className="w-full sm:flex-1 rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm shadow-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500" title="Frequency">
+                  {DOSE_FREQUENCIES.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+                </select>
+                <select {...register(`medicines.${index}.timing`)} className="w-full sm:flex-1 rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm shadow-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500" title="Timing">
+                  {DOSE_TIMINGS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+                <input
+                  type="text"
+                  {...register(`medicines.${index}.duration`)}
+                  className="w-full sm:w-24 shrink-0 rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm shadow-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  placeholder="e.g. 5 days"
+                  title="Duration"
+                />
               </div>
             </div>
           ))}
