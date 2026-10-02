@@ -2,17 +2,17 @@
 
 @theme {
   /* Medical Teal Color Palette */
-  --color-teal-50: #f0fdfa;
-  --color-teal-100: #ccfbf1;
-  --color-teal-200: #99f6e4;
-  --color-teal-300: #5eead4;
-  --color-teal-400: #2dd4bf;
-  --color-teal-500: #14b8a6;
-  --color-teal-600: #0d9488;
-  --color-teal-700: #0f766e;
-  --color-teal-800: #115e59;
-  --color-teal-900: #134e4a;
-  --color-teal-950: #042f2e;
+  --color-teal-50: #effaf8;
+  --color-teal-100: #d6f2ec;
+  --color-teal-200: #afe4da;
+  --color-teal-300: #7fd0c4;
+  --color-teal-400: #55b7a9;
+  --color-teal-500: #379f94;
+  --color-teal-600: #2b7f77;
+  --color-teal-700: #256660;
+  --color-teal-800: #20534f;
+  --color-teal-900: #1d4542;
+  --color-teal-950: #0f2827;
 
   /* Slate palette */
   --color-slate-50: #f8fafc;
@@ -28,7 +28,7 @@
   --color-slate-950: #020617;
 
   /* Design tokens */
-  --color-primary: #0d9488;
+  --color-primary: #379f94;
   --color-primary-foreground: #ffffff;
   --color-background: #ffffff;
   --color-foreground: #0f172a;
@@ -36,11 +36,11 @@
   --color-muted-foreground: #64748b;
   --color-border: #e2e8f0;
   --color-input: #e2e8f0;
-  --color-ring: #0d9488;
+  --color-ring: #379f94;
   --color-card: #ffffff;
   --color-card-foreground: #0f172a;
-  --color-accent: #f0fdfa;
-  --color-accent-foreground: #115e59;
+  --color-accent: #effaf8;
+  --color-accent-foreground: #20534f;
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
   --color-secondary: #f1f5f9;
