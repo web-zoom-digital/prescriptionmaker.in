@@ -469,8 +469,12 @@ export function EditorShell() {
                     template={selectedTemplate} 
                     initialData={prescriptionData.canvasData}
                     fullData={prescriptionData}
-                    onSave={(json) => {
-                      setPrescriptionData(prev => ({ ...prev, canvasData: json }))
+                    onSave={(data: any) => {
+                      setPrescriptionData(prev => ({ 
+                        ...prev, 
+                        canvasData: data.json,
+                        canvasImage: data.image
+                      }))
                     }}
                   />
                 )}
@@ -498,8 +502,15 @@ export function EditorShell() {
                   marginBottom: `calc((1 - ${previewScale}) * -297mm)`,
                 }}
               >
-                <div className="bg-white">
+                <div className="bg-white relative">
                   <PrescriptionPreview template={selectedTemplate} data={prescriptionData} />
+                  {prescriptionData.canvasImage && (
+                    <img 
+                      src={prescriptionData.canvasImage} 
+                      className="absolute top-0 left-0 w-full h-full object-contain pointer-events-none z-10" 
+                      alt="drawing" 
+                    />
+                  )}
                 </div>
               </div>
             </div>

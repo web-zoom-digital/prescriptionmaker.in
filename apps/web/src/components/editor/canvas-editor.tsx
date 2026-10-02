@@ -184,7 +184,10 @@ export function CanvasEditor({ template, initialData, fullData, onSave }: Canvas
           <button
             onClick={() => {
               if (canvas && onSave) {
-                onSave(canvas.toJSON())
+                onSave({
+                  json: canvas.toJSON(),
+                  image: canvas.toDataURL({ format: 'png', multiplier: 2 })
+                })
               }
             }}
             className="flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-primary/90 transition-colors"

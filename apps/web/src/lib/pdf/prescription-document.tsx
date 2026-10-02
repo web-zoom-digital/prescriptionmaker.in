@@ -96,15 +96,26 @@ export interface PrescriptionDocumentProps {
   advice?: string | null
   followUpDate?: string | null
   date?: string
+  canvasImage?: string | null
 }
 
 export function PrescriptionDocument({
   templateName, templateSlug, primaryColor: pc, accentColor: ac, bgColor = '#ffffff',
-  layout, doctor, patient, diagnosis, medicines, labTests, advice, followUpDate, date,
+  layout, doctor, patient, diagnosis, medicines, labTests, advice, followUpDate, date, canvasImage
 }: PrescriptionDocumentProps) {
   const today = date ?? new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
   const filledMeds = medicines.filter(m => m.name?.trim())
   const slug = templateSlug || layout
+
+  const CanvasOverlay = () => {
+    if (!canvasImage) return null
+    return (
+      <Image 
+        src={canvasImage} 
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, objectFit: 'contain' }} 
+      />
+    )
+  }
 
   // Shared: Signature block
   const SigBlock = () => (
@@ -298,6 +309,7 @@ export function PrescriptionDocument({
             <Text style={S.footerText}>prescriptionmaker.in · For documentation purposes only</Text>
             <SigBlock />
           </View>
+          <CanvasOverlay />
         </Page>
       </Document>
     )
@@ -366,6 +378,7 @@ export function PrescriptionDocument({
             <SigBlock />
           </View>
           <View style={{ height: 3, backgroundColor: ac, position: 'absolute', bottom: 0, left: 0, right: 0 }} />
+          <CanvasOverlay />
         </Page>
       </Document>
     )
@@ -408,6 +421,7 @@ export function PrescriptionDocument({
           <Text style={S.footerText}>{templateName} · prescriptionmaker.in · For documentation purposes only</Text>
           <SigBlock />
         </View>
+        <CanvasOverlay />
       </Page>
     </Document>
   )

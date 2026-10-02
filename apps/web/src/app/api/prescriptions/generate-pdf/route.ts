@@ -53,6 +53,7 @@ const generatePdfSchema = z.object({
   labTests: z.string().nullable().optional(),
   advice: z.string().nullable().optional(),
   followUpDate: z.string().nullable().optional(),
+  canvasImage: z.string().nullable().optional(),
 })
 
 export type GeneratePdfRequest = z.infer<typeof generatePdfSchema>
@@ -107,6 +108,7 @@ export async function POST(request: NextRequest) {
         labTests: data.labTests,
         advice: data.advice,
         followUpDate: data.followUpDate,
+        canvasImage: data.canvasImage,
       }) as any)
     )
 
