@@ -79,7 +79,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           <div>
             <div className="overflow-hidden rounded-xl border shadow-soft-lg bg-white bg-slate-50 relative">
               <img 
-                src={template.image} 
+                src={template.preview || template.thumbnail} 
                 alt={`${template.name} preview`}
                 className="w-full h-auto object-contain"
               />
