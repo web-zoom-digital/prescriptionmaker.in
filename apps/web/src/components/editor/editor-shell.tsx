@@ -211,6 +211,8 @@ export function EditorShell() {
       labTests: labTestsStr,
       advice: data.advice,
       followUpDate: data.followUp ?? data.followUpDate,
+      vitals: data.vitals,
+      chiefComplaint: data.chiefComplaint,
     })
   }
 
@@ -238,6 +240,8 @@ export function EditorShell() {
       labTests: labTestsStr,
       advice: data.advice,
       followUpDate: data.followUp ?? data.followUpDate,
+      vitals: data.vitals,
+      chiefComplaint: data.chiefComplaint,
     }
 
     const result = await generatePdfBlob(payload)
