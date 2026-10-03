@@ -384,6 +384,150 @@ export function PrescriptionDocument({
     )
   }
 
+  // ─── TWO COLUMN SIDEBAR PDF ──────────────────────────────────────────────
+  if (slug === 'two-column-sidebar') {
+    return (
+      <Document title={`Prescription — ${patient.name ?? 'Patient'}`} author={doctor.name ?? 'PrescriptionMaker'} creator="PrescriptionMaker" producer="PrescriptionMaker">
+        <Page size="A4" style={[S.page, { backgroundColor: bgColor, flexDirection: 'row', paddingBottom: 0 }]}>
+          {/* Left Sidebar */}
+          <View style={{ width: '32%', backgroundColor: pc, padding: 16, display: 'flex', flexDirection: 'column' }}>
+            <View style={{ alignItems: 'center', marginBottom: 20 }}>
+              {doctor.logoUrl ? (
+                <Image src={doctor.logoUrl} style={{ width: 60, height: 60, borderRadius: 30, marginBottom: 10, objectFit: 'cover' }} />
+              ) : (
+                <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+                  <Text style={{ fontSize: 24, fontFamily: 'Helvetica-Bold', color: '#fff' }}>Rx</Text>
+                </View>
+              )}
+              <Text style={{ fontSize: 13, fontFamily: 'Helvetica-Bold', color: '#fff', textAlign: 'center' }}>
+                {doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}
+              </Text>
+              {doctor.qualifications ? <Text style={{ fontSize: 8, color: '#e2e8f0', marginTop: 2, textAlign: 'center' }}>{doctor.qualifications}</Text> : null}
+              {doctor.specialization ? <Text style={{ fontSize: 8, color: ac, marginTop: 2, textAlign: 'center' }}>{doctor.specialization}</Text> : null}
+              {doctor.registrationNumber ? <Text style={{ fontSize: 7.5, color: '#cbd5e1', marginTop: 2, textAlign: 'center' }}>Reg: {doctor.registrationNumber}</Text> : null}
+            </View>
+
+            <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)', paddingBottom: 10, marginBottom: 10 }}>
+              <Text style={{ fontSize: 8, color: '#cbd5e1', textTransform: 'uppercase', marginBottom: 4 }}>Clinic</Text>
+              <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', color: '#fff' }}>{doctor.clinicName || '—'}</Text>
+              {doctor.address ? <Text style={{ fontSize: 8, color: '#e2e8f0', marginTop: 2 }}>{doctor.address}</Text> : null}
+              {doctor.phone ? <Text style={{ fontSize: 8, color: '#e2e8f0', marginTop: 2 }}>{doctor.phone}</Text> : null}
+            </View>
+
+            <View>
+              <Text style={{ fontSize: 8, color: '#cbd5e1', textTransform: 'uppercase', marginBottom: 6 }}>Recorded Vitals</Text>
+              {[
+                { label: 'BP', unit: 'mmHg' },
+                { label: 'Pulse', unit: 'bpm' },
+                { label: 'Temp', unit: '°F' },
+                { label: 'SpO₂', unit: '%' },
+                { label: 'Weight', unit: 'kg' },
+                { label: 'Height', unit: 'cm' },
+              ].map(v => (
+                <View key={v.label} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, borderBottomWidth: 0.5, borderBottomColor: 'rgba(255,255,255,0.1)', paddingBottom: 4 }}>
+                  <Text style={{ fontSize: 8, color: '#fff' }}>{v.label} <Text style={{ fontSize: 7, color: '#cbd5e1' }}>({v.unit})</Text></Text>
+                  <View style={{ width: 40, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.3)' }} />
+                </View>
+              ))}
+            </View>
+
+            <Text style={{ marginTop: 'auto', fontSize: 7, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }}>
+              prescriptionmaker.in
+            </Text>
+          </View>
+
+          {/* Right Content */}
+          <View style={{ flex: 1, padding: 16, display: 'flex', flexDirection: 'column' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 2, borderBottomColor: ac, paddingBottom: 8, marginBottom: 12 }}>
+              <View>
+                <Text style={{ fontSize: 11, fontFamily: 'Helvetica-Bold', color: pc, textTransform: 'uppercase', letterSpacing: 1 }}>Medical Prescription</Text>
+                <Text style={{ fontSize: 8, color: '#64748b', marginTop: 2 }}>Date: <Text style={{ fontFamily: 'Helvetica-Bold' }}>{today}</Text></Text>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={{ fontSize: 8, color: '#64748b' }}>OPD Ref: _______________</Text>
+              </View>
+            </View>
+
+            <View style={{ backgroundColor: `${ac}15`, borderRadius: 4, padding: 8, marginBottom: 12 }}>
+              <Text style={{ fontSize: 8, color: '#64748b', fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', marginBottom: 4 }}>Patient Details</Text>
+              <Text style={{ fontSize: 12, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{patient.name || '______________________________'}</Text>
+              <Text style={{ fontSize: 8.5, color: '#64748b', marginTop: 2 }}>
+                {[patient.age ? `Age: ${patient.age}` : '', patient.gender ? `Sex: ${patient.gender}` : ''].filter(Boolean).join('  ·  ')}
+              </Text>
+            </View>
+
+            {diagnosis ? (
+              <View style={{ borderWidth: 1, borderColor: `${pc}30`, borderLeftWidth: 3, borderLeftColor: pc, borderRadius: 2, padding: 6, marginBottom: 12 }}>
+                <Text style={{ fontSize: 8, color: '#64748b', fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', marginBottom: 2 }}>Diagnosis</Text>
+                <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{diagnosis}</Text>
+              </View>
+            ) : null}
+
+            <View>
+              <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', color: pc, marginBottom: 4 }}>Rx</Text>
+              <View style={{ backgroundColor: pc, flexDirection: 'row', padding: 4 }}>
+                <Text style={{ flex: 4, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#fff' }}>Medicine</Text>
+                <Text style={{ flex: 2, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#fff', textAlign: 'center' }}>Unit</Text>
+                <Text style={{ flex: 2, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#fff', textAlign: 'center' }}>Frequency</Text>
+                <Text style={{ flex: 2, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#fff', textAlign: 'center' }}>Duration</Text>
+              </View>
+              {filledMeds.length > 0 ? filledMeds.map((med, idx) => (
+                <View key={idx} style={{ flexDirection: 'row', padding: 4, backgroundColor: idx % 2 === 0 ? `${pc}08` : '#fff', borderBottomWidth: 1, borderBottomColor: `${pc}15` }}>
+                  <Text style={{ flex: 4, fontSize: 8 }}>
+                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>{idx + 1}. {med.name}</Text>
+                    {med.strength ? ` ${med.strength}` : ''}
+                  </Text>
+                  <Text style={{ flex: 2, fontSize: 8, textAlign: 'center' }}>{med.form || '—'}</Text>
+                  <Text style={{ flex: 2, fontSize: 8, textAlign: 'center' }}>{med.frequency || '—'}</Text>
+                  <Text style={{ flex: 2, fontSize: 8, textAlign: 'center' }}>{med.duration || '—'}</Text>
+                </View>
+              )) : Array.from({ length: 5 }, (_, idx) => (
+                <View key={idx} style={{ flexDirection: 'row', padding: 4, backgroundColor: idx % 2 === 0 ? `${pc}05` : '#fff', borderBottomWidth: 1, borderBottomColor: `${pc}10` }}>
+                  <Text style={{ flex: 4, fontSize: 8 }}>&nbsp;</Text>
+                  <Text style={{ flex: 2, fontSize: 8 }}>&nbsp;</Text>
+                  <Text style={{ flex: 2, fontSize: 8 }}>&nbsp;</Text>
+                  <Text style={{ flex: 2, fontSize: 8 }}>&nbsp;</Text>
+                </View>
+              ))}
+            </View>
+
+            {labTests ? (
+              <View style={{ marginTop: 12 }}>
+                <Text style={{ fontSize: 8.5 }}>
+                  <Text style={{ color: '#64748b', fontFamily: 'Helvetica-Bold' }}>Investigations: </Text>
+                  <Text style={{ color: '#374151' }}>{labTests}</Text>
+                </Text>
+              </View>
+            ) : null}
+
+            {advice ? (
+              <View style={{ marginTop: 6 }}>
+                <Text style={{ fontSize: 8.5 }}>
+                  <Text style={{ color: '#64748b', fontFamily: 'Helvetica-Bold' }}>Advice: </Text>
+                  <Text style={{ color: '#374151' }}>{advice}</Text>
+                </Text>
+              </View>
+            ) : null}
+
+            {followUpDate ? (
+              <View style={{ marginTop: 6 }}>
+                <Text style={{ fontSize: 8.5, color: '#64748b' }}>
+                  Next visit: <Text style={{ fontFamily: 'Helvetica-Bold' }}>{followUpDate}</Text>
+                </Text>
+              </View>
+            ) : null}
+
+            <View style={{ marginTop: 'auto', alignItems: 'flex-end', borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 10 }}>
+              <SigBlock />
+            </View>
+          </View>
+
+          <CanvasOverlay />
+        </Page>
+      </Document>
+    )
+  }
+
   // ─── DEFAULT PDF (for all other premium templates) ─────────────────────
   return (
     <Document title={`Prescription — ${patient.name ?? 'Patient'}`} author={doctor.name ?? 'PrescriptionMaker'} creator="PrescriptionMaker" producer="PrescriptionMaker">
