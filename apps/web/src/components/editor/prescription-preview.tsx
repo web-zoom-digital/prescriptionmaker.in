@@ -55,6 +55,8 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
   const rawTests = data['tests'] as { name: string }[] | undefined
   const labTests = Array.isArray(rawTests) ? rawTests.map(t => t.name).join(', ') : ''
   const followUpDate = (data['followUp'] as string | undefined) ?? ''
+  const vitals = (data['vitals'] as Record<string, string>) || {}
+  const chiefComplaint = (data['chiefComplaint'] as string | undefined) ?? ''
   const lang = (data['language'] as LanguageCode) || 'en'
   const slug = template.slug
   const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -561,14 +563,27 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
             {soapHeader('O', 'Objective — Vitals & Examination Findings', '#1d4ed8')}
             <div style={{ padding: '8px 10px' }}>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
-                {['BP', 'HR (bpm)', 'Temp (°F)', 'SpO₂ (%)', 'Weight (kg)', 'RR (/min)'].map(v => (
-                  <div key={v} style={{ border: '1px solid #dbeafe', borderRadius: '4px', padding: '3px 8px', fontSize: '8px', background: '#eff6ff' }}>
-                    <span style={{ color: '#94a3b8' }}>{v}: </span>
-                    <span style={{ display: 'inline-block', width: '28px', borderBottom: '1px solid #94a3b8' }}>&nbsp;</span>
+                {[
+                  { label: 'BP', value: vitals.bloodPressure },
+                  { label: 'HR (bpm)', value: vitals.pulse },
+                  { label: 'Temp (°F)', value: vitals.temperature },
+                  { label: 'SpO₂ (%)', value: vitals.spo2 },
+                  { label: 'Weight (kg)', value: vitals.weight },
+                  { label: 'RR (/min)', value: vitals.respiratoryRate }
+                ].map(v => (
+                  <div key={v.label} style={{ border: '1px solid #dbeafe', borderRadius: '4px', padding: '3px 8px', fontSize: '8px', background: '#eff6ff' }}>
+                    <span style={{ color: '#94a3b8' }}>{v.label}: </span>
+                    {v.value ? (
+                      <span style={{ color: '#1e293b', fontWeight: 600 }}>{v.value}</span>
+                    ) : (
+                      <span style={{ display: 'inline-block', width: '28px', borderBottom: '1px solid #94a3b8' }}>&nbsp;</span>
+                    )}
                   </div>
                 ))}
               </div>
-              <div style={{ color: '#d1d5db', fontSize: '8.5px', minHeight: '16px' }}>Examination findings...</div>
+              <div style={{ color: chiefComplaint ? '#374151' : '#d1d5db', fontSize: '8.5px', minHeight: '16px' }}>
+                {chiefComplaint || 'Examination findings...'}
+              </div>
             </div>
           </div>
 

@@ -23,9 +23,13 @@ const DOSE_FREQUENCIES = [{label: 'Once daily (OD)', value: 'OD'}, {label: 'Twic
 const DOSE_TIMINGS = [{label: 'Before food', value: 'before_food'}, {label: 'After food', value: 'after_food'}, {label: 'With food', value: 'with_food'}, {label: 'Empty stomach', value: 'empty_stomach'}, {label: 'At bedtime', value: 'bedtime'}]
 
 export function FormEditor({ template, initialData, onDataChange }: FormEditorProps) {
+  const SOAP_TEMPLATES = ['soap-clinical', 'vitals-first']
+  const isVitalsTemplate = SOAP_TEMPLATES.includes(template.slug)
+
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     doctor: true,
     patient: true,
+    vitals: true,
     medicines: true,
     labtests: true,
     advice: false,
@@ -446,6 +450,91 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
           </div>
         </div>
       </EditorSection>
+
+      {/* Vitals & Examination — Only for SOAP Clinical / Vitals-First templates */}
+      {isVitalsTemplate && (
+        <EditorSection
+          title="O — Vitals & Examination Findings"
+          open={openSections['vitals']!}
+          onToggle={() => toggleSection('vitals')}
+        >
+          <div className="space-y-3">
+            {/* Vitals grid */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <FormField id="vitals-bp" label="Blood Pressure (mmHg)">
+                <input
+                  id="vitals-bp"
+                  type="text"
+                  {...register('vitals.bloodPressure')}
+                  className="form-input"
+                  placeholder="e.g. 120/80"
+                />
+              </FormField>
+
+              <FormField id="vitals-hr" label="Heart Rate (bpm)">
+                <input
+                  id="vitals-hr"
+                  type="text"
+                  {...register('vitals.pulse')}
+                  className="form-input"
+                  placeholder="e.g. 72"
+                />
+              </FormField>
+
+              <FormField id="vitals-temp" label="Temp (°F)">
+                <input
+                  id="vitals-temp"
+                  type="text"
+                  {...register('vitals.temperature')}
+                  className="form-input"
+                  placeholder="e.g. 98.6"
+                />
+              </FormField>
+
+              <FormField id="vitals-spo2" label="SpO₂ (%)">
+                <input
+                  id="vitals-spo2"
+                  type="text"
+                  {...register('vitals.spo2')}
+                  className="form-input"
+                  placeholder="e.g. 99"
+                />
+              </FormField>
+
+              <FormField id="vitals-weight" label="Weight (kg)">
+                <input
+                  id="vitals-weight"
+                  type="text"
+                  {...register('vitals.weight')}
+                  className="form-input"
+                  placeholder="e.g. 65"
+                />
+              </FormField>
+
+              <FormField id="vitals-rr" label="Resp. Rate (/min)">
+                <input
+                  id="vitals-rr"
+                  type="text"
+                  {...register('vitals.respiratoryRate')}
+                  className="form-input"
+                  placeholder="e.g. 16"
+                />
+              </FormField>
+            </div>
+
+            {/* Examination Findings */}
+            <FormField id="vitals-examination" label="Examination Findings (O/E)">
+              <textarea
+                id="vitals-examination"
+                {...register('chiefComplaint')}
+                className="form-input min-h-[80px] resize-y"
+                placeholder="e.g. Chest clear, mild pharyngeal congestion, TMs bilateral intact..."
+                rows={3}
+              />
+            </FormField>
+          </div>
+        </EditorSection>
+      )}
 
       {/* Medicines */}
       <EditorSection
