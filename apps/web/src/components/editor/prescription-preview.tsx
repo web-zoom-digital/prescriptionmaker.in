@@ -369,14 +369,14 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
           {/* MRN / Ward / Bed row */}
           <div style={{ display: 'flex', border: `1px solid ${pc}40`, borderRadius: '4px', overflow: 'hidden', marginBottom: '8px' }}>
             {[
-              { label: 'MRN No.', value: '' },
-              { label: 'Ward', value: '' },
-              { label: 'Bed No.', value: '' },
-              { label: 'IP/OP No.', value: '' },
+              { label: 'MRN No.', value: patient.mrn },
+              { label: 'Ward', value: patient.ward },
+              { label: 'Bed No.', value: patient.bedNo },
+              { label: 'IP/OP No.', value: patient.ipOpNo },
             ].map((f, i) => (
               <div key={i} style={{ flex: 1, padding: '5px 8px', borderRight: i < 3 ? `1px solid ${pc}30` : 'none', background: i % 2 === 0 ? '#fff' : `${pc}05` }}>
                 <div style={{ fontSize: '7px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.3px' }}>{f.label}</div>
-                <div style={{ fontSize: '9px', fontWeight: 600, marginTop: '2px' }}>&nbsp;</div>
+                <div style={{ fontSize: '9px', fontWeight: 600, marginTop: '2px' }}>{f.value || '\u00A0'}</div>
               </div>
             ))}
           </div>
@@ -407,14 +407,14 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
                 </td>
               </tr>
               <tr style={{ borderBottom: `1px solid ${pc}25` }}>
-                <td style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25`, width: '25%' }}><span style={{ color: '#64748b' }}>MRN: </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25`, width: '25%' }}><span style={{ color: '#64748b' }}>MRN: </span><strong>{patient.mrn || '\u00A0'}</strong></td>
                 <td style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25`, width: '25%' }}><span style={{ color: '#64748b' }}>Age: </span><strong>{patient.age || '____'}</strong></td>
                 <td style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25`, width: '25%' }}><span style={{ color: '#64748b' }}>Sex: </span><strong>{patient.gender || '____'}</strong></td>
-                <td style={{ padding: '5px 8px', width: '25%' }}><span style={{ color: '#64748b' }}>Ward: </span>&nbsp;&nbsp;&nbsp;</td>
+                <td style={{ padding: '5px 8px', width: '25%' }}><span style={{ color: '#64748b' }}>Ward: </span><strong>{patient.ward || '\u00A0'}</strong></td>
               </tr>
               <tr style={{ borderBottom: `1px solid ${pc}25` }}>
-                <td colSpan={2} style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25` }}><span style={{ color: '#64748b' }}>Insurance No: </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                <td colSpan={2} style={{ padding: '5px 8px' }}><span style={{ color: '#64748b' }}>Care Provider: </span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td colSpan={2} style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25` }}><span style={{ color: '#64748b' }}>Insurance No: </span><strong>{patient.insuranceNo || '\u00A0'}</strong></td>
+                <td colSpan={2} style={{ padding: '5px 8px' }}><span style={{ color: '#64748b' }}>Care Provider: </span><strong>{patient.careProvider || '\u00A0'}</strong></td>
               </tr>
               <tr>
                 <td colSpan={4} style={{ padding: '5px 8px' }}>

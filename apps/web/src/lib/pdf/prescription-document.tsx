@@ -340,7 +340,7 @@ export function PrescriptionDocument({
             </View>
             <GridRow fields={[{ label: "Patient's Name", value: patient.name }]} />
             <GridRow fields={[{ label: 'Date of Birth', value: '' }, { label: 'Age', value: patient.age }, { label: 'Sex', value: patient.gender }, { label: 'Occupation', value: '' }]} />
-            <GridRow fields={[{ label: 'Health Insurance No.', value: '' }, { label: 'Health Care Provider', value: '' }]} />
+            <GridRow fields={[{ label: 'Health Insurance No.', value: patient.insuranceNo || '' }, { label: 'Health Care Provider', value: patient.careProvider || '' }]} />
             <GridRow fields={[{ label: "Patient's Address", value: '' }]} />
             <GridRow fields={[{ label: 'Diagnosed With', value: diagnosis }]} />
             <GridRow fields={[{ label: 'Blood Pressure', value: '' }, { label: 'Pulse Rate', value: '' }, { label: 'Weight', value: '' }]} />

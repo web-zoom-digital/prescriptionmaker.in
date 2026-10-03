@@ -386,6 +386,40 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             </select>
           </FormField>
 
+          {template.slug === 'hospital-opd' && (
+            <>
+              <FormField id="patient-mrn" label="MRN No." className="sm:col-span-1" error={errors.patient?.mrn?.message}>
+                <input id="patient-mrn" type="text" {...register('patient.mrn')} className="form-input" placeholder="e.g. MRN-123" />
+              </FormField>
+              <FormField id="patient-ward" label="Ward" className="sm:col-span-1" error={errors.patient?.ward?.message}>
+                <input id="patient-ward" type="text" {...register('patient.ward')} className="form-input" placeholder="e.g. General" />
+              </FormField>
+              <FormField id="patient-bed" label="Bed No." className="sm:col-span-1" error={errors.patient?.bedNo?.message}>
+                <input id="patient-bed" type="text" {...register('patient.bedNo')} className="form-input" placeholder="e.g. 4B" />
+              </FormField>
+              <FormField id="patient-ipop" label="IP/OP No." className="sm:col-span-1" error={errors.patient?.ipOpNo?.message}>
+                <input id="patient-ipop" type="text" {...register('patient.ipOpNo')} className="form-input" placeholder="e.g. IP-123" />
+              </FormField>
+              <FormField id="patient-insurance" label="Insurance No." className="sm:col-span-2" error={errors.patient?.insuranceNo?.message}>
+                <input id="patient-insurance" type="text" {...register('patient.insuranceNo')} className="form-input" placeholder="e.g. INS-456" />
+              </FormField>
+              <FormField id="patient-provider" label="Care Provider" className="sm:col-span-2" error={errors.patient?.careProvider?.message}>
+                <input id="patient-provider" type="text" {...register('patient.careProvider')} className="form-input" placeholder="e.g. Star Health" />
+              </FormField>
+            </>
+          )}
+
+          {template.slug === 'executive-gold' && (
+            <>
+              <FormField id="patient-insurance" label="Health Insurance No." className="sm:col-span-2" error={errors.patient?.insuranceNo?.message}>
+                <input id="patient-insurance" type="text" {...register('patient.insuranceNo')} className="form-input" placeholder="e.g. INS-456" />
+              </FormField>
+              <FormField id="patient-provider" label="Health Care Provider" className="sm:col-span-2" error={errors.patient?.careProvider?.message}>
+                <input id="patient-provider" type="text" {...register('patient.careProvider')} className="form-input" placeholder="e.g. Star Health" />
+              </FormField>
+            </>
+          )}
+
           <div className="sm:col-span-4">
             <div className="flex items-center justify-between mb-1">
               <label htmlFor="patient-diagnosis" className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
