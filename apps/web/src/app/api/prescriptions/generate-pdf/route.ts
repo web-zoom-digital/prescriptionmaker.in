@@ -130,10 +130,10 @@ export async function POST(request: NextRequest) {
         'Cache-Control': 'no-store',
       },
     })
-  } catch (err) {
+  } catch (err: any) {
     console.error('[generate-pdf] Render error:', err)
     return NextResponse.json(
-      { error: 'PDF generation failed. Please try again.' },
+      { error: 'PDF generation failed: ' + (err?.message || err?.toString() || 'Unknown error') },
       { status: 500 }
     )
   }

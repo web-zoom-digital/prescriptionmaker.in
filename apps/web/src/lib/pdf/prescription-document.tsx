@@ -1013,21 +1013,21 @@ export function PrescriptionDocument({
             <View>
               <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: pc, marginBottom: 4 }}>℞ Medications</Text>
               
-              <View style={S_rx.tableHeaderRow}>
-                <Text style={S_rx.colDrug}>Drug</Text>
-                <Text style={S_rx.colFreq}>Dose & Freq</Text>
-                <Text style={S_rx.colDur}>Duration</Text>
+              <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#cbd5e1', paddingBottom: 4, marginBottom: 4 }}>
+                <Text style={{ flex: 2, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#475569' }}>Drug</Text>
+                <Text style={{ flex: 1, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#475569', textAlign: 'center' }}>Dose & Freq</Text>
+                <Text style={{ flex: 1, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#475569', textAlign: 'center' }}>Duration</Text>
               </View>
               
               {medicines.filter(m => m.name).length > 0 ? medicines.filter(m => m.name).map((med, idx) => (
-                <View key={idx} style={S_rx.tableDataRow}>
-                  <Text style={S_rx.colDataDrug}>{med.name} {med.strength ? ` ${med.strength}` : ''}</Text>
-                  <Text style={S_rx.colDataFreq}>{med.form || ''} {med.frequency ? ` ${med.frequency}` : ''}</Text>
-                  <Text style={S_rx.colDataDur}>{med.duration || '—'}</Text>
+                <View key={idx} style={{ flexDirection: 'row', marginBottom: 4 }}>
+                  <Text style={{ flex: 2, fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{med.name} {med.strength ? ` ${med.strength}` : ''}</Text>
+                  <Text style={{ flex: 1, fontSize: 8.5, color: '#475569', textAlign: 'center' }}>{med.form || ''} {med.frequency ? ` ${med.frequency}` : ''}</Text>
+                  <Text style={{ flex: 1, fontSize: 8.5, color: '#475569', textAlign: 'center' }}>{med.duration || '—'}</Text>
                 </View>
               )) : (
-                <View style={S_rx.tableDataRow}>
-                  <Text style={S_rx.colDataDrug}>-</Text><Text style={S_rx.colDataFreq}>-</Text><Text style={S_rx.colDataDur}>-</Text>
+                <View style={{ flexDirection: 'row', marginBottom: 4 }}>
+                  <Text style={{ flex: 2, fontSize: 8.5, color: '#1e293b' }}>-</Text><Text style={{ flex: 1, fontSize: 8.5, color: '#475569', textAlign: 'center' }}>-</Text><Text style={{ flex: 1, fontSize: 8.5, color: '#475569', textAlign: 'center' }}>-</Text>
                 </View>
               )}
 
