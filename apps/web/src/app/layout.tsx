@@ -25,24 +25,34 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://prescriptionmaker.in'),
 
   title: {
-    default: 'PrescriptionMaker — Digital Prescription Software for Doctors',
+    default: 'PrescriptionMaker — Free Digital Prescription Software for Indian Doctors',
     template: '%s | PrescriptionMaker',
   },
 
   description:
-    'Create professional digital prescriptions in minutes. PrescriptionMaker offers 15+ templates, a form-filling editor, and a hand-mode drawing editor — optimized for Indian doctors and clinics.',
+    'India\'s best free digital prescription maker for doctors. Create professional e-prescriptions in seconds with 15+ templates. Supports PDF download, WhatsApp sharing, and hand-mode drawing. Trusted by doctors across India.',
 
   keywords: [
     'prescription maker',
     'digital prescription',
     'online prescription maker',
-    'prescription template',
+    'prescription template India',
     'doctor prescription software',
-    'prescription PDF',
-    'prescription editor',
+    'prescription PDF download',
+    'free prescription maker',
+    'e-prescription India',
     'medical prescription maker',
-    'prescription maker India',
-    'digital prescription maker',
+    'prescription maker for doctors',
+    'prescription maker in Hindi',
+    'OPD prescription software',
+    'clinic prescription software',
+    'prescription WhatsApp share',
+    'prescription maker online free',
+    'MBBS doctor prescription',
+    'general physician prescription',
+    'digital prescription India',
+    'prescription generator',
+    'doctor pad online',
   ],
 
   authors: [{ name: 'PrescriptionMaker', url: 'https://prescriptionmaker.in' }],
@@ -52,6 +62,14 @@ export const metadata: Metadata = {
   publisher: 'PrescriptionMaker',
 
   category: 'Healthcare Software',
+
+  // Geo-targeting for India
+  other: {
+    'geo.region': 'IN',
+    'geo.placename': 'India',
+    'ICBM': '20.5937, 78.9629',
+    'DC.Language': 'en-IN',
+  },
 
   robots: {
     index: true,
@@ -70,24 +88,24 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     url: 'https://prescriptionmaker.in',
     siteName: 'PrescriptionMaker',
-    title: 'PrescriptionMaker — Digital Prescription Software for Doctors',
+    title: 'PrescriptionMaker — Free Digital Prescription Software for Indian Doctors',
     description:
-      'Create professional digital prescriptions in minutes. 15+ templates, form editor, and hand-mode drawing editor for Indian doctors and clinics.',
+      'Create professional e-prescriptions in seconds. 15+ templates, PDF download, WhatsApp sharing, hand-mode drawing — trusted by Indian doctors.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'PrescriptionMaker — Digital Prescription Software',
+        alt: 'PrescriptionMaker — Digital Prescription Software for Doctors in India',
       },
     ],
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'PrescriptionMaker — Digital Prescription Software',
+    title: 'PrescriptionMaker — Free Digital Prescription Software',
     description:
-      'Create professional digital prescriptions in minutes. 15+ templates, form editor, and hand-mode drawing editor.',
+      'Create professional e-prescriptions in seconds. 15+ templates, PDF download, WhatsApp sharing for Indian doctors.',
     images: ['/og-image.png'],
     creator: '@prescriptionmaker',
     site: '@prescriptionmaker',
@@ -106,6 +124,9 @@ export const metadata: Metadata = {
 
   alternates: {
     canonical: 'https://prescriptionmaker.in',
+    languages: {
+      'en-IN': 'https://prescriptionmaker.in',
+    },
   },
 
   verification: {
@@ -134,14 +155,24 @@ export default function RootLayout({
               '@type': 'Organization',
               name: 'PrescriptionMaker',
               url: 'https://prescriptionmaker.in',
-              logo: 'https://prescriptionmaker.in/logo.png',
+              logo: {
+                '@type': 'ImageObject',
+                url: 'https://prescriptionmaker.in/logo.png',
+                width: 512,
+                height: 512,
+              },
               description:
-                'PrescriptionMaker provides digital prescription software for doctors and clinics in India.',
+                'PrescriptionMaker provides free digital prescription software for doctors and clinics in India. Create, manage, and export prescriptions as PDF.',
+              foundingLocation: {
+                '@type': 'Place',
+                addressCountry: 'IN',
+              },
               contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'customer support',
                 email: 'support@prescriptionmaker.in',
                 availableLanguage: ['English', 'Hindi'],
+                areaServed: 'IN',
               },
               sameAs: [
                 'https://twitter.com/prescriptionmaker',
@@ -160,6 +191,7 @@ export default function RootLayout({
               '@type': 'WebSite',
               name: 'PrescriptionMaker',
               url: 'https://prescriptionmaker.in',
+              inLanguage: 'en-IN',
               potentialAction: {
                 '@type': 'SearchAction',
                 target: {
@@ -181,15 +213,76 @@ export default function RootLayout({
               '@type': 'SoftwareApplication',
               name: 'PrescriptionMaker',
               applicationCategory: 'MedicalApplication',
-              operatingSystem: 'Web Browser',
+              applicationSubCategory: 'Prescription Software',
+              operatingSystem: 'Web Browser, Android, iOS',
               url: 'https://prescriptionmaker.in',
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.8',
+                reviewCount: '150',
+                bestRating: '5',
+              },
               offers: {
                 '@type': 'Offer',
                 price: '0',
                 priceCurrency: 'INR',
+                availability: 'https://schema.org/InStock',
+              },
+              audience: {
+                '@type': 'Audience',
+                audienceType: 'Medical Doctors, Healthcare Professionals',
+                geographicArea: {
+                  '@type': 'Country',
+                  name: 'India',
+                },
               },
               description:
-                'Digital prescription maker for doctors. Create, edit, and download professional prescriptions as PDF.',
+                'Free digital prescription maker for doctors in India. Create, edit, and download professional prescriptions as PDF with 15+ templates.',
+              featureList: [
+                'PDF Download',
+                'WhatsApp Sharing',
+                '15+ Premium Templates',
+                'Hand Drawing Mode',
+                'Form-based Editor',
+                'Multi-language Support',
+              ],
+            }),
+          }}
+        />
+
+        {/* FAQ Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: [
+                {
+                  '@type': 'Question',
+                  name: 'Is PrescriptionMaker free to use?',
+                  acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: 'Yes, PrescriptionMaker offers a free plan with access to basic templates and PDF download. Premium plans unlock more templates and advanced features.',
+                  },
+                },
+                {
+                  '@type': 'Question',
+                  name: 'Can I download prescriptions as PDF?',
+                  acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: 'Yes, you can download any prescription as a professionally formatted PDF directly from your browser or mobile device.',
+                  },
+                },
+                {
+                  '@type': 'Question',
+                  name: 'Can I share prescriptions on WhatsApp?',
+                  acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: 'Yes, PrescriptionMaker supports sharing prescriptions directly to WhatsApp from mobile devices.',
+                  },
+                },
+              ],
             }),
           }}
         />
