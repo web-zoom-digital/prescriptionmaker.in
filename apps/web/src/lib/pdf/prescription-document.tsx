@@ -123,15 +123,15 @@ export function PrescriptionDocument({
   // Shared: Signature block
   const SigBlock = () => (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
-      {doctor.stampUrl && (
+      {doctor.stampUrl ? (
         <Image src={doctor.stampUrl} style={{ width: 60, height: 60, objectFit: 'contain', opacity: 0.8 }} />
-      )}
+      ) : null}
       <View style={{ alignItems: 'center' }}>
         {doctor.signatureUrl
           ? <Image src={doctor.signatureUrl} style={{ width: 75, height: 35, objectFit: 'contain' }} />
           : <View style={S.sigLine} />}
         <Text style={S.sigLabel}>Doctor&apos;s Signature</Text>
-        {doctor.name && <Text style={{ fontSize: 7, color: '#475569', marginTop: 1 }}>Dr. {doctor.name}</Text>}
+        {doctor.name ? <Text style={{ fontSize: 7, color: '#475569', marginTop: 1 }}>Dr. {doctor.name}</Text> : null}
       </View>
     </View>
   )
@@ -725,8 +725,8 @@ export function PrescriptionDocument({
               </Text>
             )}
             <View style={{ flexDirection: 'row', gap: 16, marginTop: 4 }}>
-              {doctor.address && <Text style={{ fontSize: 9, color: '#94a3b8' }}>{doctor.address}</Text>}
-              {doctor.phone && <Text style={{ fontSize: 9, color: '#94a3b8' }}>{doctor.phone}</Text>}
+              {doctor.address ? <Text style={{ fontSize: 9, color: '#94a3b8' }}>{doctor.address}</Text> : null}
+              {doctor.phone ? <Text style={{ fontSize: 9, color: '#94a3b8' }}>{doctor.phone}</Text> : null}
             </View>
           </View>
 
@@ -824,13 +824,13 @@ export function PrescriptionDocument({
           <View style={{ backgroundColor: pc, color: '#fff', padding: '16px 24px', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <View>
               <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold' }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</Text>
-              {doctor.qualifications && <Text style={{ fontSize: 11, color: ac, marginTop: 4 }}>{doctor.qualifications}</Text>}
-              {doctor.specialization && <Text style={{ fontSize: 10, opacity: 0.8, marginTop: 2 }}>{doctor.specialization}</Text>}
+              {doctor.qualifications ? <Text style={{ fontSize: 11, color: ac, marginTop: 4 }}>{doctor.qualifications}</Text> : null}
+              {doctor.specialization ? <Text style={{ fontSize: 10, opacity: 0.8, marginTop: 2 }}>{doctor.specialization}</Text> : null}
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-              {doctor.clinicName && <Text style={{ fontSize: 14, fontFamily: 'Helvetica-Bold' }}>{doctor.clinicName}</Text>}
-              {doctor.phone && <Text style={{ fontSize: 10, opacity: 0.8, marginTop: 2 }}>{doctor.phone}</Text>}
-              {doctor.registrationNumber && <Text style={{ fontSize: 10, color: ac, marginTop: 2 }}>Reg: {doctor.registrationNumber}</Text>}
+              {doctor.clinicName ? <Text style={{ fontSize: 14, fontFamily: 'Helvetica-Bold' }}>{doctor.clinicName}</Text> : null}
+              {doctor.phone ? <Text style={{ fontSize: 10, opacity: 0.8, marginTop: 2 }}>{doctor.phone}</Text> : null}
+              {doctor.registrationNumber ? <Text style={{ fontSize: 10, color: ac, marginTop: 2 }}>Reg: {doctor.registrationNumber}</Text> : null}
             </View>
           </View>
 
@@ -1105,18 +1105,18 @@ export function PrescriptionDocument({
           {/* Header */}
           <View style={{ backgroundColor: pc, color: '#fff', padding: '16px 24px', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              {doctor.logoUrl && (
+              {doctor.logoUrl ? (
                 <Image src={doctor.logoUrl} style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 24, backgroundColor: '#fff', padding: 2, marginRight: 16 }} />
-              )}
+              ) : null}
               <View>
                 <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold' }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</Text>
                 <Text style={{ fontSize: 11, color: ac, marginTop: 4 }}>{[doctor.qualifications, doctor.specialization].filter(Boolean).join(' · ')}</Text>
               </View>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-              {doctor.clinicName && <Text style={{ fontSize: 14, fontFamily: 'Helvetica-Bold' }}>{doctor.clinicName}</Text>}
-              {doctor.phone && <Text style={{ fontSize: 10, opacity: 0.8, marginTop: 2 }}>{doctor.phone}</Text>}
-              {doctor.address && <Text style={{ fontSize: 10, opacity: 0.6, marginTop: 2 }}>{doctor.address}</Text>}
+              {doctor.clinicName ? <Text style={{ fontSize: 14, fontFamily: 'Helvetica-Bold' }}>{doctor.clinicName}</Text> : null}
+              {doctor.phone ? <Text style={{ fontSize: 10, opacity: 0.8, marginTop: 2 }}>{doctor.phone}</Text> : null}
+              {doctor.address ? <Text style={{ fontSize: 10, opacity: 0.6, marginTop: 2 }}>{doctor.address}</Text> : null}
             </View>
           </View>
 
@@ -1148,16 +1148,16 @@ export function PrescriptionDocument({
                 <View style={{ backgroundColor: `${pc}10`, padding: '6px 12px', flexDirection: 'row', alignItems: 'center' }}>
                   <Text style={{ fontSize: 14, fontFamily: 'Helvetica-Bold', color: pc, width: 24, textAlign: 'center' }}>{idx + 1}</Text>
                   <Text style={{ fontSize: 14, fontFamily: 'Helvetica-Bold', color: '#1e293b', marginLeft: 8 }}>{med.name}</Text>
-                  {med.strength && (
+                  {med.strength ? (
                     <View style={{ backgroundColor: '#e2e8f0', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginLeft: 8 }}>
                       <Text style={{ fontSize: 10, color: '#64748b' }}>{med.strength}</Text>
                     </View>
-                  )}
-                  {med.form && (
+                  ) : null}
+                  {med.form ? (
                     <View style={{ backgroundColor: `${ac}20`, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginLeft: 8 }}>
                       <Text style={{ fontSize: 10, color: ac }}>{med.form}</Text>
                     </View>
-                  )}
+                  ) : null}
                 </View>
                 <View style={{ flexDirection: 'row', borderTopWidth: 1, borderTopColor: `${pc}15` }}>
                   {[
@@ -1184,19 +1184,19 @@ export function PrescriptionDocument({
               </View>
             )}
 
-            {labTests && (
+            {labTests ? (
               <View style={{ borderWidth: 1, borderColor: `${ac}40`, borderRadius: 4, padding: '8px 12px', marginBottom: 12, backgroundColor: `${ac}10` }}>
                 <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', color: pc, textTransform: 'uppercase', marginBottom: 4 }}>Lab Investigations</Text>
                 <Text style={{ color: '#374151', fontSize: 11 }}>{labTests}</Text>
               </View>
-            )}
+            ) : null}
 
-            {advice && (
+            {advice ? (
               <View style={{ borderWidth: 1, borderColor: `${pc}20`, borderRadius: 4, padding: '8px 12px', marginBottom: 12 }}>
                 <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', color: pc, textTransform: 'uppercase', marginBottom: 4 }}>Advice</Text>
                 <Text style={{ color: '#374151', fontSize: 11 }}>{advice}</Text>
               </View>
-            )}
+            ) : null}
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 20 }}>
               {followUpDate ? <Text style={{ fontSize: 11, color: '#64748b' }}>Follow-up: <Text style={{ fontFamily: 'Helvetica-Bold' }}>{followUpDate}</Text></Text> : null}
@@ -1227,18 +1227,18 @@ export function PrescriptionDocument({
           {/* Header */}
           <View style={{ backgroundColor: pc, paddingVertical: 12, paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              {doctor.logoUrl && (
+              {doctor.logoUrl ? (
                 <Image src={doctor.logoUrl} style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 20, backgroundColor: '#fff', padding: 2, marginRight: 12 }} />
-              )}
+              ) : null}
               <View>
                 <Text style={{ fontSize: 15, fontFamily: 'Helvetica-Bold', color: '#fff' }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</Text>
                 <Text style={{ fontSize: 8.5, color: ac }}>{[doctor.qualifications, doctor.specialization].filter(Boolean).join(' · ')}</Text>
               </View>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-              {doctor.clinicName && <Text style={{ fontSize: 9.5, fontFamily: 'Helvetica-Bold', color: '#fff' }}>{doctor.clinicName}</Text>}
-              {doctor.phone && <Text style={{ fontSize: 8, color: '#fff', opacity: 0.7 }}>{doctor.phone}</Text>}
-              {doctor.address && <Text style={{ fontSize: 7.5, color: '#fff', opacity: 0.6 }}>{doctor.address}</Text>}
+              {doctor.clinicName ? <Text style={{ fontSize: 9.5, fontFamily: 'Helvetica-Bold', color: '#fff' }}>{doctor.clinicName}</Text> : null}
+              {doctor.phone ? <Text style={{ fontSize: 8, color: '#fff', opacity: 0.7 }}>{doctor.phone}</Text> : null}
+              {doctor.address ? <Text style={{ fontSize: 7.5, color: '#fff', opacity: 0.6 }}>{doctor.address}</Text> : null}
             </View>
           </View>
 
