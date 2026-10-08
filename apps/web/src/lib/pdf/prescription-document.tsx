@@ -22,6 +22,14 @@ Font.register({
   ],
 })
 
+Font.register({
+  family: 'NotoSansDevanagari',
+  fonts: [
+    { src: 'https://fonts.gstatic.com/s/notosansdevanagari/v30/TuGoUUFzXI5FBtUq5a8bjKYTZjtRU6Sgv3NaV_SNmI0b8QQCQmHn6B2OHjbL_08AlXQly-A.ttf' },
+    { src: 'https://fonts.gstatic.com/s/notosansdevanagari/v30/TuGoUUFzXI5FBtUq5a8bjKYTZjtRU6Sgv3NaV_SNmI0b8QQCQmHn6B2OHjbL_08AlZMiy-A.ttf', fontWeight: 700 }
+  ]
+})
+
 const S = StyleSheet.create({
   page: { fontFamily: 'Helvetica', fontSize: 9, color: '#1e293b', paddingBottom: 50 },
   // Header styles
@@ -82,6 +90,8 @@ export interface PrescriptionDocumentProps {
     name?: string | null
     age?: string | null
     gender?: string | null
+    address?: string | null
+    allergies?: string | null
   }
   diagnosis?: string | null
   medicines: Array<{
@@ -1434,13 +1444,13 @@ export function PrescriptionDocument({
   if (slug === 'bilingual-indian') {
     return (
       <Document title={`Prescription — ${patient.name ?? 'Patient'}`} author={doctor.name ?? 'PrescriptionMaker'} creator="PrescriptionMaker" producer="PrescriptionMaker">
-        <Page size="A4" style={{ fontFamily: 'Helvetica', fontSize: 9.5, backgroundColor: bgColor }}>
+        <Page size="A4" style={{ fontFamily: 'NotoSansDevanagari', fontSize: 9.5, backgroundColor: bgColor }}>
           {/* Purple header */}
           <View style={{ backgroundColor: pc, padding: '14px 16px', textAlign: 'center', color: '#fff' }}>
-            <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold' }}>{doctor.clinicName || 'Medical Clinic'}</Text>
+            <Text style={{ fontSize: 20, fontWeight: 700 }}>{doctor.clinicName || 'Medical Clinic'}</Text>
             {doctor.name ? (
               <View style={{ marginTop: 4, flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-end' }}>
-                <Text style={{ fontSize: 13, fontFamily: 'Helvetica-Bold' }}>Dr. {doctor.name}</Text>
+                <Text style={{ fontSize: 13, fontWeight: 700 }}>Dr. {doctor.name}</Text>
                 {doctor.qualifications ? (
                   <Text style={{ fontSize: 9, color: ac, marginLeft: 8 }}>{doctor.qualifications}</Text>
                 ) : null}
@@ -1460,32 +1470,32 @@ export function PrescriptionDocument({
             {/* Bilingual patient info */}
             <View style={{ borderWidth: 1.5, borderColor: `${pc}40`, borderRadius: 4, overflow: 'hidden', marginBottom: 10 }}>
               <View style={{ backgroundColor: `${pc}15`, padding: '3px 8px', flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: `${pc}30` }}>
-                <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: pc }}>PATIENT DETAILS / रोगी विवरण</Text>
+                <Text style={{ fontSize: 8, fontWeight: 700, color: pc }}>PATIENT DETAILS / रोगी विवरण</Text>
                 <Text style={{ fontSize: 8, color: '#64748b' }}>Date: {today}</Text>
               </View>
               <View style={{ padding: '6px 8px' }}>
                 <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: `${pc}15`, paddingBottom: 5, marginBottom: 5 }}>
                   <View style={{ flex: 3, flexDirection: 'row', alignItems: 'flex-end' }}>
                     <Text style={{ fontSize: 8, color: '#94a3b8' }}>Patient Name / मरीज का नाम: </Text>
-                    <Text style={{ fontSize: 11, fontFamily: 'Helvetica-Bold' }}>{patient.name || '____________________________'}</Text>
+                    <Text style={{ fontSize: 11, fontWeight: 700 }}>{patient.name || '____________________________'}</Text>
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end' }}>
                     <Text style={{ fontSize: 8, color: '#94a3b8' }}>Age / उम्र: </Text>
-                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>{patient.age || '______'}</Text>
+                    <Text style={{ fontWeight: 700 }}>{patient.age || '______'}</Text>
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end' }}>
                     <Text style={{ fontSize: 8, color: '#94a3b8' }}>Sex / लिंग: </Text>
-                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>{patient.gender || '______'}</Text>
+                    <Text style={{ fontWeight: 700 }}>{patient.gender || '______'}</Text>
                   </View>
                 </View>
                 <View style={{ flexDirection: 'row', gap: 10 }}>
                   <View style={{ flex: 1, flexDirection: 'row' }}>
                     <Text style={{ fontSize: 8, color: '#94a3b8' }}>Address / पता: </Text>
-                    <Text style={{ fontSize: 9 }}>___________________________</Text>
+                    <Text style={{ fontSize: 9 }}>{patient.address || '___________________________'}</Text>
                   </View>
                   <View style={{ flex: 1, flexDirection: 'row' }}>
                     <Text style={{ fontSize: 8, color: '#94a3b8' }}>Allergies / एलर्जी: </Text>
-                    <Text style={{ fontSize: 9 }}>_________________</Text>
+                    <Text style={{ fontSize: 9 }}>{patient.allergies || '_________________'}</Text>
                   </View>
                 </View>
               </View>
@@ -1495,22 +1505,22 @@ export function PrescriptionDocument({
             {diagnosis ? (
               <View style={{ borderWidth: 1, borderColor: `${pc}30`, borderLeftWidth: 4, borderLeftColor: pc, padding: '5px 10px', marginBottom: 10, backgroundColor: `${pc}08`, flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={{ fontSize: 8, color: '#64748b' }}>Diagnosis / रोग निदान: </Text>
-                <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold' }}>{diagnosis}</Text>
+                <Text style={{ fontSize: 10, fontWeight: 700 }}>{diagnosis}</Text>
               </View>
             ) : null}
 
             {/* Rx with bilingual header */}
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <Text style={{ fontSize: 24, fontFamily: 'Helvetica-Bold', color: pc }}>Rx</Text>
+              <Text style={{ fontSize: 24, fontWeight: 700, color: pc }}>Rx</Text>
               <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', color: pc }}>PRESCRIPTION </Text>
+                <Text style={{ fontSize: 10, fontWeight: 700, color: pc }}>PRESCRIPTION </Text>
                 <Text style={{ fontSize: 9, color: '#94a3b8' }}>/ दवाइयाँ</Text>
               </View>
             </View>
 
             {/* Numbered bilingual medicine list */}
             <View style={{ borderWidth: 1, borderColor: `${pc}30`, borderRadius: 4, overflow: 'hidden', marginBottom: 10 }}>
-              <View style={{ backgroundColor: pc, color: '#fff', flexDirection: 'row', fontSize: 8, fontFamily: 'Helvetica-Bold' }}>
+              <View style={{ backgroundColor: pc, color: '#fff', flexDirection: 'row', fontSize: 8, fontWeight: 700 }}>
                 <Text style={{ width: '6%', padding: '5px 6px', borderRightWidth: 1, borderRightColor: 'rgba(255,255,255,0.2)' }}>#</Text>
                 <Text style={{ width: '38%', padding: '5px 6px', borderRightWidth: 1, borderRightColor: 'rgba(255,255,255,0.2)' }}>दवाई / Medicine</Text>
                 <Text style={{ width: '16%', padding: '5px 6px', borderRightWidth: 1, borderRightColor: 'rgba(255,255,255,0.2)', textAlign: 'center' }}>Unit</Text>
@@ -1519,7 +1529,7 @@ export function PrescriptionDocument({
               </View>
               {filledMeds.length > 0 ? filledMeds.map((med, idx) => (
                 <View key={idx} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: `${pc}15`, backgroundColor: idx % 2 === 0 ? '#fff' : `${pc}06`, fontSize: 8.5 }}>
-                  <Text style={{ width: '6%', padding: '5px 6px', fontFamily: 'Helvetica-Bold', color: pc }}>{idx + 1}</Text>
+                  <Text style={{ width: '6%', padding: '5px 6px', fontWeight: 700, color: pc }}>{idx + 1}</Text>
                   <Text style={{ width: '38%', padding: '5px 6px' }}><Text style={{ fontFamily: 'Helvetica-Bold' }}>{med.name}</Text>{med.strength ? ` ${med.strength}` : null}</Text>
                   <Text style={{ width: '16%', padding: '5px 6px', textAlign: 'center' }}>{med.form || '—'}</Text>
                   <Text style={{ width: '20%', padding: '5px 6px', textAlign: 'center' }}>{med.frequency || '—'}</Text>

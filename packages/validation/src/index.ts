@@ -100,6 +100,7 @@ export const patientSchema = z.object({
     .optional()
     .or(z.literal('')),
   address: z.string().max(500).optional(),
+  allergies: z.string().max(500).optional(),
   uhid: z.string().max(50).optional(),
   
   // Hospital OPD specific fields

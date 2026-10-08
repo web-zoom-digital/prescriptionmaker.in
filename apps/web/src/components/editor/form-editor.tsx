@@ -390,6 +390,17 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             </select>
           </FormField>
 
+          {template.slug === 'bilingual-indian' && (
+            <>
+              <FormField id="patient-address" label="Address" className="sm:col-span-2" error={errors.patient?.address?.message}>
+                <input id="patient-address" type="text" {...register('patient.address')} className="form-input" placeholder="e.g. 123 Main St" />
+              </FormField>
+              <FormField id="patient-allergies" label="Allergies" className="sm:col-span-2" error={errors.patient?.allergies?.message}>
+                <input id="patient-allergies" type="text" {...register('patient.allergies')} className="form-input" placeholder="e.g. Penicillin, Peanuts" />
+              </FormField>
+            </>
+          )}
+
           {template.slug === 'hospital-opd' && (
             <>
               <FormField id="patient-mrn" label="MRN No." className="sm:col-span-1" error={errors.patient?.mrn?.message}>

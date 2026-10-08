@@ -23,6 +23,8 @@ type PatientInfo = {
   name?: string
   age?: string
   gender?: string
+  address?: string
+  allergies?: string
 }
 
 type Medicine = {
@@ -1178,11 +1180,11 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
               <div style={{ display: 'flex', gap: '10px' }}>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: '8px', color: '#94a3b8' }}>Address / पता: </span>
-                  <span style={{ fontSize: '9px' }}>___________________________</span>
+                  <span style={{ fontSize: '9px' }}>{patient.address || '___________________________'}</span>
                 </div>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: '8px', color: '#94a3b8' }}>Allergies / एलर्जी: </span>
-                  <span style={{ fontSize: '9px' }}>_________________</span>
+                  <span style={{ fontSize: '9px' }}>{patient.allergies || '_________________'}</span>
                 </div>
               </div>
             </div>
