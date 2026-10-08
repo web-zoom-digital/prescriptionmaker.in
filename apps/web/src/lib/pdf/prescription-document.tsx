@@ -1318,6 +1318,118 @@ export function PrescriptionDocument({
       </Document>
     );
   }
+  // ─── MINIMAL PRINT RULED ───────────────────────────────────────────────
+  if (slug === 'minimal-print-ruled') {
+    return (
+      <Document title={`Prescription — ${patient.name ?? 'Patient'}`} author={doctor.name ?? 'PrescriptionMaker'} creator="PrescriptionMaker" producer="PrescriptionMaker">
+        <Page size="A4" style={{ fontFamily: 'Times-Roman', fontSize: 10, backgroundColor: '#ffffff', padding: '28mm 26mm' }}>
+          {/* Clinic name — large, left aligned */}
+          <View style={{ borderBottomWidth: 2, borderBottomColor: '#1a202c', paddingBottom: 12, marginBottom: 16 }}>
+            <Text style={{ fontSize: 18, fontFamily: 'Times-Bold', color: '#1a202c' }}>
+              {doctor.clinicName || 'Medical Clinic'}
+            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                <Text style={{ fontSize: 12, fontFamily: 'Times-Bold', color: '#2d3748' }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. [Name]'}</Text>
+                {(doctor.qualifications || doctor.specialization) ? (
+                  <Text style={{ fontSize: 9, color: '#718096', fontFamily: 'Times-Italic', marginLeft: 8 }}>
+                    {[doctor.qualifications, doctor.specialization].filter(Boolean).join(', ')}
+                  </Text>
+                ) : null}
+              </View>
+              {doctor.registrationNumber ? (
+                <Text style={{ fontSize: 8.5, color: '#a0aec0' }}>Reg. No. {doctor.registrationNumber}</Text>
+              ) : null}
+            </View>
+            {(doctor.address || doctor.phone) ? (
+              <View style={{ marginTop: 2, flexDirection: 'row', gap: 16 }}>
+                {doctor.address ? <Text style={{ fontSize: 8.5, color: '#a0aec0' }}>{doctor.address}</Text> : null}
+                {doctor.phone ? <Text style={{ fontSize: 8.5, color: '#a0aec0' }}>{doctor.phone}</Text> : null}
+              </View>
+            ) : null}
+          </View>
+
+          {/* Patient + date on single line */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 6 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+              <Text style={{ fontSize: 9, color: '#a0aec0' }}>Patient: </Text>
+              <Text style={{ fontSize: 11, fontFamily: 'Times-Bold', color: '#2d3748', borderBottomWidth: 1, borderBottomColor: '#a0aec0', paddingBottom: 1 }}>
+                {patient.name || '____________________________________'}
+              </Text>
+              {patient.age ? <Text style={{ marginLeft: 14, fontSize: 9, color: '#718096' }}>Age {patient.age}{patient.gender ? ` / ${patient.gender}` : ''}</Text> : null}
+            </View>
+            <Text style={{ fontSize: 9, color: '#718096' }}>{today}</Text>
+          </View>
+
+          {/* Chief complaint — subtle line */}
+          {diagnosis ? (
+            <View style={{ marginBottom: 14, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', paddingBottom: 6, flexDirection: 'row' }}>
+              <Text style={{ fontSize: 8.5, fontFamily: 'Times-Italic', color: '#a0aec0' }}>Diagnosis: </Text>
+              <Text style={{ color: '#2d3748' }}>{diagnosis}</Text>
+            </View>
+          ) : null}
+
+          {/* Big italic Rx */}
+          <Text style={{ fontSize: 32, fontFamily: 'Times-Italic', color: '#1a202c', marginBottom: 10, marginTop: 8 }}>
+            Rx
+          </Text>
+
+          {/* Ruled medicine lines */}
+          <View style={{ paddingLeft: 8 }}>
+            {filledMeds.length > 0 ? filledMeds.map((med, idx) => (
+              <View key={idx} style={{ borderBottomWidth: 1, borderBottomColor: '#e2e8f0', paddingBottom: 10, marginBottom: 10 }}>
+                <Text style={{ fontSize: 11, fontFamily: 'Times-Bold', color: '#2d3748' }}>
+                  {idx + 1}.  {med.name}{med.strength ? ` ${med.strength}` : null}{med.form ? ` (${med.form})` : null}
+                </Text>
+                <Text style={{ paddingLeft: 22, marginTop: 3, color: '#718096', fontSize: 9, fontFamily: 'Times-Italic' }}>
+                  {[med.frequency || '', med.timing || '', med.duration || ''].filter(Boolean).join('  ·  ')}
+                </Text>
+              </View>
+            )) : [1, 2, 3, 4, 5].map(n => (
+              <View key={n} style={{ borderBottomWidth: 1, borderBottomColor: '#e2e8f0', paddingBottom: 10, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={{ color: '#e2e8f0', fontSize: 10 }}>{n}.  ______________________________________</Text>
+                <Text style={{ color: '#e2e8f0', fontSize: 9 }}>____________________</Text>
+              </View>
+            ))}
+          </View>
+
+          {labTests ? (
+            <View style={{ borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 10, marginTop: 4, marginBottom: 8, flexDirection: 'row' }}>
+              <Text style={{ fontSize: 9, fontFamily: 'Times-Italic', color: '#a0aec0' }}>Investigations: </Text>
+              <Text style={{ color: '#2d3748', fontSize: 9.5 }}>{labTests}</Text>
+            </View>
+          ) : null}
+
+          {advice ? (
+            <View style={{ borderTopWidth: labTests ? 0 : 1, borderTopColor: '#e2e8f0', paddingTop: 10, marginTop: 4 }}>
+              <Text style={{ fontSize: 9, fontFamily: 'Times-Italic', color: '#a0aec0', marginBottom: 4 }}>Advice:</Text>
+              <Text style={{ color: '#2d3748', fontSize: 9.5, paddingLeft: 4, lineHeight: 1.8 }}>{advice}</Text>
+            </View>
+          ) : null}
+
+          {followUpDate ? (
+            <View style={{ marginTop: 10, flexDirection: 'row' }}>
+              <Text style={{ fontSize: 9, fontFamily: 'Times-Italic', color: '#718096' }}>Review on: </Text>
+              <Text style={{ fontSize: 9, fontFamily: 'Times-Italic', color: '#718096' }}>{followUpDate}</Text>
+            </View>
+          ) : null}
+
+          {/* Signature */}
+          <View style={{ marginTop: 32, alignItems: 'flex-end', borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 12 }}>
+            <View style={{ alignItems: 'center' }}>
+              {doctor.signatureUrl ? (
+                <Image src={doctor.signatureUrl} style={{ width: 80, height: 32, objectFit: 'contain', marginBottom: 4 }} />
+              ) : (
+                <View style={{ width: 100, borderBottomWidth: 1, borderBottomColor: '#718096', marginBottom: 4, height: 28 }} />
+              )}
+              <Text style={{ fontSize: 8, color: '#718096' }}>Doctor's Signature</Text>
+            </View>
+          </View>
+          <CanvasOverlay />
+        </Page>
+      </Document>
+    );
+  }
   // ─── DEFAULT PDF (for all other premium templates) ─────────────────────
   return (
     <Document title={`Prescription — ${patient.name ?? 'Patient'}`} author={doctor.name ?? 'PrescriptionMaker'} creator="PrescriptionMaker" producer="PrescriptionMaker">
