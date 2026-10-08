@@ -1199,7 +1199,7 @@ export function PrescriptionDocument({
             )}
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 20 }}>
-              {followUpDate ? <Text style={{ fontSize: 11, color: '#64748b' }}>Follow-up: <Text style={{ fontFamily: 'Helvetica-Bold' }}>{followUpDate}</Text></Text> : <Text />}
+              {followUpDate ? <Text style={{ fontSize: 11, color: '#64748b' }}>Follow-up: <Text style={{ fontFamily: 'Helvetica-Bold' }}>{followUpDate}</Text></Text> : null}
               <SigBlock />
             </View>
           </View>
@@ -1309,7 +1309,7 @@ export function PrescriptionDocument({
             </View>
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 10 }}>
-              {followUpDate ? <Text style={{ fontSize: 8.5, color: '#64748b' }}>Next visit: <Text style={{ fontFamily: 'Helvetica-Bold' }}>{followUpDate}</Text></Text> : <Text />}
+              {followUpDate ? <Text style={{ fontSize: 8.5, color: '#64748b' }}>Next visit: <Text style={{ fontFamily: 'Helvetica-Bold' }}>{followUpDate}</Text></Text> : null}
               <SigBlock />
             </View>
           </View>
