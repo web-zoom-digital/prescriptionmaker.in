@@ -478,7 +478,7 @@ export function PrescriptionDocument({
                 <View key={idx} style={{ flexDirection: 'row', padding: 4, backgroundColor: idx % 2 === 0 ? `${pc}08` : '#fff', borderBottomWidth: 1, borderBottomColor: `${pc}15` }}>
                   <Text style={{ flex: 4, fontSize: 8 }}>
                     <Text style={{ fontFamily: 'Helvetica-Bold' }}>{idx + 1}. {med.name}</Text>
-                    {med.strength ? ` ${med.strength}` : ''}
+                    {med.strength ? ` ${med.strength}` : null}
                   </Text>
                   <Text style={{ flex: 2, fontSize: 8, textAlign: 'center' }}>{med.form || '—'}</Text>
                   <Text style={{ flex: 2, fontSize: 8, textAlign: 'center' }}>{med.frequency || '—'}</Text>
@@ -905,7 +905,7 @@ export function PrescriptionDocument({
               {(filledMeds.length > 0 ? filledMeds : Array.from({ length: 4 }, () => ({ name: '', strength: '', form: '', frequency: '', duration: '' }))).map((med, idx) => (
                 <View key={idx} style={{ flexDirection: 'row', backgroundColor: idx % 2 === 0 ? '#fff' : `${ac}10`, borderBottomWidth: 1, borderBottomColor: `${pc}15`, padding: '6px 8px', minHeight: 24 }}>
                   <Text style={{ color: pc, fontSize: 10, fontFamily: 'Helvetica-Bold', width: '5%' }}>{idx + 1}</Text>
-                  <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', width: '40%' }}>{med.name}{med.strength ? ` ${med.strength}` : ''}</Text>
+                  <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', width: '40%' }}>{med.name}{med.strength ? ` ${med.strength}` : null}</Text>
                   <Text style={{ fontSize: 10, width: '15%', textAlign: 'center' }}>{med.form || ''}</Text>
                   <Text style={{ fontSize: 10, width: '20%', textAlign: 'center' }}>{med.frequency || ''}</Text>
                   <Text style={{ fontSize: 10, width: '10%', textAlign: 'center' }}>{med.duration || ''}</Text>
@@ -1058,7 +1058,7 @@ export function PrescriptionDocument({
               
               {medicines.filter(m => m.name).length > 0 ? medicines.filter(m => m.name).map((med, idx) => (
                 <View key={idx} style={{ flexDirection: 'row', marginBottom: 4 }}>
-                  <Text style={{ flex: 2, fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{med.name} {med.strength ? ` ${med.strength}` : ''}</Text>
+                  <Text style={{ flex: 2, fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{med.name} {med.strength ? ` ${med.strength}` : null}</Text>
                   <Text style={{ flex: 1, fontSize: 8.5, color: '#475569', textAlign: 'center' }}>{med.form || ''} {med.frequency ? ` ${med.frequency}` : ''}</Text>
                   <Text style={{ flex: 1, fontSize: 8.5, color: '#475569', textAlign: 'center' }}>{med.duration || '—'}</Text>
                 </View>
@@ -1282,9 +1282,9 @@ export function PrescriptionDocument({
                 </View>
                 {filledMeds.length > 0 ? filledMeds.map((med, idx) => (
                   <View key={idx} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: `${pc}10`, paddingVertical: 4, paddingHorizontal: 6 }}>
-                    <Text style={{ width: '40%', fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#000' }}>{idx + 1}. {med.name}{med.strength ? ` ${med.strength}` : ''}</Text>
+                    <Text style={{ width: '40%', fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#000' }}>{idx + 1}. {med.name}{med.strength ? ` ${med.strength}` : null}</Text>
                     <Text style={{ width: '18%', fontSize: 8.5, textAlign: 'center', color: '#000' }}>{med.form || '—'}</Text>
-                    <Text style={{ width: '22%', fontSize: 8.5, textAlign: 'center', color: '#000' }}>{med.frequency ? t(med.frequency, lang) : '—'}</Text>
+                    <Text style={{ width: '22%', fontSize: 8.5, textAlign: 'center', color: '#000' }}>{med.frequency || '—'}</Text>
                     <Text style={{ width: '20%', fontSize: 8.5, textAlign: 'center', color: '#000' }}>{med.duration || '—'}</Text>
                   </View>
                 )) : Array.from({ length: 4 }).map((_, i) => (
@@ -1303,7 +1303,7 @@ export function PrescriptionDocument({
               </View>
               <View style={{ flex: 1 }}>
                 <Box title="Advice" color={ac}>
-                  <Text style={{ color: '#374151', fontSize: 9.5 }}>{advice ? t(advice, lang) : 'Patient advice...'}</Text>
+                  <Text style={{ color: '#374151', fontSize: 9.5 }}>{advice || 'Patient advice...'}</Text>
                 </Box>
               </View>
             </View>
