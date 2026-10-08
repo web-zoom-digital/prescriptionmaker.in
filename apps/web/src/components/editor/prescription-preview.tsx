@@ -700,12 +700,12 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0' }}>
               {[
-                { label: 'BLOOD PRESSURE', unit: 'mmHg' },
-                { label: 'HEART RATE', unit: 'bpm' },
-                { label: 'SpO₂', unit: '%' },
-                { label: 'TEMPERATURE', unit: '°F' },
-                { label: 'WEIGHT', unit: 'kg' },
-                { label: 'RR', unit: '/min' },
+                { label: 'BLOOD PRESSURE', value: vitals?.bloodPressure, unit: 'mmHg' },
+                { label: 'HEART RATE', value: vitals?.pulse, unit: 'bpm' },
+                { label: 'SpO₂', value: vitals?.spo2, unit: '%' },
+                { label: 'TEMPERATURE', value: vitals?.temperature, unit: '°F' },
+                { label: 'WEIGHT', value: vitals?.weight, unit: 'kg' },
+                { label: 'RR', value: vitals?.respiratoryRate, unit: '/min' },
               ].map((v, i) => (
                 <div key={i} style={{
                   padding: '8px 10px',
@@ -715,7 +715,9 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
                 }}>
                   <div style={{ fontSize: '7px', fontWeight: 700, color: pc, textTransform: 'uppercase', letterSpacing: '0.4px' }}>{v.label}</div>
                   <div style={{ fontSize: '7.5px', color: '#64748b', marginTop: '1px' }}>({v.unit})</div>
-                  <div style={{ marginTop: '4px', borderBottom: `1px solid ${pc}60`, height: '14px' }}></div>
+                  <div style={{ marginTop: '4px', borderBottom: `1px solid ${pc}60`, minHeight: '14px', fontSize: '11px', fontWeight: 700, color: '#0f172a' }}>
+                    {v.value || ''}
+                  </div>
                 </div>
               ))}
             </div>
