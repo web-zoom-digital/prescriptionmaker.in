@@ -1460,8 +1460,8 @@ export function PrescriptionDocument({
             {doctor.registrationNumber ? <Text style={{ fontSize: 8, opacity: 0.7, marginTop: 2 }}>Reg. No.: {doctor.registrationNumber}</Text> : null}
             {(doctor.address || doctor.phone) ? (
               <View style={{ marginTop: 4, flexDirection: 'row', justifyContent: 'center', gap: 16 }}>
-                {doctor.address ? <Text style={{ fontSize: 8, opacity: 0.7 }}>📍 {doctor.address}</Text> : null}
-                {doctor.phone ? <Text style={{ fontSize: 8, opacity: 0.7 }}>📞 {doctor.phone}</Text> : null}
+                {doctor.address ? <Text style={{ fontSize: 8, opacity: 0.7 }}>{doctor.address}</Text> : null}
+                {doctor.phone ? <Text style={{ fontSize: 8, opacity: 0.7 }}>{doctor.phone}</Text> : null}
               </View>
             ) : null}
           </View>

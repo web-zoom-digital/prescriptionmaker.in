@@ -38,6 +38,8 @@ const generatePdfSchema = z.object({
     name: z.string().nullable().optional(),
     age: z.string().nullable().optional(),
     gender: z.string().nullable().optional(),
+    address: z.string().nullable().optional(),
+    allergies: z.string().nullable().optional(),
   }),
   diagnosis: z.string().nullable().optional(),
   medicines: z.array(
