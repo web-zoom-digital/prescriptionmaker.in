@@ -101,6 +101,7 @@ export const patientSchema = z.object({
     .or(z.literal('')),
   address: z.string().max(500).optional(),
   allergies: z.string().max(500).optional(),
+  disabilities: z.string().max(500).optional(),
   uhid: z.string().max(50).optional(),
   
   // Hospital OPD specific fields
@@ -110,6 +111,11 @@ export const patientSchema = z.object({
   ipOpNo: z.string().max(50).optional(),
   insuranceNo: z.string().max(50).optional(),
   careProvider: z.string().max(100).optional(),
+  // Medical Prescription Form fields
+  dob: z.string().max(20).optional(),
+  occupation: z.string().max(100).optional(),
+  healthCardNo: z.string().max(50).optional(),
+  patientIdNo: z.string().max(50).optional(),
 })
 
 // =============================================================================

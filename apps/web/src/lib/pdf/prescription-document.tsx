@@ -1687,6 +1687,206 @@ export function PrescriptionDocument({
     )
   }
 
+  // ─── MEDICAL PRESCRIPTION FORM PDF ───────────────────────────────────────
+  if (slug === 'medical-prescription-form') {
+    const borderColor = `${pc}60`
+    
+    return (
+      <Document title={`Prescription — ${patient.name ?? 'Patient'}`} author={doctor.name ?? 'PrescriptionMaker'} creator="PrescriptionMaker" producer="PrescriptionMaker">
+        <Page size="A4" style={[{ backgroundColor: '#f4f4f8', padding: 25, fontFamily: 'Helvetica', position: 'relative' }]}>
+          
+          {/* Decorative circles — top right */}
+          <View style={{ position: 'absolute', top: 6, right: 6, flexDirection: 'column', gap: 6 }}>
+            <View style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 1.5, borderColor: `${pc}40`, alignSelf: 'flex-end' }} />
+            <View style={{ width: 10, height: 10, borderRadius: 5, borderWidth: 1.5, borderColor: `${pc}40`, alignSelf: 'flex-start' }} />
+            <View style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 1.5, borderColor: `${pc}40`, alignSelf: 'flex-end' }} />
+          </View>
+
+          {/* Decorative circles — bottom left */}
+          <View style={{ position: 'absolute', bottom: 6, left: 6, flexDirection: 'column', gap: 6 }}>
+            <View style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 1.5, borderColor: `${pc}40`, alignSelf: 'flex-start' }} />
+            <View style={{ width: 10, height: 10, borderRadius: 5, borderWidth: 1.5, borderColor: `${pc}40`, alignSelf: 'flex-end' }} />
+            <View style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 1.5, borderColor: `${pc}40`, alignSelf: 'flex-start' }} />
+          </View>
+
+          {/* ── Header row: Rx + Title + Date box ── */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              {/* Bullet circles */}
+              <View style={{ flexDirection: 'column', gap: 3, marginRight: 2 }}>
+                <View style={{ width: 6, height: 6, borderRadius: 3, borderWidth: 1.5, borderColor: pc, backgroundColor: pc }} />
+                <View style={{ width: 6, height: 6, borderRadius: 3, borderWidth: 1.5, borderColor: pc }} />
+                <View style={{ width: 6, height: 6, borderRadius: 3, borderWidth: 1.5, borderColor: pc }} />
+              </View>
+              <Text style={{ fontSize: 32, fontFamily: 'Helvetica-Bold', color: pc, letterSpacing: -1 }}>Rx</Text>
+              <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', color: pc, marginLeft: 10 }}>Medical Prescription</Text>
+            </View>
+            <View style={{ borderWidth: 1, borderColor, borderRadius: 4, padding: '6px 12px', backgroundColor: '#fff', flexDirection: 'row' }}>
+              <Text style={{ fontSize: 9, color: '#64748b' }}>Date: </Text>
+              <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{today}</Text>
+            </View>
+          </View>
+
+          {/* ── Patient Info Table ── */}
+          <View style={{ borderWidth: 1, borderColor, borderRadius: 4, marginBottom: 8, backgroundColor: '#fff' }}>
+            {/* Row 1: Patient's Name */}
+            <View style={{ borderBottomWidth: 1, borderBottomColor: borderColor, padding: '6px 8px', flexDirection: 'row' }}>
+              <Text style={{ fontSize: 9, color: '#64748b' }}>Patient&apos;s Name: </Text>
+              <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{patient.name || ' '}</Text>
+            </View>
+            {/* Row 2: DOB | Age | Sex | Occupation */}
+            <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: borderColor }}>
+              {[
+                { label: 'Date of Birth:', value: (patient as any).dob || '' },
+                { label: 'Age:', value: patient.age || '' },
+                { label: 'Sex:', value: patient.gender || '' },
+                { label: 'Occupation:', value: (patient as any).occupation || '' },
+              ].map((f, i) => (
+                <View key={i} style={{ padding: '4px 8px', borderRightWidth: i < 3 ? 1 : 0, borderRightColor: borderColor, flexDirection: 'row', flex: i === 0 || i === 3 ? 1.5 : 1 }}>
+                  <Text style={{ fontSize: 8.5, color: '#64748b' }}>{f.label} </Text>
+                  <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{f.value}</Text>
+                </View>
+              ))}
+            </View>
+            {/* Row 3: Insurance | Care Provider */}
+            <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: borderColor }}>
+              <View style={{ flex: 1, padding: '4px 8px', borderRightWidth: 1, borderRightColor: borderColor, flexDirection: 'row' }}>
+                <Text style={{ fontSize: 8.5, color: '#64748b' }}>Health Insurance Number: </Text>
+                <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{(patient as any).insuranceNo || ''}</Text>
+              </View>
+              <View style={{ flex: 1, padding: '4px 8px', flexDirection: 'row' }}>
+                <Text style={{ fontSize: 8.5, color: '#64748b' }}>Health Care Provider: </Text>
+                <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{(patient as any).careProvider || ''}</Text>
+              </View>
+            </View>
+            {/* Row 4: Health Card | Patient ID */}
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ flex: 1, padding: '4px 8px', borderRightWidth: 1, borderRightColor: borderColor, flexDirection: 'row' }}>
+                <Text style={{ fontSize: 8.5, color: '#64748b' }}>Health Card Number: </Text>
+                <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{(patient as any).healthCardNo || ''}</Text>
+              </View>
+              <View style={{ flex: 1, padding: '4px 8px', flexDirection: 'row' }}>
+                <Text style={{ fontSize: 8.5, color: '#64748b' }}>Patient ID Number: </Text>
+                <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{(patient as any).patientIdNo || ''}</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* ── Address + Diagnosis + Vitals + Allergies ── */}
+          <View style={{ borderWidth: 1, borderColor, borderRadius: 4, marginBottom: 8, backgroundColor: '#fff' }}>
+            <View style={{ padding: '4px 8px', borderBottomWidth: 1, borderBottomColor: borderColor, flexDirection: 'row' }}>
+              <Text style={{ fontSize: 8.5, color: '#64748b' }}>Patient&apos;s Address: </Text>
+              <Text style={{ fontSize: 8.5, color: '#1e293b' }}>{patient.address || ''}</Text>
+            </View>
+            <View style={{ padding: '4px 8px', borderBottomWidth: 1, borderBottomColor: borderColor, minHeight: 24, flexDirection: 'row' }}>
+              <Text style={{ fontSize: 8.5, color: '#64748b' }}>Diagnosed With: </Text>
+              <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{diagnosis || ''}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: borderColor }}>
+              {[
+                { label: 'Blood Pressure:', value: vitals?.bloodPressure || '' },
+                { label: 'Pulse Rate:', value: vitals?.pulse || '' },
+                { label: 'Weight:', value: vitals?.weight || '' },
+              ].map((f, i) => (
+                <View key={i} style={{ flex: 1, padding: '4px 8px', borderRightWidth: i < 2 ? 1 : 0, borderRightColor: borderColor, flexDirection: 'row' }}>
+                  <Text style={{ fontSize: 8.5, color: '#64748b' }}>{f.label} </Text>
+                  <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{f.value}</Text>
+                </View>
+              ))}
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ flex: 1, padding: '4px 8px', borderRightWidth: 1, borderRightColor: borderColor, flexDirection: 'row' }}>
+                <Text style={{ fontSize: 8.5, color: '#64748b' }}>Allergies: </Text>
+                <Text style={{ fontSize: 8.5, color: '#1e293b' }}>{patient.allergies || ''}</Text>
+              </View>
+              <View style={{ flex: 1, padding: '4px 8px', flexDirection: 'row' }}>
+                <Text style={{ fontSize: 8.5, color: '#64748b' }}>Disabilities if any: </Text>
+                <Text style={{ fontSize: 8.5, color: '#1e293b' }}>{(patient as any).disabilities || ''}</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* ── Drug Table ── */}
+          <View style={{ borderWidth: 1, borderColor, borderRadius: 4, marginBottom: 8, backgroundColor: '#fff', overflow: 'hidden' }}>
+            {/* Table Header */}
+            <View style={{ flexDirection: 'row', backgroundColor: `${pc}15`, borderBottomWidth: 1, borderBottomColor: borderColor }}>
+              <View style={{ width: '5%', padding: '6px 4px', borderRightWidth: 1, borderRightColor: borderColor, justifyContent: 'center' }}>
+                <Text style={{ fontSize: 8.5, color: '#64748b' }}>#</Text>
+              </View>
+              <View style={{ width: '43%', padding: '6px 4px', borderRightWidth: 1, borderRightColor: borderColor, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: pc }}>DRUGS</Text>
+              </View>
+              <View style={{ width: '26%', padding: '6px 4px', borderRightWidth: 1, borderRightColor: borderColor, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: pc }}>Unit (Tablet/Syrup)</Text>
+              </View>
+              <View style={{ width: '26%', padding: '6px 4px', justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: pc }}>Dosage (Per day)</Text>
+              </View>
+            </View>
+            {/* Table Body */}
+            {(filledMeds.length > 0 ? filledMeds : Array.from({ length: 7 }, () => ({} as any))).map((med, idx) => (
+              <View key={idx} style={{ flexDirection: 'row', borderBottomWidth: idx === Math.max(filledMeds.length - 1, 6) ? 0 : 1, borderBottomColor: borderColor }}>
+                <View style={{ width: '5%', padding: '6px 4px', borderRightWidth: 1, borderRightColor: borderColor, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: pc }}>{idx + 1}</Text>
+                </View>
+                <View style={{ width: '43%', padding: '6px 4px', borderRightWidth: 1, borderRightColor: borderColor, flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 8.5 }}>
+                    <Text style={{ fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{med.name || ' '}</Text>
+                    {med.strength ? <Text style={{ color: '#64748b' }}> {med.strength}</Text> : null}
+                  </Text>
+                </View>
+                <View style={{ width: '26%', padding: '6px 4px', borderRightWidth: 1, borderRightColor: borderColor, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 8.5, color: '#1e293b' }}>{med.form || ' '}</Text>
+                </View>
+                <View style={{ width: '26%', padding: '6px 4px', justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 8.5, color: '#1e293b' }}>{med.frequency || med.duration || ' '}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          {/* ── Bottom: Diet + History + Signature ── */}
+          <View style={{ flexDirection: 'row', borderWidth: 1, borderColor, borderRadius: 4, backgroundColor: '#fff' }}>
+            <View style={{ flex: 1, borderRightWidth: 1, borderRightColor: borderColor }}>
+              <View style={{ padding: '4px 8px', borderBottomWidth: 1, borderBottomColor: borderColor }}>
+                <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#64748b' }}>Diet to Follow:</Text>
+              </View>
+              <View style={{ padding: '6px 8px', minHeight: 40 }}>
+                <Text style={{ fontSize: 8.5, color: '#374151' }}>{advice || ''}</Text>
+              </View>
+              <View style={{ padding: '4px 8px', borderTopWidth: 1, borderTopColor: borderColor, borderBottomWidth: 1, borderBottomColor: borderColor }}>
+                <Text style={{ fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#64748b' }}>Brief History of Patient:</Text>
+              </View>
+              <View style={{ padding: '6px 8px', minHeight: 40 }}>
+              </View>
+            </View>
+            <View style={{ flex: 1, justifyContent: 'space-between' }}>
+              <View style={{ padding: '6px 8px', minHeight: 40 }} />
+              {/* Signature */}
+              <View style={{ borderTopWidth: 1, borderTopColor: borderColor, padding: '6px 8px', alignItems: 'center' }}>
+                {doctor.signatureUrl ? (
+                  <Image src={doctor.signatureUrl} style={{ width: 70, height: 28, objectFit: 'contain', marginBottom: 4 }} />
+                ) : (
+                  <View style={{ height: 28, marginBottom: 4 }} />
+                )}
+                <Text style={{ fontSize: 8, color: '#64748b' }}>Doctor&apos;s Signature</Text>
+                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: pc, marginTop: 1 }}>{doctor.name ? `Dr. ${doctor.name}` : ''}</Text>
+                {doctor.registrationNumber ? <Text style={{ fontSize: 7, color: '#94a3b8' }}>Reg: {doctor.registrationNumber}</Text> : null}
+              </View>
+            </View>
+          </View>
+
+          {/* Watermark */}
+          <View style={{ marginTop: 8, alignItems: 'center' }}>
+            <Text style={{ fontSize: 6.5, color: `${pc}50`, letterSpacing: 1 }}>prescriptionmaker.in</Text>
+          </View>
+          
+          <CanvasOverlay />
+        </Page>
+      </Document>
+    )
+  }
+
   // ─── DEFAULT PDF (for all other premium templates) ─────────────────────
   return (
     <Document title={`Prescription — ${patient.name ?? 'Patient'}`} author={doctor.name ?? 'PrescriptionMaker'} creator="PrescriptionMaker" producer="PrescriptionMaker">

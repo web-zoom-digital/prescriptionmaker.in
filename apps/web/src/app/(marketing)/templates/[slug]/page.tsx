@@ -3,7 +3,20 @@ import { TEMPLATES } from '@prescriptionmaker/config/templates'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Download, Check } from 'lucide-react'
+import { PrescriptionPreview } from '@/components/editor/prescription-preview'
 
+const dummyData = {
+  doctorName: 'Full Name',
+  doctorQualifications: 'MBBS, MD',
+  doctorSpecialization: 'General Medicine',
+  clinicName: 'Name of your clinic',
+  patient: { name: 'Patient full name', age: '34', gender: 'Male' },
+  diagnosis: 'Acute Pharyngitis',
+  medicines: [
+    { name: 'Medicine Name', dosage: '1-0-1', duration: '5 days' },
+    { name: 'Second Medicine', dosage: '0-0-1', duration: '3 days' }
+  ]
+}
 interface PageProps {
   params: Promise<{ slug: string }>
 }
@@ -76,12 +89,17 @@ export default async function TemplateDetailPage({ params }: PageProps) {
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           {/* Template preview */}
           <div className="flex justify-center lg:justify-end xl:justify-center">
-            <div className="overflow-hidden rounded-xl border shadow-soft-lg bg-white bg-slate-50 relative w-full max-w-[420px]">
-              <img 
-                src={template.preview || template.thumbnail} 
-                alt={`${template.name} preview`}
-                className="w-full h-auto object-contain"
-              />
+            <div className="overflow-hidden rounded-xl border shadow-soft-lg bg-white relative w-full max-w-[420px] h-[580px] flex items-start justify-center pt-8">
+              <div 
+                className="origin-top shadow-md bg-white pointer-events-none"
+                style={{ 
+                  transform: 'scale(0.5)', 
+                  width: '210mm',
+                  marginBottom: '-148mm' // Prevent it from pushing height
+                }}
+              >
+                <PrescriptionPreview template={template as any} data={dummyData} />
+              </div>
             </div>
           </div>
 

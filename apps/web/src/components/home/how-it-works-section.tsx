@@ -21,9 +21,9 @@ const STEPS = [
   {
     number: '03',
     icon: FilePen,
-    title: 'Fill or draw your prescription',
+    title: 'Fill out your prescription',
     description:
-      'Use the structured Form Editor to fill in patient details, diagnosis, medicines, and advice. Or switch to Hand Mode to write and draw directly on a canvas.',
+      'Use the structured Form Editor to rapidly fill in patient details, diagnosis, vitals, medicines, and advice.',
   },
   {
     number: '04',

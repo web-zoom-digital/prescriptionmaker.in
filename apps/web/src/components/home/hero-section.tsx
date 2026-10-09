@@ -204,10 +204,7 @@ export function HeroSection() {
                         <Download className="h-3 w-3" aria-hidden="true" />
                         Export PDF
                       </button>
-                      <button className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground">
-                        <Pen className="h-3 w-3" aria-hidden="true" />
-                        Hand Mode
-                      </button>
+
                     </div>
                   </div>
 

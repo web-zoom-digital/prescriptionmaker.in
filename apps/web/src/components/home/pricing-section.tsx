@@ -148,9 +148,7 @@ export function PricingSection() {
                       : `${plan.features.maxTemplates} templates`}
                   </PlanFeature>
                   <PlanFeature>PDF export</PlanFeature>
-                  {plan.features.handModeEnabled && (
-                    <PlanFeature>Hand Mode editor</PlanFeature>
-                  )}
+
                   {plan.features.customBranding && (
                     <PlanFeature>Custom clinic branding</PlanFeature>
                   )}

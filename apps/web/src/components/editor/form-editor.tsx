@@ -23,7 +23,7 @@ const DOSE_FREQUENCIES = [{label: 'Once daily (OD)', value: 'OD'}, {label: 'Twic
 const DOSE_TIMINGS = [{label: 'Before food', value: 'before_food'}, {label: 'After food', value: 'after_food'}, {label: 'With food', value: 'with_food'}, {label: 'Empty stomach', value: 'empty_stomach'}, {label: 'At bedtime', value: 'bedtime'}]
 
 export function FormEditor({ template, initialData, onDataChange }: FormEditorProps) {
-  const SOAP_TEMPLATES = ['soap-clinical', 'vitals-first']
+  const SOAP_TEMPLATES = ['soap-clinical', 'vitals-first', 'medical-prescription-form']
   const isVitalsTemplate = SOAP_TEMPLATES.includes(template.slug)
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -390,7 +390,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             </select>
           </FormField>
 
-          {template.slug === 'bilingual-indian' && (
+          {['bilingual-indian', 'medical-prescription-form'].includes(template.slug) && (
             <>
               <FormField id="patient-address" label="Address" className="sm:col-span-2" error={errors.patient?.address?.message}>
                 <input id="patient-address" type="text" {...register('patient.address')} className="form-input" placeholder="e.g. 123 Main St" />
@@ -398,6 +398,31 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
               <FormField id="patient-allergies" label="Allergies" className="sm:col-span-2" error={errors.patient?.allergies?.message}>
                 <input id="patient-allergies" type="text" {...register('patient.allergies')} className="form-input" placeholder="e.g. Penicillin, Peanuts" />
               </FormField>
+              {template.slug === 'medical-prescription-form' && (
+                <>
+                  <FormField id="patient-dob" label="Date of Birth" className="sm:col-span-2" error={(errors.patient as any)?.dob?.message}>
+                    <input id="patient-dob" type="text" {...register('patient.dob' as any)} className="form-input" placeholder="e.g. 15-08-1990" />
+                  </FormField>
+                  <FormField id="patient-occupation" label="Occupation" className="sm:col-span-2" error={(errors.patient as any)?.occupation?.message}>
+                    <input id="patient-occupation" type="text" {...register('patient.occupation' as any)} className="form-input" placeholder="e.g. Teacher" />
+                  </FormField>
+                  <FormField id="patient-insurance" label="Insurance No." className="sm:col-span-2" error={(errors.patient as any)?.insuranceNo?.message}>
+                    <input id="patient-insurance" type="text" {...register('patient.insuranceNo' as any)} className="form-input" placeholder="e.g. INS-456" />
+                  </FormField>
+                  <FormField id="patient-provider" label="Care Provider" className="sm:col-span-2" error={(errors.patient as any)?.careProvider?.message}>
+                    <input id="patient-provider" type="text" {...register('patient.careProvider' as any)} className="form-input" placeholder="e.g. Star Health" />
+                  </FormField>
+                  <FormField id="patient-healthcard" label="Health Card No." className="sm:col-span-2" error={(errors.patient as any)?.healthCardNo?.message}>
+                    <input id="patient-healthcard" type="text" {...register('patient.healthCardNo' as any)} className="form-input" placeholder="e.g. HC-789" />
+                  </FormField>
+                  <FormField id="patient-idno" label="Patient ID No." className="sm:col-span-2" error={(errors.patient as any)?.patientIdNo?.message}>
+                    <input id="patient-idno" type="text" {...register('patient.patientIdNo' as any)} className="form-input" placeholder="e.g. PID-102" />
+                  </FormField>
+                  <FormField id="patient-disabilities" label="Disabilities if any" className="sm:col-span-4" error={(errors.patient as any)?.disabilities?.message}>
+                    <input id="patient-disabilities" type="text" {...register('patient.disabilities' as any)} className="form-input" placeholder="e.g. None" />
+                  </FormField>
+                </>
+              )}
             </>
           )}
 

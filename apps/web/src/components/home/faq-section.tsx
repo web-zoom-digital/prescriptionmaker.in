@@ -16,11 +16,7 @@ const FAQS = [
     answer:
       'No. PrescriptionMaker is a documentation software. It helps healthcare professionals format and record prescriptions they have already decided upon. It does not provide medical advice, diagnoses, or treatment recommendations.',
   },
-  {
-    question: 'What are the two editor modes?',
-    answer:
-      'The Form Editor is a structured input form where you fill in patient info, diagnosis, medicines (with dose, frequency, duration), lab tests, and advice. The Hand Mode Editor is a canvas where you can write or draw freely, similar to writing on paper — using a mouse, touch screen, or stylus.',
-  },
+
   {
     question: 'How many templates are available?',
     answer:
@@ -39,7 +35,7 @@ const FAQS = [
   {
     question: 'Can I use PrescriptionMaker for free?',
     answer:
-      'Yes. The Free plan allows up to 10 prescriptions per month with 3 templates. Upgrade to Pro for unlimited prescriptions, all templates, Hand Mode editor, and custom branding.',
+      'Yes. The Free plan allows up to 10 prescriptions per month with 3 templates. Upgrade to Pro for unlimited prescriptions, all templates, and custom branding.',
   },
   {
     question: 'Does PrescriptionMaker work on mobile?',

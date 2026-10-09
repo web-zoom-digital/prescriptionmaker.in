@@ -27,13 +27,7 @@ const FEATURES = [
       'Fill patient info, diagnosis, vitals, medicines with dosage/frequency/duration, lab tests, advice, and follow-up — all in a clean, guided interface.',
     accent: 'teal',
   },
-  {
-    icon: Pen,
-    title: 'Hand Mode Drawing Editor',
-    description:
-      'Canvas-based editor for writing or drawing prescriptions by hand. Supports mouse, touch, and stylus. Undo, redo, zoom, erase, and insert predefined fields.',
-    accent: 'teal',
-  },
+
   {
     icon: Pill,
     title: 'Medicine Builder',

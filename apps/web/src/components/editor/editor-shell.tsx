@@ -331,41 +331,7 @@ export function EditorShell() {
           </div>
         </div>
 
-        {/* Mode toggle */}
-        <div
-          className="flex items-center rounded-lg border border-border bg-slate-50 p-0.5"
-          role="tablist"
-          aria-label="Editor mode"
-        >
-          <button
-            role="tab"
-            aria-selected={mode === 'form'}
-            className={cn(
-              'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-200',
-              mode === 'form'
-                ? 'bg-white text-slate-900 shadow-soft-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-            onClick={() => setMode('form')}
-          >
-            <FileText className="h-3.5 w-3.5" aria-hidden="true" />
-            Form
-          </button>
-          <button
-            role="tab"
-            aria-selected={mode === 'hand'}
-            className={cn(
-              'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-200',
-              mode === 'hand'
-                ? 'bg-white text-slate-900 shadow-soft-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-            onClick={() => setMode('hand')}
-          >
-            <Pen className="h-3.5 w-3.5" aria-hidden="true" />
-            Hand Mode
-          </button>
-        </div>
+
 
         {/* Actions - Desktop */}
         <div className="hidden lg:flex items-center gap-2">
@@ -508,13 +474,7 @@ export function EditorShell() {
               >
                 <div className="bg-white relative">
                   <PrescriptionPreview template={selectedTemplate} data={prescriptionData} />
-                  {prescriptionData.canvasImage && (
-                    <img 
-                      src={prescriptionData.canvasImage} 
-                      className="absolute top-0 left-0 w-full h-full object-contain pointer-events-none z-10" 
-                      alt="drawing" 
-                    />
-                  )}
+
                 </div>
               </div>
             </div>

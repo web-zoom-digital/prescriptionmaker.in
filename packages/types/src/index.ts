@@ -151,6 +151,7 @@ export interface TemplateStyles {
     | 'pediatric-banner'
     | 'dark-banner'
     | 'corporate-split'
+    | 'specialty-banner'
   medicineTableStyle:
     | 'bordered'
     | 'striped'

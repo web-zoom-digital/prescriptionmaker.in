@@ -1380,6 +1380,601 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
     )
   }
 
+  // ─── 11. EYE SPECIALIST LETTERHEAD ────────────────────────────────────────
+  // Pixel-perfect match of the reference design
+  if (slug === 'eye-specialist-letterhead') {
+    // SVG eye illustration (realistic eye matching reference image)
+    const EyeSVG = ({ size = 80, opacity = 1 }: { size?: number; opacity?: number }) => (
+      <svg width={size} height={size * 0.55} viewBox="0 0 120 66" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity }}>
+        {/* Eyelashes top */}
+        <path d="M20 28 Q30 8 60 6 Q90 8 100 28" stroke="#1a1a1a" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+        {/* Upper eyelid fill */}
+        <path d="M12 32 Q30 4 60 3 Q90 4 108 32 Q90 56 60 58 Q30 56 12 32Z" fill="white" stroke="#888" strokeWidth="0.5"/>
+        {/* Iris */}
+        <circle cx="60" cy="32" r="18" fill="#1e90ff"/>
+        <circle cx="60" cy="32" r="18" fill="url(#irisGrad)" />
+        {/* Pupil */}
+        <circle cx="60" cy="32" r="9" fill="#111"/>
+        {/* Iris detail rings */}
+        <circle cx="60" cy="32" r="14" stroke="#0066cc" strokeWidth="0.8" fill="none" opacity="0.6"/>
+        <circle cx="60" cy="32" r="17" stroke="#1a7adb" strokeWidth="0.5" fill="none" opacity="0.4"/>
+        {/* Highlight */}
+        <ellipse cx="53" cy="26" rx="4" ry="3" fill="white" opacity="0.7"/>
+        <circle cx="67" cy="28" r="1.5" fill="white" opacity="0.5"/>
+        {/* Lower eyelid */}
+        <path d="M12 32 Q30 58 60 60 Q90 58 108 32" stroke="#aaa" strokeWidth="1" fill="none"/>
+        {/* Eyelashes — lower few */}
+        <line x1="28" y1="52" x2="22" y2="58" stroke="#555" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="42" y1="58" x2="38" y2="64" stroke="#555" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="78" y1="58" x2="82" y2="64" stroke="#555" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="92" y1="52" x2="98" y2="58" stroke="#555" strokeWidth="1.5" strokeLinecap="round"/>
+        {/* Eyelashes — upper few */}
+        <line x1="30" y1="14" x2="26" y2="6" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
+        <line x1="45" y1="8" x2="43" y2="0" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
+        <line x1="60" y1="6" x2="60" y2="0" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
+        <line x1="75" y1="8" x2="77" y2="0" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
+        <line x1="90" y1="14" x2="94" y2="6" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
+        <defs>
+          <radialGradient id="irisGrad" cx="45%" cy="40%" r="55%">
+            <stop offset="0%" stopColor="#4eb8ff"/>
+            <stop offset="60%" stopColor="#1e80ff"/>
+            <stop offset="100%" stopColor="#0050cc"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    )
+
+    // Stacked chevron/diamond logo shapes (teal stacked triangles like in reference)
+    const ChevronLogo = () => (
+      <svg width="32" height="38" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* 3 stacked chevron/diamond shapes */}
+        <path d="M16 0 L28 9 L16 14 L4 9 Z" fill="#0e7490" opacity="0.9"/>
+        <path d="M16 13 L28 22 L16 27 L4 22 Z" fill="#0891b2" opacity="0.9"/>
+        <path d="M16 26 L28 35 L16 38 L4 35 Z" fill="#06b6d4" opacity="0.9"/>
+      </svg>
+    )
+
+    return (
+      <div style={{
+        width: '210mm', minHeight: '297mm', background: '#ffffff',
+        fontFamily: 'Inter, sans-serif', fontSize: '9.5px',
+        boxSizing: 'border-box', display: 'flex', flexDirection: 'column',
+      }}>
+
+        {/* ═══ HEADER ═══ */}
+        <div style={{ display: 'flex', alignItems: 'stretch', minHeight: '26mm' }}>
+
+          {/* LEFT: Stacked chevron logo + arrow name banner */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0', flexShrink: 0 }}>
+            {/* Chevron logo column */}
+            <div style={{
+              background: 'linear-gradient(180deg, #0e7490 0%, #0891b2 50%, #06b6d4 100%)',
+              width: '14mm',
+              minHeight: '26mm',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              {doctor.logoUrl ? (
+                <img src={doctor.logoUrl} alt="Logo" style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
+              ) : (
+                <ChevronLogo />
+              )}
+            </div>
+
+            {/* Hospital name in arrow/parallelogram banner */}
+            <div style={{
+              background: 'linear-gradient(135deg, #0891b2, #06b6d4)',
+              minHeight: '26mm',
+              padding: '0 18px 0 10px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              flexShrink: 0,
+              clipPath: 'polygon(0 0, 92% 0, 100% 50%, 92% 100%, 0 100%)',
+              minWidth: '44mm',
+            }}>
+              <div style={{ fontSize: '6px', fontWeight: 600, color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>
+                LOGO HERE
+              </div>
+              <div style={{ fontSize: '12px', fontWeight: 900, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.4px', lineHeight: 1.25 }}>
+                {doctor.clinicName || 'NAME OF THE\nHOSPITAL'}
+              </div>
+            </div>
+          </div>
+
+          {/* CENTER: Doctor name + specialty */}
+          <div style={{ flex: 1, padding: '10px 12px 10px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#111827' }}>
+                {doctor.name ? `DR. ${doctor.name}` : 'DR. Petter Devin'}
+              </span>
+              {doctor.qualifications ? (
+                <span style={{ fontSize: '9px', color: '#0891b2', fontWeight: 600, textDecoration: 'underline', cursor: 'default' }}>
+                  {doctor.qualifications}
+                </span>
+              ) : (
+                <span style={{ fontSize: '9px', color: '#0891b2', fontWeight: 600, textDecoration: 'underline' }}>M.B.B.S</span>
+              )}
+            </div>
+            <div style={{ fontSize: '9px', color: '#6b7280', marginTop: '3px', fontStyle: 'italic' }}>
+              {doctor.specialization || 'Specialist Eyes Surgen'}
+            </div>
+            {doctor.address && (
+              <div style={{ fontSize: '7.5px', color: '#9ca3af', marginTop: '4px' }}>{doctor.address}</div>
+            )}
+          </div>
+
+          {/* RIGHT: DEA No + Eye illustration */}
+          <div style={{
+            width: '38mm', padding: '8px 10px',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'flex-end', justifyContent: 'space-between',
+            flexShrink: 0,
+          }}>
+            <div style={{ fontSize: '7.5px', color: '#9ca3af', whiteSpace: 'nowrap' }}>
+              DEA NO//: &nbsp;.............................
+            </div>
+            {/* Realistic eye illustration */}
+            <div style={{ marginTop: '4px' }}>
+              <EyeSVG size={75} />
+            </div>
+          </div>
+        </div>
+
+        {/* Teal separator line */}
+        <div style={{ height: '2.5px', background: 'linear-gradient(90deg, #0e7490, #0891b2, #06b6d4)' }} />
+
+        {/* ═══ PATIENT INFO SECTION ═══ */}
+        <div style={{ display: 'flex', padding: '8px 14px 4px', gap: '0', alignItems: 'stretch' }}>
+          {/* Left: Patient Name + Address fields */}
+          <div style={{ flex: 1, paddingRight: '10px' }}>
+            {/* Patient Name row */}
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '7px' }}>
+              <span style={{ fontSize: '8.5px', color: '#374151', whiteSpace: 'nowrap', minWidth: '68px' }}>Patient Name :</span>
+              <div style={{
+                flex: 1,
+                borderBottom: '1px dotted #9ca3af',
+                marginLeft: '4px',
+                height: '14px',
+                display: 'flex', alignItems: 'flex-end',
+              }}>
+                <span style={{ fontSize: '9px', fontWeight: 600, color: '#111827', paddingBottom: '1px' }}>
+                  {patient.name || ''}
+                </span>
+              </div>
+            </div>
+            {/* Address row */}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ fontSize: '8.5px', color: '#374151', whiteSpace: 'nowrap', minWidth: '68px' }}>Address :</span>
+              <div style={{
+                flex: 1,
+                borderBottom: '1px dotted #9ca3af',
+                marginLeft: '4px',
+                height: '14px',
+                display: 'flex', alignItems: 'flex-end',
+              }}>
+                <span style={{ fontSize: '8.5px', color: '#374151', paddingBottom: '1px' }}>
+                  {patient.address || ''}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: S.No + Age with teal right border */}
+          <div style={{
+            width: '36mm', flexShrink: 0,
+            borderLeft: '2px solid #0891b2',
+            paddingLeft: '10px',
+            display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '6px',
+          }}>
+            <div style={{ fontSize: '8px', color: '#374151' }}>
+              S. No:&nbsp;&nbsp;.............................
+            </div>
+            <div style={{ fontSize: '8px', color: '#374151' }}>
+              Age:&nbsp;&nbsp;...............
+            </div>
+          </div>
+        </div>
+
+        {/* Thin separator */}
+        <div style={{ height: '1px', background: '#e5e7eb', margin: '4px 14px 0' }} />
+
+        {/* FAX line */}
+        <div style={{ padding: '5px 14px 2px', fontSize: '8px', color: '#6b7280' }}>
+          FAX: {doctor.phone ? `(${doctor.phone})` : '(207) 808 2015 2202'}
+        </div>
+
+        {/* ═══ Rx + Date ROW ═══ */}
+        <div style={{ padding: '4px 14px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{
+            fontSize: '40px', fontFamily: 'Georgia, serif', fontStyle: 'italic',
+            fontWeight: 900, color: '#111827', lineHeight: 1,
+          }}>
+            Rx
+          </div>
+          <div style={{ fontSize: '10px', color: '#374151', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ fontWeight: 600 }}>Date</span>
+            <span>___/___/______</span>
+          </div>
+        </div>
+
+        {/* ═══ MAIN WRITING AREA ═══ */}
+        <div style={{ flex: 1, position: 'relative', margin: '0 14px', minHeight: '100mm', borderTop: '1px solid #e5e7eb' }}>
+          {/* Watermark Eye SVG — large, centered, very faint */}
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none', userSelect: 'none',
+            opacity: 0.07,
+          }}>
+            <EyeSVG size={220} />
+          </div>
+
+          {/* Medicine prescription content */}
+          <div style={{ paddingTop: '10px', paddingLeft: '6px', position: 'relative', zIndex: 1 }}>
+            {filledMeds.length > 0 ? filledMeds.map((med, idx) => (
+              <div key={idx} style={{ marginBottom: '14px', borderBottom: '1px dotted #d1d5db', paddingBottom: '10px' }}>
+                <div style={{ fontWeight: 700, fontSize: '11px', color: '#111827' }}>
+                  {idx + 1}.&nbsp;&nbsp;{med.name}{med.strength ? ` ${med.strength}` : ''}{med.form ? ` (${med.form})` : ''}
+                </div>
+                <div style={{ paddingLeft: '22px', marginTop: '3px', fontSize: '9px', color: '#4b5563' }}>
+                  {[med.frequency ? t(med.frequency, lang) : '', med.timing ? t(med.timing, lang) : '', med.duration].filter(Boolean).join('  ·  ')}
+                </div>
+              </div>
+            )) : [1, 2, 3, 4, 5, 6, 7].map(n => (
+              <div key={n} style={{ marginBottom: '16px', borderBottom: '1px dotted #e5e7eb', paddingBottom: '12px' }}>
+                <span style={{ color: 'transparent', fontSize: '10px' }}>&nbsp;</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Advice / investigations if present */}
+          {(advice || labTests) && (
+            <div style={{ padding: '4px 0', fontSize: '8.5px', color: '#374151', borderTop: '1px solid #e5e7eb', marginTop: '8px', position: 'relative', zIndex: 1 }}>
+              {advice && <div><strong style={{ color: '#0891b2' }}>Advice:</strong> {t(advice, lang)}</div>}
+              {labTests && <div style={{ marginTop: '2px' }}><strong style={{ color: '#0891b2' }}>Tests:</strong> {labTests}</div>}
+            </div>
+          )}
+        </div>
+
+        {/* ═══ DOCTOR SIGNATURE LINE ═══ */}
+        <div style={{ padding: '14px 14px 8px', display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {doctor.signatureUrl && (
+              <img src={doctor.signatureUrl} alt="Signature" style={{ width: '70px', height: '28px', objectFit: 'contain' }} />
+            )}
+            <span style={{ fontSize: '8.5px', color: '#374151' }}>
+              Doctor Signature :&nbsp;&nbsp;......................................
+            </span>
+          </div>
+        </div>
+
+        {/* ═══ FOOTER BAND ═══ */}
+        <div style={{
+          display: 'flex', alignItems: 'stretch',
+          background: '#f0f9ff',
+          borderTop: '2px solid #0891b2',
+          minHeight: '12mm',
+        }}>
+          {/* Left teal section: clinic name + address */}
+          <div style={{
+            background: 'linear-gradient(135deg, #0e7490, #0891b2)',
+            padding: '6px 14px',
+            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            minWidth: '52mm', flexShrink: 0,
+          }}>
+            <div style={{ fontSize: '9.5px', fontWeight: 900, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+              {doctor.clinicName || 'NAME OF THE HOSPITAL'}
+            </div>
+            <div style={{ fontSize: '7px', color: 'rgba(255,255,255,0.8)', marginTop: '2px' }}>
+              {doctor.address || '751 Victoria 0053 street, South Statue 20440'}
+            </div>
+          </div>
+
+          {/* Right: Book appointment + phone */}
+          <div style={{
+            flex: 1, display: 'flex', alignItems: 'center',
+            justifyContent: 'flex-end', gap: '10px', padding: '6px 10px',
+            background: '#f0f9ff',
+          }}>
+            <div style={{
+              background: '#0f172a', color: '#ffffff',
+              borderRadius: '3px', padding: '4px 10px',
+              fontSize: '7.5px', fontWeight: 700,
+              textTransform: 'uppercase', letterSpacing: '0.3px',
+              whiteSpace: 'nowrap',
+            }}>
+              BOOK YOUR APPOINTMENT
+            </div>
+            <div style={{ fontSize: '8px', color: '#0891b2', fontWeight: 600, whiteSpace: 'nowrap' }}>
+              {doctor.phone
+                ? `${doctor.phone}  ${doctor.phone}`
+                : '091-099-099-008  091-099-099-000'}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── 12. SIMPLE RX PAD ─────────────────────────────────────────────────────
+  // Classic minimalist B&W Rx pad
+  if (slug === 'simple-rx-pad') {
+    return (
+      <div style={{ width: '210mm', minHeight: '297mm', background: '#f8f8f8', fontFamily: 'Georgia, serif', fontSize: '10px', boxSizing: 'border-box', padding: '22mm 22mm' }}>
+        {/* Top section: Large Rx symbol + Patient fields */}
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', marginBottom: '12px' }}>
+          {/* Big Rx */}
+          <div style={{ fontSize: '72px', fontFamily: 'Georgia, serif', fontWeight: 900, color: '#111', lineHeight: 1, flexShrink: 0, marginTop: '-8px' }}>
+            Rx
+          </div>
+          {/* Patient fields */}
+          <div style={{ flex: 1, paddingTop: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '9px', color: '#555', whiteSpace: 'nowrap' }}>Patient</span>
+              <div style={{ flex: 1, borderBottom: '1px solid #888' }}>
+                <span style={{ fontSize: '10px', color: '#111', fontWeight: 600, display: 'block', paddingBottom: '2px' }}>{patient.name || ''}</span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '4px' }}>
+              <div style={{ flex: 1, borderBottom: '1px solid #aaa' }}>
+                <span style={{ fontSize: '9px', color: '#555' }}>{patient.age ? `Age: ${patient.age}` : ''}</span>
+              </div>
+              <div style={{ flex: 1, borderBottom: '1px solid #aaa', textAlign: 'right' }}>
+                <span style={{ fontSize: '9px', color: '#555' }}>{patient.gender || ''}</span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
+              <span style={{ fontSize: '9px', color: '#555', whiteSpace: 'nowrap' }}>Address</span>
+              <div style={{ flex: 1, borderBottom: '1px solid #aaa' }}>
+                <span style={{ fontSize: '9.5px', color: '#111', display: 'block', paddingBottom: '2px' }}>{patient.address || ''}</span>
+              </div>
+            </div>
+            <div style={{ flex: 1, borderBottom: '1px solid #aaa', minHeight: '16px', marginTop: '4px' }}></div>
+          </div>
+        </div>
+
+        {/* Bold divider */}
+        <div style={{ borderTop: '2.5px solid #111', marginBottom: '20px' }}></div>
+
+        {/* Diagnosis if present */}
+        {diagnosis && (
+          <div style={{ marginBottom: '12px', fontSize: '9.5px', color: '#444', fontStyle: 'italic' }}>
+            Diagnosis: {diagnosis}
+          </div>
+        )}
+
+        {/* Writing / medicine area */}
+        <div style={{ paddingLeft: '4px', minHeight: '130mm' }}>
+          {filledMeds.length > 0 ? filledMeds.map((med, idx) => (
+            <div key={idx} style={{ marginBottom: '18px', borderBottom: '1px solid #ddd', paddingBottom: '12px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#111' }}>
+                {idx + 1}.&nbsp;&nbsp;{med.name}{med.strength ? ` ${med.strength}` : ''}{med.form ? ` (${med.form})` : ''}
+              </div>
+              <div style={{ paddingLeft: '24px', marginTop: '4px', fontSize: '9.5px', color: '#555', fontStyle: 'italic' }}>
+                {[med.frequency ? t(med.frequency, lang) : '', med.timing ? t(med.timing, lang) : '', med.duration].filter(Boolean).join('  ·  ')}
+              </div>
+            </div>
+          )) : [1, 2, 3, 4, 5].map(n => (
+            <div key={n} style={{ marginBottom: '18px', borderBottom: '1px solid #ddd', paddingBottom: '12px', minHeight: '32px' }}></div>
+          ))}
+        </div>
+
+        {/* Advice / investigations */}
+        {(advice || labTests) && (
+          <div style={{ marginTop: '8px', borderTop: '1px solid #ddd', paddingTop: '8px', fontSize: '9px', color: '#444' }}>
+            {advice && <div>Advice: {t(advice, lang)}</div>}
+            {labTests && <div style={{ marginTop: '3px' }}>Investigations: {labTests}</div>}
+          </div>
+        )}
+
+        {/* Bottom: Date + Signature */}
+        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div>
+            <div style={{ borderBottom: '1px solid #888', width: '100px', marginBottom: '4px', minHeight: '20px' }}></div>
+            <div style={{ fontSize: '9px', color: '#555' }}>Date</div>
+          </div>
+          <div>
+            {doctor.signatureUrl
+              ? <img src={doctor.signatureUrl} alt="Signature" style={{ width: '90px', height: '36px', objectFit: 'contain', display: 'block', marginBottom: '4px' }} />
+              : <div style={{ borderBottom: '1px solid #888', width: '130px', marginBottom: '4px', minHeight: '24px' }}></div>}
+            <div style={{ fontSize: '9px', color: '#555', textAlign: 'right' }}>Signature</div>
+          </div>
+        </div>
+
+        {/* Prescriber info at bottom if present */}
+        {doctor.name && (
+          <div style={{ marginTop: '16px', textAlign: 'center', borderTop: '1px dotted #ccc', paddingTop: '8px' }}>
+            <div style={{ fontSize: '9px', fontWeight: 700, color: '#333' }}>Dr. {doctor.name}</div>
+            {doctor.clinicName && <div style={{ fontSize: '8px', color: '#777' }}>{doctor.clinicName}</div>}
+            {doctor.registrationNumber && <div style={{ fontSize: '7.5px', color: '#aaa' }}>Reg. {doctor.registrationNumber}</div>}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ─── 13. MEDICAL PRESCRIPTION FORM ────────────────────────────────────────
+  // Comprehensive form with drug table, patient info grid, diet & history
+  if (slug === 'medical-prescription-form') {
+    const borderColor = `${pc}60`
+    const cellStyle = { padding: '4px 8px', borderRight: `1px solid ${borderColor}`, fontSize: '8.5px' }
+    return (
+      <div style={{ width: '210mm', minHeight: '297mm', background: '#f4f4f8', fontFamily: 'Inter, sans-serif', fontSize: '9px', boxSizing: 'border-box', padding: '8mm', position: 'relative' }}>
+
+        {/* Decorative circles — top right */}
+        <div style={{ position: 'absolute', top: '6px', right: '6px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          {[20, 14, 20].map((s, i) => (
+            <div key={i} style={{ width: `${s}px`, height: `${s}px`, borderRadius: '50%', border: `2px solid ${pc}40`, alignSelf: i === 1 ? 'flex-start' : 'flex-end' }}></div>
+          ))}
+        </div>
+        {/* Decorative circles — bottom left */}
+        <div style={{ position: 'absolute', bottom: '6px', left: '6px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          {[20, 14, 20].map((s, i) => (
+            <div key={i} style={{ width: `${s}px`, height: `${s}px`, borderRadius: '50%', border: `2px solid ${pc}40`, alignSelf: i === 1 ? 'flex-end' : 'flex-start' }}></div>
+          ))}
+        </div>
+
+        {/* ── Header row: Rx + Title + Date box ── */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Bullet circles */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginRight: '2px' }}>
+              {[0, 1, 2].map(i => (
+                <div key={i} style={{ width: '8px', height: '8px', borderRadius: '50%', border: `1.5px solid ${pc}`, background: i === 0 ? pc : 'transparent' }}></div>
+              ))}
+            </div>
+            <div style={{ fontSize: '24px', fontFamily: 'Georgia, serif', fontWeight: 900, color: pc, lineHeight: 1 }}>Rx</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: pc, letterSpacing: '-0.5px' }}>Medical Prescription</div>
+          </div>
+          <div style={{ border: `1.5px solid ${borderColor}`, borderRadius: '4px', padding: '4px 14px', fontSize: '9px', background: '#fff', minWidth: '80px' }}>
+            <span style={{ color: '#64748b' }}>Date:</span>
+            <span style={{ marginLeft: '4px', fontWeight: 700 }}>{today}</span>
+          </div>
+        </div>
+
+        {/* ── Patient Info Table ── */}
+        <div style={{ border: `1.5px solid ${borderColor}`, borderRadius: '4px', overflow: 'hidden', marginBottom: '6px', background: '#fff' }}>
+          {/* Row 1: Patient's Name */}
+          <div style={{ ...cellStyle as any, borderBottom: `1px solid ${borderColor}`, borderRight: 'none', padding: '5px 8px' }}>
+            <span style={{ color: '#64748b' }}>Patient&apos;s Name:</span>
+            <strong style={{ marginLeft: '8px', fontSize: '10px' }}>{patient.name || ' '}</strong>
+          </div>
+          {/* Row 2: DOB | Age | Sex | Occupation */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto 1fr', borderBottom: `1px solid ${borderColor}` }}>
+            {[
+              { label: 'Date of Birth:', value: (patient as any).dob || '' },
+              { label: 'Age:', value: patient.age || '' },
+              { label: 'Sex:', value: patient.gender || '' },
+              { label: 'Occupation:', value: (patient as any).occupation || '' },
+            ].map((f, i) => (
+              <div key={i} style={{ ...cellStyle as any, borderRight: i < 3 ? `1px solid ${borderColor}` : 'none', borderBottom: 'none' }}>
+                <span style={{ color: '#64748b' }}>{f.label}</span>
+                <span style={{ marginLeft: '4px', fontWeight: 600 }}>{f.value}</span>
+              </div>
+            ))}
+          </div>
+          {/* Row 3: Insurance | Care Provider */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: `1px solid ${borderColor}` }}>
+            <div style={{ ...cellStyle as any, borderRight: `1px solid ${borderColor}`, borderBottom: 'none' }}>
+              <span style={{ color: '#64748b' }}>Health Insurance Number:</span>
+              <span style={{ marginLeft: '4px', fontWeight: 600 }}>{(patient as any).insuranceNo || ''}</span>
+            </div>
+            <div style={{ ...cellStyle as any, borderRight: 'none', borderBottom: 'none' }}>
+              <span style={{ color: '#64748b' }}>Health Care Provider:</span>
+              <span style={{ marginLeft: '4px', fontWeight: 600 }}>{(patient as any).careProvider || ''}</span>
+            </div>
+          </div>
+          {/* Row 4: Health Card | Patient ID */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            <div style={{ ...cellStyle as any, borderRight: `1px solid ${borderColor}`, borderBottom: 'none' }}>
+              <span style={{ color: '#64748b' }}>Health Card Number:</span>
+              <span style={{ marginLeft: '4px', fontWeight: 600 }}>{(patient as any).healthCardNo || ''}</span>
+            </div>
+            <div style={{ ...cellStyle as any, borderRight: 'none', borderBottom: 'none' }}>
+              <span style={{ color: '#64748b' }}>Patient ID Number:</span>
+              <span style={{ marginLeft: '4px', fontWeight: 600 }}>{(patient as any).patientIdNo || ''}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Address + Diagnosis + Vitals + Allergies ── */}
+        <div style={{ border: `1.5px solid ${borderColor}`, borderRadius: '4px', overflow: 'hidden', marginBottom: '6px', background: '#fff' }}>
+          <div style={{ ...cellStyle as any, borderRight: 'none', borderBottom: `1px solid ${borderColor}` }}>
+            <span style={{ color: '#64748b' }}>Patient&apos;s Address:</span>
+            <span style={{ marginLeft: '8px' }}>{patient.address || ''}</span>
+          </div>
+          <div style={{ ...cellStyle as any, borderRight: 'none', borderBottom: `1px solid ${borderColor}`, minHeight: '24px' }}>
+            <span style={{ color: '#64748b' }}>Diagnosed With:</span>
+            <strong style={{ marginLeft: '8px' }}>{diagnosis || ''}</strong>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', borderBottom: `1px solid ${borderColor}` }}>
+            {[
+              { label: 'Blood Pressure:', value: vitals?.bloodPressure || '' },
+              { label: 'Pulse Rate:', value: vitals?.pulse || '' },
+              { label: 'Weight:', value: vitals?.weight || '' },
+            ].map((f, i) => (
+              <div key={i} style={{ ...cellStyle as any, borderRight: i < 2 ? `1px solid ${borderColor}` : 'none', borderBottom: 'none' }}>
+                <span style={{ color: '#64748b' }}>{f.label}</span>
+                <span style={{ marginLeft: '4px', fontWeight: 600 }}>{f.value}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            <div style={{ ...cellStyle as any, borderRight: `1px solid ${borderColor}`, borderBottom: 'none' }}>
+              <span style={{ color: '#64748b' }}>Allergies:</span>
+              <span style={{ marginLeft: '4px' }}>{patient.allergies || ''}</span>
+            </div>
+            <div style={{ ...cellStyle as any, borderRight: 'none', borderBottom: 'none' }}>
+              <span style={{ color: '#64748b' }}>Disabilities if any:</span>
+              <span style={{ marginLeft: '4px' }}>{(patient as any).disabilities || ''}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Drug Table ── */}
+        <table style={{ width: '100%', borderCollapse: 'collapse', border: `1.5px solid ${borderColor}`, borderRadius: '4px', overflow: 'hidden', marginBottom: '6px', background: '#fff', fontSize: '8.5px' }}>
+          <thead>
+            <tr style={{ background: `${pc}15` }}>
+              <th style={{ padding: '5px', textAlign: 'left', borderRight: `1px solid ${borderColor}`, borderBottom: `1px solid ${borderColor}`, width: '5%', color: '#64748b' }}>#</th>
+              <th colSpan={2} style={{ padding: '5px', textAlign: 'center', borderRight: `1px solid ${borderColor}`, borderBottom: `1px solid ${borderColor}`, color: pc, fontWeight: 700 }}>DRUGS</th>
+              <th style={{ padding: '5px', textAlign: 'center', borderRight: `1px solid ${borderColor}`, borderBottom: `1px solid ${borderColor}`, color: pc, fontWeight: 700, width: '26%' }}>Unit (Tablet/Syrup)</th>
+              <th style={{ padding: '5px', textAlign: 'center', borderBottom: `1px solid ${borderColor}`, color: pc, fontWeight: 700, width: '26%' }}>Dosage (Per day)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(filledMeds.length > 0 ? filledMeds : Array.from({ length: 6 }, () => ({} as Medicine))).map((med, idx) => (
+              <tr key={idx} style={{ borderBottom: `1px solid ${borderColor}` }}>
+                <td style={{ padding: '5px', textAlign: 'center', borderRight: `1px solid ${borderColor}`, color: pc, fontWeight: 700 }}>{idx + 1}</td>
+                <td colSpan={2} style={{ padding: '5px', borderRight: `1px solid ${borderColor}` }}>
+                  {med.name && <strong>{med.name}</strong>}
+                  {med.strength && <span style={{ color: '#64748b', marginLeft: '4px', fontSize: '8px' }}>{med.strength}</span>}
+                </td>
+                <td style={{ padding: '5px', textAlign: 'center', borderRight: `1px solid ${borderColor}` }}>
+                  {med.form || ''}
+                </td>
+                <td style={{ padding: '5px', textAlign: 'center' }}>
+                  {med.frequency ? t(med.frequency, lang) : (med.duration || '')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* ── Bottom: Diet + History + Signature ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', border: `1.5px solid ${borderColor}`, borderRadius: '4px', overflow: 'hidden', background: '#fff' }}>
+          <div style={{ borderRight: `1px solid ${borderColor}` }}>
+            <div style={{ padding: '5px 8px', borderBottom: `1px solid ${borderColor}`, fontSize: '8.5px', color: '#64748b', fontWeight: 600 }}>Diet to Follow:</div>
+            <div style={{ padding: '6px 8px', minHeight: '30px', fontSize: '8.5px', color: '#374141' }}>
+              {advice ? t(advice, lang) : ''}
+            </div>
+            <div style={{ padding: '5px 8px', borderTop: `1px solid ${borderColor}`, borderBottom: `1px solid ${borderColor}`, fontSize: '8.5px', color: '#64748b', fontWeight: 600 }}>Brief History of Patient:</div>
+            <div style={{ padding: '6px 8px', minHeight: '28px' }}></div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div style={{ padding: '6px 8px', minHeight: '40px' }}></div>
+            {/* Signature at bottom-right of bottom section */}
+            <div style={{ borderTop: `1px solid ${borderColor}`, padding: '5px 8px', textAlign: 'center' }}>
+              {doctor.signatureUrl
+                ? <img src={doctor.signatureUrl} alt="Sig" style={{ width: '70px', height: '28px', objectFit: 'contain', display: 'block', margin: '0 auto 4px' }} />
+                : <div style={{ height: '28px' }}></div>}
+              <div style={{ fontSize: '8px', color: '#64748b' }}>Doctor&apos;s Signature</div>
+              {doctor.name && <div style={{ fontSize: '7.5px', fontWeight: 700, color: pc, marginTop: '1px' }}>Dr. {doctor.name}</div>}
+              {doctor.registrationNumber && <div style={{ fontSize: '7px', color: '#94a3b8' }}>Reg: {doctor.registrationNumber}</div>}
+            </div>
+          </div>
+        </div>
+
+        {/* Prescriptionmaker watermark */}
+        <div style={{ marginTop: '6px', textAlign: 'center', fontSize: '6.5px', color: `${pc}50`, letterSpacing: '1px' }}>
+          prescriptionmaker.in
+        </div>
+      </div>
+    )
+  }
+
   // ─── Default fallback ─────────────────────────────────────────────────────
   return (
     <div style={{ width: '210mm', minHeight: '297mm', background: bg, fontFamily: ff, fontSize: '10px', boxSizing: 'border-box', padding: '16px 20px' }}>
