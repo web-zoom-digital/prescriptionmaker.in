@@ -8,7 +8,7 @@ import { router } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import Svg, { Path, Line, Rect, Text as SvgText } from 'react-native-svg'
 import * as Print from 'expo-print'
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import * as Sharing from 'expo-sharing'
 
 const { width: SW, height: SH } = Dimensions.get('window')
@@ -644,14 +644,8 @@ function CanvasStep({
       } else {
         // Mobile (iOS/Android) native flow
         try {
-          Alert.alert('Debug', 'Starting native export...')
           const { uri } = await Print.printToFileAsync({ html, base64: false })
-          Alert.alert('Debug', `PDF Created at: ${uri}`)
-          const name = patient.patientName.replace(/\s+/g, '_')
-          const dest = `${FileSystem.documentDirectory}rx_${name}_${Date.now()}.pdf`
-          await FileSystem.moveAsync({ from: uri, to: dest })
-          Alert.alert('Debug', `Moved to: ${dest}`)
-          await Sharing.shareAsync(dest, { mimeType: 'application/pdf', dialogTitle: 'Share Prescription' })
+          await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Share Prescription' })
         } catch (e: any) {
           Alert.alert('Native Export Error', e.message)
         }

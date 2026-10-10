@@ -16,7 +16,7 @@ import { type LanguageCode, LANGUAGES } from '../lib/translations'
 import { getDoctorProfile } from '../lib/local-store'
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import * as MailComposer from 'expo-mail-composer'
 
 import { Colors, Typography, Spacing, Radius, Shadow } from '../lib/design-system'
@@ -373,10 +373,7 @@ export default function PrescriptionEditor() {
     }
 
     const { uri } = await Print.printToFileAsync({ html, base64: false })
-    // @ts-ignore
-    const dest = `${FileSystem.documentDirectory}prescription_${patientInfo.name.replace(/\s/g, '_') || 'rx'}_${Date.now()}.pdf`
-    await FileSystem.moveAsync({ from: uri, to: dest })
-    return dest
+    return uri
   }
 
   const handleExportAction = async (action: 'download' | 'share' | 'email' | 'whatsapp') => {
