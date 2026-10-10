@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-rou
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Ionicons } from '@expo/vector-icons'
-
+import { Colors, Typography, Spacing, Radius, Shadow } from '../../lib/design-system'
 
 export default function PatientHistory() {
   const router = useRouter()
@@ -79,7 +79,7 @@ export default function PatientHistory() {
         <View style={styles.cardBody}>
           {!!item.diagnosis && (
             <View style={styles.infoRow}>
-              <Ionicons name="medical-outline" size={16} color="#0d9488" />
+              <Ionicons name="medical" size={14} color={Colors.primaryBlue} style={{ marginTop: 2 }} />
               <View style={styles.infoCol}>
                 <Text style={styles.infoLabel}>DIAGNOSIS</Text>
                 <Text style={styles.infoValue}>{item.diagnosis}</Text>
@@ -89,7 +89,7 @@ export default function PatientHistory() {
 
           {meds.length > 0 && (
             <View style={[styles.infoRow, { marginTop: 12 }]}>
-              <Ionicons name="bandage-outline" size={16} color="#2563eb" />
+              <Ionicons name="bandage" size={14} color={Colors.primaryBlue} style={{ marginTop: 2 }} />
               <View style={styles.infoCol}>
                 <Text style={styles.infoLabel}>MEDICINES ({meds.length})</Text>
                 <View style={styles.tagsContainer}>
@@ -112,7 +112,7 @@ export default function PatientHistory() {
             style={styles.repeatButton}
             onPress={() => router.push({ pathname: '/editor', params: { clone_id: item.id } })}
           >
-            <Ionicons name="copy-outline" size={16} color="#fff" />
+            <Ionicons name="copy-outline" size={16} color={Colors.white} />
             <Text style={styles.repeatButtonText}>Repeat Prescription</Text>
           </TouchableOpacity>
         </View>
@@ -122,7 +122,12 @@ export default function PatientHistory() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: name }} />
+      <Stack.Screen options={{ 
+        title: name,
+        headerStyle: { backgroundColor: Colors.darkNavy },
+        headerTintColor: Colors.white,
+        headerTitleStyle: { fontWeight: '700', fontSize: 16 },
+      }} />
       
       {/* Vitals Overview */}
       <View style={styles.header}>
@@ -146,7 +151,7 @@ export default function PatientHistory() {
             <Text style={styles.vitalLabel}>Weight</Text>
             <Text style={styles.vitalValue}>{latestInfo.weight ? `${latestInfo.weight} kg` : '-'}</Text>
           </View>
-          <View style={styles.vitalBox}>
+          <View style={[styles.vitalBox, { borderRightWidth: 0 }]}>
             <Text style={styles.vitalLabel}>Visits</Text>
             <Text style={styles.vitalValue}>{prescriptions.length}</Text>
           </View>
@@ -155,7 +160,7 @@ export default function PatientHistory() {
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#0f766e" />
+          <ActivityIndicator size="large" color={Colors.primaryBlue} />
         </View>
       ) : (
         <FlatList
@@ -165,7 +170,7 @@ export default function PatientHistory() {
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="document-text-outline" size={48} color="#cbd5e1" />
+              <Ionicons name="document-text-outline" size={48} color={Colors.textMuted} />
               <Text style={styles.emptyText}>No prescriptions found</Text>
             </View>
           }
@@ -174,7 +179,7 @@ export default function PatientHistory() {
 
       {/* FAB for New Prescription */}
       <TouchableOpacity style={styles.fab} onPress={handleNewRx}>
-        <Ionicons name="add" size={24} color="#fff" />
+        <Ionicons name="add" size={24} color={Colors.white} />
         <Text style={styles.fabText}>New Rx</Text>
       </TouchableOpacity>
     </View>
@@ -182,44 +187,60 @@ export default function PatientHistory() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: Colors.paleBlue },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { backgroundColor: '#fff', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e2e8f0' },
-  avatarRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
-  avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#0f766e', justifyContent: 'center', alignItems: 'center' },
-  avatarText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  name: { fontSize: 18, fontWeight: 'bold', color: '#0f172a' },
-  phone: { fontSize: 14, color: '#64748b' },
-  vitalsRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  vitalBox: { flex: 1, alignItems: 'center', borderRightWidth: 1, borderRightColor: '#f1f5f9' },
-  vitalLabel: { fontSize: 11, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 },
-  vitalValue: { fontSize: 14, fontWeight: 'bold', color: '#0f172a' },
-  list: { padding: 16, paddingBottom: 80, gap: 16 },
-  card: { backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0' },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12, backgroundColor: '#f8fafc', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  
+  header: { 
+    backgroundColor: Colors.white, padding: Spacing.lg, 
+    borderBottomWidth: 1, borderBottomColor: Colors.border,
+    ...Shadow.sm
+  },
+  avatarRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 20 },
+  avatar: { 
+    width: 52, height: 52, borderRadius: 26, 
+    backgroundColor: Colors.primaryBlue, 
+    justifyContent: 'center', alignItems: 'center',
+    ...Shadow.blue
+  },
+  avatarText: { color: Colors.white, fontSize: 22, fontWeight: '800' },
+  name: { ...Typography.h3, color: Colors.textPrimary },
+  phone: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2 },
+  
+  vitalsRow: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: Colors.surface, borderRadius: Radius.md, paddingVertical: 10 },
+  vitalBox: { flex: 1, alignItems: 'center', borderRightWidth: 1, borderRightColor: Colors.border },
+  vitalLabel: { ...Typography.labelSm, color: Colors.textSecondary, textTransform: 'uppercase', marginBottom: 2 },
+  vitalValue: { ...Typography.body, fontWeight: '700', color: Colors.textPrimary },
+  
+  list: { padding: Spacing.md, paddingBottom: 80, gap: Spacing.sm },
+  card: { backgroundColor: Colors.white, borderRadius: Radius.lg, overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
   dateBadge: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#0f766e' },
-  dateText: { fontSize: 13, fontWeight: '600', color: '#334155' },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.primaryBlue },
+  dateText: { fontSize: 13, fontWeight: '700', color: Colors.textPrimary },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, borderWidth: 1 },
-  statusComplete: { backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' },
-  statusDraft: { backgroundColor: '#fffbeb', borderColor: '#fde68a' },
-  statusText: { fontSize: 11, fontWeight: '600' },
-  textComplete: { color: '#166534' },
-  textDraft: { color: '#92400e' },
+  statusComplete: { backgroundColor: Colors.successLight, borderColor: '#bbf7d0' },
+  statusDraft: { backgroundColor: Colors.warningLight, borderColor: '#fde68a' },
+  statusText: { fontSize: 11, fontWeight: '700' },
+  textComplete: { color: Colors.success },
+  textDraft: { color: Colors.warning },
+  
   cardBody: { padding: 16 },
-  infoRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  infoRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   infoCol: { flex: 1 },
-  infoLabel: { fontSize: 10, fontWeight: 'bold', color: '#64748b', marginBottom: 2 },
-  infoValue: { fontSize: 14, color: '#0f172a', fontWeight: '500' },
+  infoLabel: { ...Typography.labelSm, color: Colors.textMuted, marginBottom: 2 },
+  infoValue: { ...Typography.body, color: Colors.textPrimary, fontWeight: '600' },
   tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 },
-  tag: { backgroundColor: '#eff6ff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  tagText: { fontSize: 12, color: '#1d4ed8', fontWeight: '500' },
-  moreText: { fontSize: 12, color: '#64748b', alignSelf: 'center' },
-  cardFooter: { padding: 12, borderTopWidth: 1, borderTopColor: '#f1f5f9', backgroundColor: '#f8fafc' },
-  repeatButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#0f766e', paddingVertical: 8, borderRadius: 8 },
-  repeatButtonText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  tag: { backgroundColor: Colors.lightBlue, paddingHorizontal: 8, paddingVertical: 4, borderRadius: Radius.sm },
+  tagText: { fontSize: 12, color: Colors.primaryBlue, fontWeight: '600' },
+  moreText: { fontSize: 12, color: Colors.textSecondary, alignSelf: 'center', fontWeight: '500' },
+  
+  cardFooter: { padding: 12, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.paleBlue },
+  repeatButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: Colors.primaryBlue, paddingVertical: 10, borderRadius: Radius.md, ...Shadow.blue },
+  repeatButtonText: { color: Colors.white, fontSize: 13, fontWeight: '700' },
+  
   emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 40 },
-  emptyText: { marginTop: 12, fontSize: 14, color: '#64748b' },
-  fab: { position: 'absolute', right: 16, bottom: 16, flexDirection: 'row', alignItems: 'center', backgroundColor: '#0f766e', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 24, gap: 8, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 },
-  fabText: { color: '#fff', fontWeight: 'bold', fontSize: 15 }
+  emptyText: { marginTop: 12, ...Typography.body, color: Colors.textSecondary },
+  
+  fab: { position: 'absolute', right: 16, bottom: 20, flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.primaryBlue, paddingHorizontal: 20, paddingVertical: 14, borderRadius: 28, gap: 8, ...Shadow.blue },
+  fabText: { color: Colors.white, fontWeight: '800', fontSize: 15 }
 })

@@ -6,6 +6,7 @@ import {
 import { router } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { DOSAGE_DB, calculatePediatricDose, type DosageEntry } from '../lib/dosage-db'
+import { Colors, Typography, Spacing, Radius, Shadow } from '../lib/design-system'
 
 type PatientType = 'pediatric' | 'adult'
 
@@ -17,7 +18,7 @@ function ResultCard({ med, weight, type }: { med: DosageEntry; weight: number; t
       {/* Header */}
       <View style={styles.resultHeader}>
         <View style={styles.resultIcon}>
-          <Ionicons name="flask" size={16} color="#0f766e" />
+          <Ionicons name="flask" size={18} color={Colors.primaryBlue} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.resultName}>{med.name}</Text>
@@ -42,7 +43,7 @@ function ResultCard({ med, weight, type }: { med: DosageEntry; weight: number; t
             </View>
             <View style={styles.doseRow}>
               <Text style={styles.doseLabel}>Nearest Strength</Text>
-              <Text style={[styles.doseValue, { color: '#1e40af' }]}>{pediatricResult.recommendedStrength}</Text>
+              <Text style={[styles.doseValue, { color: Colors.darkNavy }]}>{pediatricResult.recommendedStrength}</Text>
             </View>
             <View style={styles.doseRow}>
               <Text style={styles.doseLabel}>Frequency</Text>
@@ -50,7 +51,7 @@ function ResultCard({ med, weight, type }: { med: DosageEntry; weight: number; t
             </View>
             {pediatricResult.warning ? (
               <View style={styles.capWarning}>
-                <Ionicons name="alert-circle" size={13} color="#d97706" />
+                <Ionicons name="alert-circle" size={14} color={Colors.warning} />
                 <Text style={styles.capWarningText}>{pediatricResult.warning}</Text>
               </View>
             ) : null}
@@ -72,7 +73,7 @@ function ResultCard({ med, weight, type }: { med: DosageEntry; weight: number; t
           </>
         )}
         <View style={styles.instructRow}>
-          <Ionicons name="information-circle-outline" size={14} color="#0f766e" />
+          <Ionicons name="information-circle" size={16} color={Colors.primaryBlue} />
           <Text style={styles.instructText}>{med.instructions}</Text>
         </View>
       </View>
@@ -80,7 +81,7 @@ function ResultCard({ med, weight, type }: { med: DosageEntry; weight: number; t
       {/* Age limit */}
       {med.ageLimit && (
         <View style={styles.ageLimitRow}>
-          <Ionicons name="calendar-outline" size={13} color="#64748b" />
+          <Ionicons name="calendar-outline" size={14} color={Colors.textSecondary} />
           <Text style={styles.ageLimitText}>{med.ageLimit}</Text>
         </View>
       )}
@@ -121,10 +122,10 @@ export default function DosageCalculatorScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/dashboard')} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={22} color="#fff" />
+          <Ionicons name="arrow-back" size={22} color={Colors.white} />
         </Pressable>
         <View>
-          <Text style={styles.headerTitle}>⚖️ Dosage Calculator</Text>
+          <Text style={styles.headerTitle}>Dosage Calculator</Text>
           <Text style={styles.headerSub}>Pediatric & Adult dose reference</Text>
         </View>
       </View>
@@ -137,15 +138,15 @@ export default function DosageCalculatorScreen() {
             style={[styles.toggleBtn, patientType === 'pediatric' && styles.toggleActive]}
             onPress={() => setPatientType('pediatric')}
           >
-            <Ionicons name="happy-outline" size={16} color={patientType === 'pediatric' ? '#fff' : '#64748b'} />
-            <Text style={[styles.toggleText, patientType === 'pediatric' && { color: '#fff' }]}>Pediatric</Text>
+            <Ionicons name="happy-outline" size={18} color={patientType === 'pediatric' ? Colors.white : Colors.textSecondary} />
+            <Text style={[styles.toggleText, patientType === 'pediatric' && { color: Colors.white }]}>Pediatric</Text>
           </Pressable>
           <Pressable
             style={[styles.toggleBtn, patientType === 'adult' && styles.toggleActive]}
             onPress={() => setPatientType('adult')}
           >
-            <Ionicons name="person-outline" size={16} color={patientType === 'adult' ? '#fff' : '#64748b'} />
-            <Text style={[styles.toggleText, patientType === 'adult' && { color: '#fff' }]}>Adult</Text>
+            <Ionicons name="person-outline" size={18} color={patientType === 'adult' ? Colors.white : Colors.textSecondary} />
+            <Text style={[styles.toggleText, patientType === 'adult' && { color: Colors.white }]}>Adult</Text>
           </Pressable>
         </View>
 
@@ -160,7 +161,7 @@ export default function DosageCalculatorScreen() {
                 keyboardType="decimal-pad"
                 value={weight}
                 onChangeText={setWeight}
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={Colors.textMuted}
               />
               <Text style={styles.weightUnit}>kg</Text>
             </View>
@@ -179,17 +180,17 @@ export default function DosageCalculatorScreen() {
         <View style={styles.searchCard}>
           <Text style={styles.inputLabel}>SEARCH MEDICINE</Text>
           <View style={styles.searchRow}>
-            <Ionicons name="search" size={16} color="#94a3b8" style={{ marginLeft: 10 }} />
+            <Ionicons name="search" size={18} color={Colors.textMuted} style={{ marginLeft: 12 }} />
             <TextInput
               style={styles.searchInput}
               placeholder="Type medicine name or category..."
               value={search}
               onChangeText={t => { setSearch(t); setSelectedMed(null) }}
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={Colors.textMuted}
             />
             {search ? (
-              <Pressable onPress={() => { setSearch(''); setSelectedMed(null) }} style={{ marginRight: 10 }}>
-                <Ionicons name="close-circle" size={18} color="#94a3b8" />
+              <Pressable onPress={() => { setSearch(''); setSelectedMed(null) }} style={{ marginRight: 12 }}>
+                <Ionicons name="close-circle" size={20} color={Colors.textMuted} />
               </Pressable>
             ) : null}
           </View>
@@ -203,12 +204,12 @@ export default function DosageCalculatorScreen() {
                   style={styles.suggestionItem}
                   onPress={() => { setSelectedMed(med); setSearch(med.name) }}
                 >
-                  <Ionicons name="flask-outline" size={14} color="#0f766e" />
+                  <Ionicons name="flask" size={16} color={Colors.primaryBlue} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.suggName}>{med.name}</Text>
                     <Text style={styles.suggCategory}>{med.category}</Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={14} color="#cbd5e1" />
+                  <Ionicons name="chevron-forward" size={16} color={Colors.border} />
                 </Pressable>
               ))}
               {filtered.length === 0 && (
@@ -229,7 +230,7 @@ export default function DosageCalculatorScreen() {
         {/* Prompt to enter weight */}
         {selectedMed && patientType === 'pediatric' && !weightKg && (
           <View style={styles.promptBox}>
-            <Ionicons name="scale-outline" size={28} color="#0f766e" />
+            <Ionicons name="scale-outline" size={32} color={Colors.primaryBlue} />
             <Text style={styles.promptText}>Please enter patient weight above to calculate the dose</Text>
           </View>
         )}
@@ -254,7 +255,7 @@ export default function DosageCalculatorScreen() {
 
         {/* Disclaimer */}
         <View style={styles.disclaimer}>
-          <Ionicons name="shield-checkmark-outline" size={14} color="#64748b" />
+          <Ionicons name="shield-checkmark" size={16} color={Colors.textSecondary} />
           <Text style={styles.disclaimerText}>
             For reference only. Always verify doses clinically and adjust for individual patient factors (renal/hepatic function, comorbidities).
           </Text>
@@ -266,61 +267,82 @@ export default function DosageCalculatorScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f8fafc' },
+  root: { flex: 1, backgroundColor: Colors.paleBlue },
+  
   header: {
-    backgroundColor: '#0f766e', flexDirection: 'row', alignItems: 'center',
+    backgroundColor: Colors.darkNavy, flexDirection: 'row', alignItems: 'center',
     paddingTop: Platform.OS === 'ios' ? 54 : 14, paddingBottom: 14, paddingHorizontal: 16, gap: 12,
   },
-  backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 17, fontWeight: '800', color: '#fff' },
-  headerSub: { fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 1 },
-  scroll: { padding: 16, gap: 14, paddingBottom: 48 },
+  backBtn: { padding: 4 },
+  headerTitle: { ...Typography.h3, color: Colors.white },
+  headerSub: { ...Typography.caption, color: 'rgba(255,255,255,0.7)', marginTop: 2, fontWeight: '500' },
+  
+  scroll: { padding: Spacing.md, gap: Spacing.md, paddingBottom: 48 },
+  
   toggleRow: { flexDirection: 'row', gap: 10 },
-  toggleBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: 12, backgroundColor: '#f1f5f9', borderWidth: 1.5, borderColor: '#e2e8f0' },
-  toggleActive: { backgroundColor: '#0f766e', borderColor: '#0f766e' },
-  toggleText: { fontSize: 14, fontWeight: '700', color: '#64748b' },
-  inputCard: { backgroundColor: '#fff', borderRadius: 14, padding: 14, gap: 8, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
-  inputLabel: { fontSize: 11, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8 },
-  weightRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  weightInput: { flex: 1, fontSize: 28, fontWeight: '800', color: '#0f172a', borderBottomWidth: 2, borderBottomColor: '#0f766e', paddingBottom: 6 },
-  weightUnit: { fontSize: 18, fontWeight: '600', color: '#64748b' },
-  weightHint: { fontSize: 13, color: '#0f766e', fontWeight: '600' },
-  searchCard: { backgroundColor: '#fff', borderRadius: 14, padding: 14, gap: 10, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
-  searchRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' },
-  searchInput: { flex: 1, fontSize: 14, color: '#0f172a', padding: 10 },
-  suggestionList: { borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' },
-  suggestionItem: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', backgroundColor: '#fff' },
-  suggName: { fontSize: 13, fontWeight: '700', color: '#0f172a' },
-  suggCategory: { fontSize: 11, color: '#94a3b8', marginTop: 1 },
-  noResult: { padding: 14, fontSize: 13, color: '#94a3b8', textAlign: 'center' },
-  resultLabel: { fontSize: 11, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, marginBottom: 8 },
-  resultCard: { backgroundColor: '#fff', borderRadius: 16, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2, borderLeftWidth: 4, borderLeftColor: '#0f766e' },
-  resultHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
-  resultIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#f0fdf4', alignItems: 'center', justifyContent: 'center' },
-  resultName: { fontSize: 15, fontWeight: '800', color: '#0f172a' },
-  resultCategory: { fontSize: 11, color: '#64748b', marginTop: 1 },
-  routeBadge: { backgroundColor: '#e0f2fe', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99 },
-  routeText: { fontSize: 10, fontWeight: '700', color: '#0369a1' },
-  doseBox: { padding: 14, gap: 8 },
+  toggleBtn: { 
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, 
+    paddingVertical: 14, borderRadius: Radius.md, backgroundColor: Colors.white, 
+    borderWidth: 1.5, borderColor: Colors.border, ...Shadow.sm
+  },
+  toggleActive: { backgroundColor: Colors.primaryBlue, borderColor: Colors.primaryBlue },
+  toggleText: { fontSize: 15, fontWeight: '700', color: Colors.textSecondary },
+  
+  inputCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: 16, gap: 10, ...Shadow.sm, borderWidth: 1, borderColor: Colors.border },
+  inputLabel: { ...Typography.labelSm, color: Colors.primaryBlue },
+  weightRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  weightInput: { 
+    flex: 1, fontSize: 32, fontWeight: '900', color: Colors.textPrimary, 
+    borderBottomWidth: 2, borderBottomColor: Colors.primaryBlue, paddingBottom: 6 
+  },
+  weightUnit: { fontSize: 20, fontWeight: '700', color: Colors.textSecondary },
+  weightHint: { fontSize: 13, color: Colors.primaryBlue, fontWeight: '700' },
+  
+  searchCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: 16, gap: 12, ...Shadow.sm, borderWidth: 1, borderColor: Colors.border },
+  searchRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.paleBlue, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.border },
+  searchInput: { flex: 1, fontSize: 15, color: Colors.textPrimary, padding: 12, fontWeight: '500' },
+  suggestionList: { borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.border, overflow: 'hidden' },
+  suggestionItem: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderBottomWidth: 1, borderBottomColor: Colors.border, backgroundColor: Colors.white },
+  suggName: { fontSize: 14, fontWeight: '800', color: Colors.textPrimary },
+  suggCategory: { fontSize: 12, color: Colors.textSecondary, marginTop: 2, fontWeight: '500' },
+  noResult: { padding: 16, fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
+  
+  resultLabel: { ...Typography.labelSm, color: Colors.textMuted, marginBottom: 8 },
+  resultCard: { 
+    backgroundColor: Colors.white, borderRadius: Radius.lg, overflow: 'hidden', 
+    ...Shadow.md, borderLeftWidth: 4, borderLeftColor: Colors.primaryBlue,
+    borderWidth: 1, borderColor: Colors.border
+  },
+  resultHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderBottomWidth: 1, borderBottomColor: Colors.border, backgroundColor: Colors.surface },
+  resultIcon: { width: 40, height: 40, borderRadius: Radius.sm, backgroundColor: Colors.paleBlue, alignItems: 'center', justifyContent: 'center' },
+  resultName: { ...Typography.h4, color: Colors.textPrimary },
+  resultCategory: { fontSize: 12, color: Colors.textSecondary, marginTop: 2, fontWeight: '500' },
+  routeBadge: { backgroundColor: Colors.lightBlue, paddingHorizontal: 10, paddingVertical: 4, borderRadius: Radius.full },
+  routeText: { fontSize: 11, fontWeight: '800', color: Colors.primaryBlue },
+  
+  doseBox: { padding: 16, gap: 10 },
   doseRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  doseLabel: { fontSize: 12, color: '#64748b', fontWeight: '600' },
-  doseValue: { fontSize: 16, fontWeight: '800', color: '#0f766e' },
-  doseSmall: { fontSize: 12, color: '#334155', fontWeight: '600', textAlign: 'right', flex: 1, marginLeft: 8 },
-  capWarning: { flexDirection: 'row', gap: 6, alignItems: 'flex-start', backgroundColor: '#fffbeb', borderRadius: 8, padding: 8, marginTop: 4 },
-  capWarningText: { fontSize: 11, color: '#92400e', flex: 1 },
-  instructRow: { flexDirection: 'row', gap: 6, alignItems: 'center', marginTop: 4, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#f1f5f9' },
-  instructText: { fontSize: 12, color: '#0f766e', fontWeight: '600', flex: 1 },
-  ageLimitRow: { flexDirection: 'row', gap: 6, alignItems: 'center', paddingHorizontal: 14, paddingBottom: 10 },
-  ageLimitText: { fontSize: 11, color: '#64748b' },
-  warningsBox: { backgroundColor: '#fff7ed', margin: 10, borderRadius: 10, padding: 12, gap: 4 },
-  warningsTitle: { fontSize: 12, fontWeight: '700', color: '#9a3412', marginBottom: 4 },
-  warningItem: { fontSize: 11, color: '#9a3412', lineHeight: 18 },
-  promptBox: { alignItems: 'center', gap: 10, padding: 24, backgroundColor: '#f0fdf4', borderRadius: 14, borderWidth: 1.5, borderColor: '#bbf7d0', borderStyle: 'dashed' },
-  promptText: { fontSize: 14, color: '#0f766e', textAlign: 'center', fontWeight: '600' },
-  quickSection: { gap: 10 },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { backgroundColor: '#fff', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1.5, borderColor: '#e2e8f0', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4, elevation: 1 },
-  chipText: { fontSize: 12, fontWeight: '700', color: '#0f766e' },
-  disclaimer: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', backgroundColor: '#f1f5f9', borderRadius: 10, padding: 12 },
-  disclaimerText: { flex: 1, fontSize: 11, color: '#64748b', lineHeight: 17 },
+  doseLabel: { fontSize: 13, color: Colors.textSecondary, fontWeight: '700' },
+  doseValue: { fontSize: 18, fontWeight: '900', color: Colors.primaryBlue },
+  doseSmall: { fontSize: 13, color: Colors.textPrimary, fontWeight: '700', textAlign: 'right', flex: 1, marginLeft: 8 },
+  capWarning: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', backgroundColor: Colors.warningLight, borderRadius: Radius.md, padding: 10, marginTop: 6 },
+  capWarningText: { fontSize: 12, color: Colors.warning, flex: 1, fontWeight: '600' },
+  instructRow: { flexDirection: 'row', gap: 8, alignItems: 'center', marginTop: 6, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
+  instructText: { fontSize: 13, color: Colors.primaryBlue, fontWeight: '700', flex: 1 },
+  ageLimitRow: { flexDirection: 'row', gap: 8, alignItems: 'center', paddingHorizontal: 16, paddingBottom: 14 },
+  ageLimitText: { fontSize: 12, color: Colors.textSecondary, fontWeight: '500' },
+  warningsBox: { backgroundColor: Colors.errorLight, margin: 12, borderRadius: Radius.md, padding: 14, gap: 6 },
+  warningsTitle: { fontSize: 13, fontWeight: '800', color: Colors.error, marginBottom: 4 },
+  warningItem: { fontSize: 12, color: Colors.error, lineHeight: 18, fontWeight: '500' },
+  
+  promptBox: { alignItems: 'center', gap: 12, padding: 24, backgroundColor: Colors.lightBlue, borderRadius: Radius.lg, borderWidth: 1.5, borderColor: Colors.primaryBlue, borderStyle: 'dashed' },
+  promptText: { fontSize: 15, color: Colors.primaryBlue, textAlign: 'center', fontWeight: '700' },
+  
+  quickSection: { gap: 12 },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  chip: { backgroundColor: Colors.white, borderRadius: Radius.full, paddingHorizontal: 16, paddingVertical: 10, borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
+  chipText: { fontSize: 13, fontWeight: '800', color: Colors.primaryBlue },
+  
+  disclaimer: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', backgroundColor: Colors.surface, borderRadius: Radius.md, padding: 14, borderWidth: 1, borderColor: Colors.border },
+  disclaimerText: { flex: 1, fontSize: 12, color: Colors.textSecondary, lineHeight: 18, fontWeight: '500' },
 })

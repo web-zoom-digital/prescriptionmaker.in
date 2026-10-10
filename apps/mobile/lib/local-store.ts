@@ -13,6 +13,14 @@ export type DoctorProfile = {
   signature: string
   logoUrl?: string
   stampUrl?: string
+  clinicType?: 'Clinic' | 'Hospital' | 'Nursing Home' | 'Diagnostic Centre'
+  clinicRegNo?: string
+  clinicEmail?: string
+  clinicWebsite?: string
+  country?: string
+  state?: string
+  city?: string
+  pincode?: string
 }
 
 const PROFILE_KEY = '@doctor_profile'

@@ -1,209 +1,287 @@
-import { View, Text, StyleSheet, ScrollView, Pressable, Platform, Alert, StatusBar } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import {
+  View, Text, StyleSheet, Pressable, ScrollView,
+  Alert, ActivityIndicator, Platform, StatusBar,
+} from 'react-native'
 import { useState, useEffect } from 'react'
 import { router } from 'expo-router'
+import { Ionicons } from '@expo/vector-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { getCurrentUser, signOut, type AuthUser } from '../../lib/auth'
-import { getDoctorProfile, getReminders, getSavedPatients } from '../../lib/local-store'
+import { Colors, Typography, Spacing, Radius, Shadow } from '../../lib/design-system'
 
-const TEAL = '#0d9488'
-const TEAL_DARK = '#0f766e'
+type SettingRow = {
+  icon: string; label: string; sublabel?: string;
+  onPress: () => void; danger?: boolean; value?: string
+}
 
-// ── Setting Row ────────────────────────────────────────
-function SettingRow({
-  icon, label, value, onPress, color = TEAL, destructive = false, badge, arrow = true
-}: {
-  icon: string; label: string; value?: string; onPress?: () => void
-  color?: string; destructive?: boolean; badge?: number; arrow?: boolean
-}) {
-  const iconBg = destructive ? '#fff1f2' : `${color}15`
-  const iconColor = destructive ? '#ef4444' : color
-  const textColor = destructive ? '#ef4444' : '#0f172a'
-
+function SettingItem({ item }: { item: SettingRow }) {
   return (
     <Pressable
-      style={({ pressed }) => [srStyles.row, pressed && { opacity: 0.85 }]}
-      onPress={onPress}
-      disabled={!onPress}
+      style={({ pressed }) => [sItem.row, pressed && { backgroundColor: Colors.lightBlue }]}
+      onPress={item.onPress}
     >
-      <View style={[srStyles.iconBox, { backgroundColor: iconBg }]}>
-        <Ionicons name={icon as any} size={17} color={iconColor} />
+      <View style={[sItem.iconBox, { backgroundColor: item.danger ? Colors.errorLight : Colors.lightBlue }]}>
+        <Ionicons name={item.icon as any} size={18} color={item.danger ? Colors.error : Colors.primaryBlue} />
       </View>
-      <View style={srStyles.rowContent}>
-        <Text style={[srStyles.label, { color: textColor }]}>{label}</Text>
-        {value ? <Text style={srStyles.value} numberOfLines={1}>{value}</Text> : null}
+      <View style={{ flex: 1 }}>
+        <Text style={[sItem.label, item.danger && { color: Colors.error }]}>{item.label}</Text>
+        {item.sublabel ? <Text style={sItem.sublabel}>{item.sublabel}</Text> : null}
       </View>
-      {badge !== undefined && badge > 0 && (
-        <View style={[srStyles.badge, { backgroundColor: color }]}>
-          <Text style={srStyles.badgeText}>{badge}</Text>
-        </View>
-      )}
-      {arrow && onPress && !destructive && (
-        <Ionicons name="chevron-forward" size={15} color="#cbd5e1" />
+      {item.value ? <Text style={sItem.value}>{item.value}</Text> : null}
+      {!item.value && (
+        <Ionicons name="chevron-forward" size={16} color={item.danger ? Colors.error : Colors.textMuted} />
       )}
     </Pressable>
   )
 }
 
-const srStyles = StyleSheet.create({
+const sItem = StyleSheet.create({
   row: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingVertical: 12, paddingHorizontal: 14,
-    borderBottomWidth: 1, borderBottomColor: '#f8fafc',
+    paddingHorizontal: Spacing.md, paddingVertical: 13,
+    backgroundColor: Colors.white,
   },
-  iconBox: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  rowContent: { flex: 1, gap: 1 },
-  label: { fontSize: 14, fontWeight: '600', color: '#0f172a' },
-  value: { fontSize: 11, color: '#94a3b8' },
-  badge: { minWidth: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-  badgeText: { color: '#fff', fontSize: 10, fontWeight: '800' },
+  iconBox: { width: 36, height: 36, borderRadius: Radius.sm, alignItems: 'center', justifyContent: 'center' },
+  label: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
+  sublabel: { fontSize: 12, color: Colors.textMuted, marginTop: 1 },
+  value: { fontSize: 13, color: Colors.textSecondary, fontWeight: '500' },
 })
 
-// ── Section Card ───────────────────────────────────────
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SettingSection({ title, items }: { title: string; items: SettingRow[] }) {
   return (
-    <View style={scStyles.card}>
-      <Text style={scStyles.label}>{title}</Text>
-      <View style={scStyles.inner}>{children}</View>
+    <View style={sSection.wrap}>
+      <Text style={sSection.title}>{title}</Text>
+      <View style={sSection.card}>
+        {items.map((item, i) => (
+          <View key={item.label}>
+            <SettingItem item={item} />
+            {i < items.length - 1 && <View style={sSection.divider} />}
+          </View>
+        ))}
+      </View>
     </View>
   )
 }
-const scStyles = StyleSheet.create({
-  card: { marginBottom: 10 },
-  label: { fontSize: 11, fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.9, marginBottom: 6, paddingLeft: 2 },
-  inner: { backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#f1f5f9', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
+
+const sSection = StyleSheet.create({
+  wrap: { gap: 6 },
+  title: { fontSize: 11, fontWeight: '700', color: Colors.textMuted, letterSpacing: 0.6, paddingHorizontal: 4, textTransform: 'uppercase' },
+  card: { backgroundColor: Colors.white, borderRadius: Radius.lg, overflow: 'hidden', ...Shadow.sm, borderWidth: 1, borderColor: Colors.border },
+  divider: { height: 1, backgroundColor: Colors.border, marginHorizontal: Spacing.md },
 })
 
-// ── MAIN SETTINGS SCREEN ───────────────────────────────
 export default function SettingsScreen() {
+  const insets = useSafeAreaInsets()
   const [user, setUser] = useState<AuthUser | null>(null)
-  const [patientCount, setPatientCount] = useState(0)
-  const [pendingReminders, setPendingReminders] = useState(0)
-  const [hasProfile, setHasProfile] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [signingOut, setSigningOut] = useState(false)
 
   useEffect(() => {
-    getCurrentUser().then(setUser)
-    getSavedPatients().then(p => setPatientCount(p.length))
-    getReminders().then(r => setPendingReminders(r.filter(rem => !rem.isDone).length))
-    getDoctorProfile().then(p => setHasProfile(!!p?.name))
+    getCurrentUser().then(u => { setUser(u); setLoading(false) })
   }, [])
 
-  const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
+  const handleSignOut = () => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Logout', style: 'destructive', onPress: async () => {
-        await signOut()
-        router.replace('/login')
-      }},
+      {
+        text: 'Sign Out', style: 'destructive',
+        onPress: async () => {
+          setSigningOut(true)
+          await signOut()
+          router.replace('/login')
+        },
+      },
     ])
   }
 
-  const isPro = user?.plan === 'pro'
+  const initial = (user?.name || 'D').charAt(0).toUpperCase()
+
+  const accountItems: SettingRow[] = [
+    {
+      icon: 'person-outline', label: 'Edit Profile',
+      sublabel: 'Update your name, photo, and credentials',
+      onPress: () => router.push({ pathname: '/doctor-profile', params: { tab: 'profile' } }),
+    },
+    {
+      icon: 'business-outline', label: 'Clinic Details',
+      sublabel: 'Manage clinic name, address, and contact',
+      onPress: () => router.push({ pathname: '/doctor-profile', params: { tab: 'clinic' } }),
+    },
+    {
+      icon: 'images-outline', label: 'Clinic Assets',
+      sublabel: 'Logo, digital signature, doctor seal',
+      onPress: () => router.push({ pathname: '/doctor-profile', params: { tab: 'assets' } }),
+    },
+  ]
+
+  const workflowItems: SettingRow[] = [
+    {
+      icon: 'calculator-outline', label: 'Dosage Calculator',
+      onPress: () => router.push('/dosage-calculator'),
+    },
+    {
+      icon: 'time-outline', label: 'Reminders',
+      sublabel: 'Patient follow-up reminders',
+      onPress: () => router.push('/reminders'),
+    },
+    {
+      icon: 'people-outline', label: 'Patient Records',
+      sublabel: 'View and manage patient history',
+      onPress: () => router.push('/patients'),
+    },
+  ]
+
+  const helpItems: SettingRow[] = [
+    {
+      icon: 'help-circle-outline', label: 'Help & Support',
+      onPress: () => Alert.alert('Support', 'Contact us at support@prescriptionmaker.in'),
+    },
+    {
+      icon: 'shield-checkmark-outline', label: 'Privacy Policy',
+      onPress: () => Alert.alert('Privacy', 'Visit prescriptionmaker.in/privacy'),
+    },
+    {
+      icon: 'document-text-outline', label: 'Terms of Service',
+      onPress: () => Alert.alert('Terms', 'Visit prescriptionmaker.in/terms'),
+    },
+    {
+      icon: 'information-circle-outline', label: 'About',
+      sublabel: 'PrescriptionMaker v1.0.0',
+      value: '1.0.0',
+      onPress: () => {},
+    },
+  ]
 
   return (
-    <View style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor={TEAL_DARK} />
+    <View style={[styles.root, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="light-content" backgroundColor={Colors.darkNavy} />
 
-      {/* ── Hero Profile Header ── */}
-      <View style={styles.hero}>
-        <View style={styles.heroInner}>
-          <View style={styles.avatarWrap}>
-            <Text style={styles.avatarText}>{(user?.name || 'D').charAt(0).toUpperCase()}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.heroName}>Dr. {user?.name || 'Loading...'}</Text>
-            <Text style={styles.heroEmail}>{user?.email || ''}</Text>
-            <View style={styles.planBadge}>
-              <Ionicons name={isPro ? 'star' : 'star-outline'} size={10} color={isPro ? '#f59e0b' : '#94a3b8'} />
-              <Text style={[styles.planText, { color: isPro ? '#f59e0b' : '#94a3b8' }]}>
-                {isPro ? 'PRO PLAN' : 'FREE PLAN'}
-              </Text>
-            </View>
-          </View>
-          <Pressable style={styles.editBtn} onPress={() => router.push('/doctor-profile')}>
-            <Ionicons name="create-outline" size={15} color={TEAL} />
-            <Text style={styles.editBtnText}>Edit</Text>
-          </Pressable>
-        </View>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Profile</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-
-        {/* Profile warning */}
-        {!hasProfile && (
-          <Pressable style={styles.warningBanner} onPress={() => router.push('/doctor-profile')}>
-            <Ionicons name="warning" size={15} color="#d97706" />
-            <Text style={styles.warningText}>Set up your Doctor Profile to auto-fill prescriptions faster!</Text>
-            <Ionicons name="chevron-forward" size={13} color="#d97706" />
-          </Pressable>
+      <ScrollView
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Doctor Profile Card */}
+        {loading ? (
+          <View style={styles.profileCardLoading}>
+            <ActivityIndicator color={Colors.primaryBlue} />
+          </View>
+        ) : (
+          <View style={styles.profileCard}>
+            <View style={styles.profileAvatar}>
+              <Text style={styles.profileAvatarText}>{initial}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.profileName}>{user?.name || 'Doctor'}</Text>
+              <Text style={styles.profileEmail}>{user?.email || ''}</Text>
+              <View style={styles.profilePlanRow}>
+                <View style={[
+                  styles.planBadge,
+                  user?.plan === 'pro' && { backgroundColor: Colors.primaryBlue },
+                  user?.plan === 'enterprise' && { backgroundColor: Colors.darkNavy },
+                ]}>
+                  <Text style={styles.planBadgeText}>
+                    {(user?.plan ?? 'free').toUpperCase()}
+                  </Text>
+                </View>
+                {user?.role === 'doctor' && (
+                  <View style={styles.roleBadge}>
+                    <Ionicons name="medical" size={9} color={Colors.success} />
+                    <Text style={styles.roleBadgeText}>Verified Doctor</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+            <Pressable
+              style={styles.editProfileBtn}
+              onPress={() => router.push('/doctor-profile')}
+            >
+              <Ionicons name="pencil" size={16} color={Colors.primaryBlue} />
+            </Pressable>
+          </View>
         )}
 
-        <SectionCard title="Create">
-          <SettingRow icon="document-text-outline" label="New Prescription" value="Form mode editor" onPress={() => router.push('/editor')} />
-          <SettingRow icon="pencil-outline" label="Hand Mode" value="Draw a prescription" onPress={() => router.push('/hand-mode')} color="#7c3aed" />
-        </SectionCard>
+        {/* Settings sections */}
+        <SettingSection title="Account" items={accountItems} />
+        <SettingSection title="Tools" items={workflowItems} />
+        <SettingSection title="Help & Legal" items={helpItems} />
 
-        <SectionCard title="Doctor Tools">
-          <SettingRow icon="person-circle-outline" label="My Doctor Profile" value={hasProfile ? '✓ Profile saved' : 'Not set up yet'} onPress={() => router.push('/doctor-profile')} />
-          <SettingRow icon="people-outline" label="Patient Records" value={`${patientCount} saved patients`} onPress={() => router.push('/(tabs)/patients')} color="#6366f1" badge={patientCount} />
-          <SettingRow icon="notifications-outline" label="Follow-up Reminders" value={pendingReminders > 0 ? `${pendingReminders} pending` : 'None pending'} onPress={() => router.push('/reminders')} color="#d97706" badge={pendingReminders} />
-          <SettingRow icon="flask-outline" label="Dosage Calculator" value="Pediatric & Adult doses" onPress={() => router.push('/dosage-calculator')} color="#059669" />
-        </SectionCard>
+        {/* Sign out */}
+        <View style={sSection.card}>
+          <Pressable
+            style={({ pressed }) => [sItem.row, pressed && { backgroundColor: Colors.errorLight }]}
+            onPress={handleSignOut}
+            disabled={signingOut}
+          >
+            <View style={[sItem.iconBox, { backgroundColor: Colors.errorLight }]}>
+              {signingOut
+                ? <ActivityIndicator size="small" color={Colors.error} />
+                : <Ionicons name="log-out-outline" size={18} color={Colors.error} />
+              }
+            </View>
+            <Text style={[sItem.label, { color: Colors.error }]}>Sign Out</Text>
+          </Pressable>
+        </View>
 
-        <SectionCard title="Account">
-          <SettingRow icon="mail-outline" label="Email" value={user?.email || ''} arrow={false} color="#64748b" />
-          <SettingRow
-            icon="ribbon-outline"
-            label="Plan"
-            value={isPro ? '⭐ Pro Plan Active' : '🆓 Free Plan — Upgrade for more'}
-            color="#f59e0b"
-            arrow={!isPro}
-          />
-        </SectionCard>
-
-        <SectionCard title="About">
-          <SettingRow icon="information-circle-outline" label="App Version" value="2.0.0" arrow={false} color="#64748b" />
-          <SettingRow icon="globe-outline" label="prescriptionmaker.in" value="Visit website" color="#64748b" />
-          <SettingRow icon="shield-checkmark-outline" label="Privacy Policy" color="#64748b" />
-        </SectionCard>
-
-        <SectionCard title="Session">
-          <SettingRow icon="log-out-outline" label="Logout" onPress={handleLogout} destructive arrow={false} />
-        </SectionCard>
-
-        <Text style={styles.footerText}>PrescriptionMaker v2.0 · Made for Indian doctors 🇮🇳</Text>
+        <Text style={styles.footerText}>
+          PrescriptionMaker.in · For licensed medical practitioners
+        </Text>
       </ScrollView>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f8fafc' },
-
-  // Hero
-  hero: {
-    backgroundColor: TEAL_DARK,
-    paddingTop: Platform.OS === 'ios' ? 56 : 20,
-    paddingBottom: 20,
-    paddingHorizontal: 18,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+  root: { flex: 1, backgroundColor: Colors.paleBlue },
+  header: {
+    backgroundColor: Colors.darkNavy,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 14,
+    paddingBottom: 16,
   },
-  heroInner: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  avatarWrap: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.2)', borderWidth: 2, borderColor: 'rgba(255,255,255,0.4)', alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 24, fontWeight: '900', color: '#fff' },
-  heroName: { fontSize: 18, fontWeight: '800', color: '#fff' },
-  heroEmail: { fontSize: 12, color: '#99f6e4', marginTop: 1 },
-  planBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 5, backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99, alignSelf: 'flex-start' },
-  planText: { fontSize: 10, fontWeight: '800' },
-  editBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#fff', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 7 },
-  editBtnText: { fontSize: 13, fontWeight: '700', color: TEAL },
+  headerTitle: { ...Typography.h3, color: Colors.white },
+  scroll: { padding: Spacing.md, gap: Spacing.md },
 
-  // Content
-  content: { padding: 16, paddingBottom: 40, gap: 0 },
-
-  // Warning
-  warningBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fffbeb', borderRadius: 12, padding: 12, marginBottom: 14, borderWidth: 1, borderColor: '#fde68a' },
-  warningText: { flex: 1, fontSize: 12, color: '#92400e', lineHeight: 17 },
-
-  footerText: { textAlign: 'center', fontSize: 11, color: '#cbd5e1', marginTop: 20, marginBottom: 8 },
+  // Profile card
+  profileCard: {
+    backgroundColor: Colors.white, borderRadius: Radius.xl, padding: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    ...Shadow.md, borderWidth: 1, borderColor: Colors.border,
+  },
+  profileCardLoading: {
+    backgroundColor: Colors.white, borderRadius: Radius.xl, padding: 28,
+    alignItems: 'center', ...Shadow.sm,
+  },
+  profileAvatar: {
+    width: 56, height: 56, borderRadius: 28,
+    backgroundColor: Colors.primaryBlue, alignItems: 'center', justifyContent: 'center',
+    ...Shadow.blue,
+  },
+  profileAvatarText: { fontSize: 22, fontWeight: '900', color: Colors.white },
+  profileName: { ...Typography.h4, color: Colors.textPrimary, marginBottom: 2 },
+  profileEmail: { ...Typography.caption, color: Colors.textSecondary, marginBottom: 6 },
+  profilePlanRow: { flexDirection: 'row', gap: 6, alignItems: 'center', flexWrap: 'wrap' },
+  planBadge: {
+    backgroundColor: Colors.textMuted, borderRadius: Radius.full,
+    paddingHorizontal: 7, paddingVertical: 2,
+  },
+  planBadgeText: { fontSize: 9, fontWeight: '800', color: Colors.white, letterSpacing: 0.6 },
+  roleBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+    backgroundColor: Colors.successLight, borderRadius: Radius.full,
+    paddingHorizontal: 7, paddingVertical: 2,
+  },
+  roleBadgeText: { fontSize: 9, fontWeight: '700', color: Colors.success },
+  editProfileBtn: {
+    width: 36, height: 36, borderRadius: Radius.sm,
+    backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+  },
+  footerText: {
+    textAlign: 'center', fontSize: 11, color: Colors.textMuted,
+    fontWeight: '500', marginTop: 4,
+  },
 })

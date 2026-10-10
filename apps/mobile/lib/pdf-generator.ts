@@ -23,6 +23,9 @@ export type PrescriptionData = {
     address: string
     phone: string
     email: string
+    logoUrl?: string
+    stampUrl?: string
+    signature?: string
   }
   patientInfo: {
     name: string
