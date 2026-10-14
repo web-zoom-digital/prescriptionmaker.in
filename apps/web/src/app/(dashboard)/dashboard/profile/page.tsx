@@ -106,6 +106,22 @@ export default function ProfilePage() {
           signatureUrl: profile.signatureUrl,
         }),
       })
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('pm_doctor_profile', JSON.stringify({
+            doctorName: profile.doctorName,
+            doctorQualifications: profile.qualifications,
+            doctorSpecialization: profile.specialization,
+            doctorRegNumber: profile.registrationNumber,
+            clinicName: profile.clinicName,
+            clinicPhone: profile.clinicPhone,
+            clinicAddress: profile.clinicAddress,
+            clinicLogoUrl: profile.clinicLogoUrl,
+            stampUrl: profile.stampUrl,
+            signatureDataUrl: profile.signatureUrl,
+          }))
+        } catch (_) {}
+      }
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (err) {

@@ -69,21 +69,39 @@ export function EditorShell() {
   useEffect(() => {
     async function loadData() {
         let baseDoctorInfo: any = {}
+        // Instant pre-fill from cached profile if available
+        if (typeof window !== 'undefined') {
+          try {
+            const cached = localStorage.getItem('pm_doctor_profile')
+            if (cached) {
+              const parsed = JSON.parse(cached)
+              if (parsed && (parsed.doctorName || parsed.clinicName)) {
+                baseDoctorInfo = { ...parsed }
+              }
+            }
+          } catch (_) {}
+        }
+
         try {
           const profRes = await fetch('/api/profile')
           const profJson = await profRes.json()
-          if (profJson.data) {
+          if (profJson.data && (profJson.data.doctor_name || profJson.data.clinic_name)) {
             baseDoctorInfo = {
-              doctorName: profJson.data.doctor_name,
-              doctorQualifications: profJson.data.qualifications,
-              doctorSpecialization: profJson.data.specialization,
-              doctorRegNumber: profJson.data.registration_number,
-              clinicName: profJson.data.clinic_name,
-              clinicPhone: profJson.data.clinic_phone,
-              clinicAddress: profJson.data.clinic_address,
-              signatureDataUrl: profJson.data.signature_url,
-              clinicLogoUrl: profJson.data.clinic_logo_url,
-              stampUrl: profJson.data.stamp_url,
+              doctorName: profJson.data.doctor_name || baseDoctorInfo.doctorName,
+              doctorQualifications: profJson.data.qualifications || baseDoctorInfo.doctorQualifications,
+              doctorSpecialization: profJson.data.specialization || baseDoctorInfo.doctorSpecialization,
+              doctorRegNumber: profJson.data.registration_number || baseDoctorInfo.doctorRegNumber,
+              clinicName: profJson.data.clinic_name || baseDoctorInfo.clinicName,
+              clinicPhone: profJson.data.clinic_phone || baseDoctorInfo.clinicPhone,
+              clinicAddress: profJson.data.clinic_address || baseDoctorInfo.clinicAddress,
+              signatureDataUrl: profJson.data.signature_url || baseDoctorInfo.signatureDataUrl,
+              clinicLogoUrl: profJson.data.clinic_logo_url || baseDoctorInfo.clinicLogoUrl,
+              stampUrl: profJson.data.stamp_url || baseDoctorInfo.stampUrl,
+            }
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.setItem('pm_doctor_profile', JSON.stringify(baseDoctorInfo))
+              } catch (_) {}
             }
           }
         } catch (e) {
@@ -91,7 +109,21 @@ export function EditorShell() {
         }
 
         if (!id) {
-          setPrescriptionData(baseDoctorInfo)
+          setPrescriptionData(prev => ({
+            ...baseDoctorInfo,
+            ...prev,
+            // Ensure doctor fields from profile take precedence if prev is empty
+            doctorName: prev.doctorName || baseDoctorInfo.doctorName || '',
+            doctorQualifications: prev.doctorQualifications || baseDoctorInfo.doctorQualifications || '',
+            doctorSpecialization: prev.doctorSpecialization || baseDoctorInfo.doctorSpecialization || '',
+            doctorRegNumber: prev.doctorRegNumber || baseDoctorInfo.doctorRegNumber || '',
+            clinicName: prev.clinicName || baseDoctorInfo.clinicName || '',
+            clinicPhone: prev.clinicPhone || baseDoctorInfo.clinicPhone || '',
+            clinicAddress: prev.clinicAddress || baseDoctorInfo.clinicAddress || '',
+            signatureDataUrl: prev.signatureDataUrl || baseDoctorInfo.signatureDataUrl || '',
+            clinicLogoUrl: prev.clinicLogoUrl || baseDoctorInfo.clinicLogoUrl || '',
+            stampUrl: prev.stampUrl || baseDoctorInfo.stampUrl || '',
+          }))
           setIsLoading(false)
           return
         }
@@ -124,13 +156,13 @@ export function EditorShell() {
             })
           }
         } catch (err) {
-        console.error('Failed to load prescription:', err)
-      } finally {
-        setIsLoading(false)
+          console.error('Failed to load prescription:', err)
+        } finally {
+          setIsLoading(false)
+        }
       }
-    }
-    loadData()
-  }, [id])
+      loadData()
+    }, [id])
 
   const { exportPdf, generatePdfBlob, isExporting } = usePdfExport()
 
@@ -309,10 +341,22 @@ export function EditorShell() {
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           </Link>
 
-          <div className="flex items-center gap-3 border-l border-border pl-3">
-            <span className="text-sm font-semibold text-slate-900 truncate max-w-[150px] sm:max-w-none">
-              {selectedTemplate.name}
-            </span>
+          <div className="flex items-center gap-2 border-l border-border pl-3">
+            <select
+              value={selectedTemplate.slug}
+              onChange={(e) => {
+                const nextSlug = e.target.value
+                router.replace(`/editor?template=${nextSlug}${id ? `&id=${id}` : ''}`)
+              }}
+              className="text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-md px-2 py-1 focus:outline-hidden focus:ring-1 focus:ring-primary cursor-pointer max-w-[170px] sm:max-w-none"
+              title="Switch Prescription Template"
+            >
+              {TEMPLATES.map(t => (
+                <option key={t.slug} value={t.slug}>
+                  📋 {t.name}
+                </option>
+              ))}
+            </select>
             <label className="relative flex items-center gap-1.5 cursor-pointer rounded-md border border-slate-200 bg-slate-50 px-2 py-1 shadow-sm transition-colors hover:bg-slate-100 hover:border-slate-300">
               <input 
                 type="color" 

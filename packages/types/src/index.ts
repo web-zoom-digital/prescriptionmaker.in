@@ -225,6 +225,12 @@ export interface PatientInfo {
   phone?: string
   address?: string
   uhid?: string // Unique Health ID
+  mrn?: string
+  ward?: string
+  bedNo?: string
+  ipOpNo?: string
+  insuranceNo?: string
+  careProvider?: string
 }
 
 export interface VitalsInfo {
@@ -248,6 +254,7 @@ export type MedicineForm =
   | 'inhaler'
   | 'patch'
   | 'suppository'
+  | 'powder'
   | 'other'
 
 export type MedicineFrequency =

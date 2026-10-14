@@ -25,6 +25,12 @@ type PatientInfo = {
   gender?: string
   address?: string
   allergies?: string
+  mrn?: string
+  ward?: string
+  bedNo?: string
+  ipOpNo?: string
+  insuranceNo?: string
+  careProvider?: string
 }
 
 type Medicine = {

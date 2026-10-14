@@ -1,0 +1,766 @@
+// Predefined Auto-Fill Test Presets for PrescriptionMaker Mobile App
+// 10 distinct, clinical-grade test cases — one for each template layout
+
+export type TestPreset = {
+  id: string
+  templateId: string
+  templateName: string
+  emoji: string
+  specialty: string
+  caseTitle: string
+  description: string
+  doctor: {
+    name: string
+    qualification: string
+    specialization: string
+    regNo: string
+    clinicName: string
+    address: string
+    phone: string
+    email: string
+  }
+  patient: {
+    name: string
+    age: string
+    gender: string
+    weight: string
+    phone: string
+    date?: string
+    chiefComplaint: string
+    diagnosis: string
+  }
+  symptoms: string
+  medicines: Array<{
+    id: string
+    name: string
+    strength: string
+    form?: string
+    frequency: string
+    duration: string
+    instructions: string
+  }>
+  labTests: string[]
+  advice: string
+  followUp: string
+  language?: 'en' | 'hi'
+}
+
+export const TEST_PRESETS: TestPreset[] = [
+  // 1. Classic Letterhead — General Medicine
+  {
+    id: 'classic-letterhead',
+    templateId: 'classic-letterhead',
+    templateName: 'Classic Letterhead',
+    emoji: '📜',
+    specialty: 'Senior Physician / Internal Medicine',
+    caseTitle: 'Viral Fever & Pharyngitis',
+    description: 'Classic fever, throat pain with standard Indian antipyretic & antibiotic regimen.',
+    doctor: {
+      name: 'Dr. Rahul Sharma',
+      qualification: 'MBBS, MD (Medicine)',
+      specialization: 'Senior Consultant Physician',
+      regNo: 'MCI-48291',
+      clinicName: 'Apollo Clinic & Healthcare Centre',
+      address: 'B-12, Green Park Main, South Ext., New Delhi - 110016',
+      phone: '+91 98110 23456',
+      email: 'dr.rahul@apolloclinic.com',
+    },
+    patient: {
+      name: 'Aarav Verma',
+      age: '32',
+      gender: 'Male',
+      weight: '68 kg',
+      phone: '+91 98765 43210',
+      chiefComplaint: 'High grade fever (102°F), severe throat irritation, body ache for 3 days',
+      diagnosis: 'Acute Viral Fever with Exudative Pharyngitis',
+    },
+    symptoms: 'High fever, sore throat, painful swallowing, malaise, frontal headache',
+    medicines: [
+      {
+        id: 'tp-1-1',
+        name: 'Paracetamol',
+        strength: '650mg',
+        form: 'tablet',
+        frequency: '1-0-1-1 (QID)',
+        duration: '3 days',
+        instructions: 'Take with water after meals. SOS if temperature > 100°F',
+      },
+      {
+        id: 'tp-1-2',
+        name: 'Azithromycin',
+        strength: '500mg',
+        form: 'tablet',
+        frequency: '1-0-0 (OD)',
+        duration: '3 days',
+        instructions: '1 hour before breakfast on empty stomach. Complete full 3-day course',
+      },
+      {
+        id: 'tp-1-3',
+        name: 'Levocetirizine + Montelukast',
+        strength: '5mg/10mg',
+        form: 'tablet',
+        frequency: '0-0-1 (Bedtime)',
+        duration: '5 days',
+        instructions: 'Take at night. May cause mild drowsiness',
+      },
+      {
+        id: 'tp-1-4',
+        name: 'Ascoril-D Cough Syrup',
+        strength: '10ml',
+        form: 'syrup',
+        frequency: '10ml TDS',
+        duration: '5 days',
+        instructions: 'Take 2 teaspoons with lukewarm water after food',
+      },
+    ],
+    labTests: ['Complete Blood Count (CBC)', 'Dengue NS1 Antigen', 'Widal Slide Test'],
+    advice: 'Drink at least 3-4 liters of warm water daily. Warm salt water gargles 3 times a day. Complete bed rest for 3 days.',
+    followUp: 'Review in OPD after 3 days or SOS if fever persists > 102°F',
+    language: 'en',
+  },
+
+  // 2. Two-Column Sidebar — Cardiology
+  {
+    id: 'two-column-sidebar',
+    templateId: 'two-column-sidebar',
+    templateName: 'Two-Column Sidebar',
+    emoji: '🏥',
+    specialty: 'Cardiology & Hypertension',
+    caseTitle: 'Essential Hypertension & Dyslipidemia',
+    description: 'Stage 2 HTN with elevated lipids; left sidebar doctor vitals layout.',
+    doctor: {
+      name: 'Dr. Priya Nair',
+      qualification: 'MBBS, MD, DM (Cardiology), FACC',
+      specialization: 'Chief Interventional Cardiologist',
+      regNo: 'KMC-72940',
+      clinicName: 'Metro Heart Institute & Diagnostics',
+      address: '42, Indiranagar 100ft Road, Bengaluru - 560038',
+      phone: '+91 98450 12345',
+      email: 'dr.priyanair@metroheart.in',
+    },
+    patient: {
+      name: 'Ramesh Sundaram',
+      age: '58',
+      gender: 'Male',
+      weight: '78 kg',
+      phone: '+91 98451 98765',
+      chiefComplaint: 'Occasional morning occipital headache, mild exertional breathlessness, BP 160/95 mmHg',
+      diagnosis: 'Stage 2 Essential Hypertension with Mixed Dyslipidemia',
+    },
+    symptoms: 'Morning heaviness in head, mild dizziness on standing, elevated blood pressure',
+    medicines: [
+      {
+        id: 'tp-2-1',
+        name: 'Telmisartan + Amlodipine',
+        strength: '40mg / 5mg',
+        form: 'tablet',
+        frequency: '1-0-0 (OD)',
+        duration: '30 days',
+        instructions: 'Take every morning after breakfast regularly',
+      },
+      {
+        id: 'tp-2-2',
+        name: 'Atorvastatin',
+        strength: '20mg',
+        form: 'tablet',
+        frequency: '0-0-1 (OD)',
+        duration: '30 days',
+        instructions: 'Take at bedtime daily with water',
+      },
+      {
+        id: 'tp-2-3',
+        name: 'Ecosprin (Aspirin)',
+        strength: '75mg',
+        form: 'tablet',
+        frequency: '0-1-0 (OD)',
+        duration: '30 days',
+        instructions: 'Post-lunch only. Never take on empty stomach',
+      },
+    ],
+    labTests: ['Fasting Lipid Profile', 'Serum Creatinine & eGFR', 'ECG 12-Lead', 'Urine Microalbumin'],
+    advice: 'Strict low sodium intake (< 2g salt/day). Avoid fried and processed snacks. 40 minutes brisk morning walk. Record daily home BP chart.',
+    followUp: 'Review after 1 Month with repeat Fasting Lipid Profile & BP log',
+    language: 'en',
+  },
+
+  // 3. Hospital OPD Form — Acute Emergency / Hospital
+  {
+    id: 'hospital-opd',
+    templateId: 'hospital-opd',
+    templateName: 'Hospital OPD Form',
+    emoji: '🏛️',
+    specialty: 'Hospital OPD / General Surgery',
+    caseTitle: 'Acute Gastroenteritis & Dehydration',
+    description: 'Hospital OPD format with MRN, ward, oral rehydration and gut anti-infectives.',
+    doctor: {
+      name: 'Dr. Vikram Malhotra',
+      qualification: 'MBBS, DNB (Emergency Medicine)',
+      specialization: 'Senior Medical Officer / OPD In-charge',
+      regNo: 'DMC-88124',
+      clinicName: 'Civil Multi-Speciality Hospital',
+      address: 'OPD Block C, Ring Road, New Delhi - 110029',
+      phone: '+91 11 2659 8700',
+      email: 'opd@civilhospital.org',
+    },
+    patient: {
+      name: 'Sunita Devi',
+      age: '28',
+      gender: 'Female',
+      weight: '52 kg',
+      phone: '+91 99112 33445',
+      chiefComplaint: 'Frequent watery stools (7 episodes), nausea, severe abdominal colic cramps since last night',
+      diagnosis: 'Acute Infective Gastroenteritis with Moderate Dehydration',
+    },
+    symptoms: 'Watery diarrhea, vomiting, lower abdomen cramping, dry mouth, mild tachycardia',
+    medicines: [
+      {
+        id: 'tp-3-1',
+        name: 'Ofloxacin + Ornidazole',
+        strength: '200mg / 500mg',
+        form: 'tablet',
+        frequency: '1-0-1 (BD)',
+        duration: '5 days',
+        instructions: 'Take after meals with plenty of water',
+      },
+      {
+        id: 'tp-3-2',
+        name: 'Ondansetron (Vomikind MD)',
+        strength: '4mg',
+        form: 'tablet',
+        frequency: 'SOS (Max TDS)',
+        duration: '3 days',
+        instructions: 'Mouth dissolving tablet — place on tongue 30 mins before food',
+      },
+      {
+        id: 'tp-3-3',
+        name: 'Racecadotril (Redotil)',
+        strength: '100mg',
+        form: 'capsule',
+        frequency: '1-1-1 (TDS)',
+        duration: '3 days',
+        instructions: 'Take before meals until stool consistency improves',
+      },
+      {
+        id: 'tp-3-4',
+        name: 'WHO ORS Sachet (Electral)',
+        strength: '21.8g Sachet',
+        form: 'powder',
+        frequency: 'Frequent sips',
+        duration: '3 days',
+        instructions: 'Dissolve entire packet in 1 Liter boiled & cooled water. Sip throughout day',
+      },
+    ],
+    labTests: ['Stool Routine & Microscopy', 'Serum Electrolytes (Na+, K+, Cl-)', 'Random Blood Sugar'],
+    advice: 'Strict liquid diet for 24 hours (rice starch kanji, coconut water, light moong dal khichdi). Avoid cow milk, spicy food, and outside meals.',
+    followUp: 'Review in Emergency / OPD after 48 hours or immediately if vomiting persists',
+    language: 'en',
+  },
+
+  // 4. SOAP Clinical Notes — Endocrinology
+  {
+    id: 'soap-clinical',
+    templateId: 'soap-clinical',
+    templateName: 'SOAP Clinical Notes',
+    emoji: '📋',
+    specialty: 'Endocrinology & Diabetology',
+    caseTitle: 'Type 2 Diabetes Mellitus (Uncontrolled)',
+    description: 'Standard Subjective-Objective-Assessment-Plan formatted clinical notes.',
+    doctor: {
+      name: 'Dr. Ananya Roy',
+      qualification: 'MBBS, MD, DNB (Endocrinology)',
+      specialization: 'Consultant Endocrinologist & Diabetologist',
+      regNo: 'WBMC-63189',
+      clinicName: 'Fortis Endocrine & Diabetes Centre',
+      address: '730, Eastern Metropolitan Bypass, Kolkata - 700107',
+      phone: '+91 98300 54321',
+      email: 'dr.ananya@fortishealthcare.com',
+    },
+    patient: {
+      name: 'Mohan Lal Agarwal',
+      age: '54',
+      gender: 'Male',
+      weight: '82 kg',
+      phone: '+91 98311 88776',
+      chiefComplaint: 'S: Burning soles at night, increased thirst, fatigue. O: FBS 188 mg/dL, PPBS 284 mg/dL, HbA1c 8.8%',
+      diagnosis: 'Uncontrolled Type 2 Diabetes Mellitus with Early Peripheral Neuropathy',
+    },
+    symptoms: 'Polyuria, polydipsia, bilateral burning feet paresthesia, postprandial lethargy',
+    medicines: [
+      {
+        id: 'tp-4-1',
+        name: 'Metformin Sustained Release',
+        strength: '1000mg',
+        form: 'tablet',
+        frequency: '1-0-1 (BD)',
+        duration: '30 days',
+        instructions: 'Take immediately with breakfast and dinner to avoid gastric upset',
+      },
+      {
+        id: 'tp-4-2',
+        name: 'Dapagliflozin (Forxiga)',
+        strength: '10mg',
+        form: 'tablet',
+        frequency: '1-0-0 (OD)',
+        duration: '30 days',
+        instructions: 'Take in morning before breakfast with 1 glass of water',
+      },
+      {
+        id: 'tp-4-3',
+        name: 'Pregabalin + Methylcobalamin',
+        strength: '75mg / 1500mcg',
+        form: 'capsule',
+        frequency: '0-0-1 (Bedtime)',
+        duration: '30 days',
+        instructions: 'Take at night for diabetic nerve pain and tingling',
+      },
+    ],
+    labTests: ['HbA1c Glycated Hemoglobin', 'Urine Albumin-to-Creatinine Ratio (UACR)', 'Serum Creatinine', 'Fundoscopy Eye Checkup'],
+    advice: 'Strict diabetic diet. Zero direct sugar, sweets, potatoes, white rice. 45 min daily brisk walking. Daily inspection of feet for sores.',
+    followUp: 'Review after 4 Weeks with 7-point Fasting & Post-Meal blood sugar log',
+    language: 'en',
+  },
+
+  // 5. Vitals-First — Cardiology / ICU
+  {
+    id: 'vitals-first',
+    templateId: 'vitals-first',
+    templateName: 'Vitals-First',
+    emoji: '❤️',
+    specialty: 'Cardiology & Critical Care',
+    caseTitle: 'Post-PTCA Ischemic Heart Disease',
+    description: 'Prominent vitals grid (BP: 124/78, HR: 64, SpO2: 99%) with dual antiplatelet therapy.',
+    doctor: {
+      name: 'Dr. Siddharth Mehta',
+      qualification: 'MBBS, MD, DM, FACC, FSCAI',
+      specialization: 'Director — Interventional Cardiology',
+      regNo: 'MMC-39045',
+      clinicName: 'Lilavati Hospital & Research Centre',
+      address: 'A-791, Bandra Reclamation, Bandra West, Mumbai - 400050',
+      phone: '+91 98200 67890',
+      email: 'dr.mehta@lilavatihospital.com',
+    },
+    patient: {
+      name: 'Harshvardhan Patil',
+      age: '64',
+      gender: 'Male',
+      weight: '74 kg',
+      phone: '+91 98201 11223',
+      chiefComplaint: 'Routine 3-month post-stenting review. Vitals: BP 124/78, Pulse 64 bpm, SpO2 99%, BMI 25.4',
+      diagnosis: 'Post-Percutaneous Coronary Intervention (DES in LAD), Stable Ischemic Heart Disease',
+    },
+    symptoms: 'No active angina chest pain, mild post-meal fullness, good functional exercise tolerance',
+    medicines: [
+      {
+        id: 'tp-5-1',
+        name: 'Ticagrelor (Brilinta)',
+        strength: '90mg',
+        form: 'tablet',
+        frequency: '1-0-1 (BD)',
+        duration: '90 days',
+        instructions: 'After meals morning & night. Crucial: Do NOT skip any dose',
+      },
+      {
+        id: 'tp-5-2',
+        name: 'Aspirin Gastro-resistant',
+        strength: '75mg',
+        form: 'tablet',
+        frequency: '0-1-0 (OD)',
+        duration: '90 days',
+        instructions: 'After lunch with water. Never on empty stomach',
+      },
+      {
+        id: 'tp-5-3',
+        name: 'Rosuvastatin + Ezetimibe',
+        strength: '20mg / 10mg',
+        form: 'tablet',
+        frequency: '0-0-1 (OD)',
+        duration: '90 days',
+        instructions: 'Take at bedtime daily for target LDL < 55 mg/dL',
+      },
+      {
+        id: 'tp-5-4',
+        name: 'Metoprolol Succinate (ER)',
+        strength: '25mg',
+        form: 'tablet',
+        frequency: '1-0-0 (OD)',
+        duration: '90 days',
+        instructions: 'Morning after food. Keeps resting heart rate controlled',
+      },
+    ],
+    labTests: ['2D Echocardiography with Doppler', 'Comprehensive Lipid Profile', 'Liver Function Tests (SGOT/SGPT)', 'Serum Creatinine'],
+    advice: 'Low salt, zero trans-fat heart healthy diet. Daily 30 min morning walk. Keep SOS Sorbitrate 5mg tablet handy.',
+    followUp: 'Review after 3 Months with updated 2D Echo report',
+    language: 'en',
+  },
+
+  // 6. Detailed Drug Chart — Neurology
+  {
+    id: 'detailed-drug-chart',
+    templateId: 'detailed-drug-chart',
+    templateName: 'Detailed Drug Chart',
+    emoji: '💊',
+    specialty: 'Neurology & Neuro-medicine',
+    caseTitle: 'Chronic Migraine & Cervical Spasm',
+    description: 'Detailed cards with prophylaxis and abortive attack medication breakdown.',
+    doctor: {
+      name: 'Dr. Shalini Deshmukh',
+      qualification: 'MBBS, MD, DM (Neurology)',
+      specialization: 'Senior Consultant Neurologist',
+      regNo: 'MMC-55412',
+      clinicName: 'Brain & Spine Institute',
+      address: 'Plot 18, F.C. Road, Shivajinagar, Pune - 411005',
+      phone: '+91 98900 45678',
+      email: 'dr.shalini@brainspinepune.org',
+    },
+    patient: {
+      name: 'Sneha Kulkarni',
+      age: '29',
+      gender: 'Female',
+      weight: '54 kg',
+      phone: '+91 98901 99887',
+      chiefComplaint: 'Unilateral pulsating headache (5-6 attacks/month), visual aura zig-zag lines, neck stiffness',
+      diagnosis: 'Frequent Episodic Migraine with Aura & Associated Cervical Muscle Spasm',
+    },
+    symptoms: 'Hemicranial throbbing pain, photophobia, phonophobia, nausea, trapezius muscle tenderness',
+    medicines: [
+      {
+        id: 'tp-6-1',
+        name: 'Flunarizine',
+        strength: '10mg',
+        form: 'tablet',
+        frequency: '0-0-1 (Bedtime)',
+        duration: '30 days',
+        instructions: 'Take every night at bedtime. Preventive therapy for migraine',
+      },
+      {
+        id: 'tp-6-2',
+        name: 'Naproxen + Domperidone',
+        strength: '500mg / 10mg',
+        form: 'tablet',
+        frequency: 'SOS (Max 2/day)',
+        duration: '10 days',
+        instructions: 'Take immediately at the first sign of headache aura with water',
+      },
+      {
+        id: 'tp-6-3',
+        name: 'Thiocolchicoside',
+        strength: '4mg',
+        form: 'capsule',
+        frequency: '1-0-1 (BD)',
+        duration: '5 days',
+        instructions: 'Muscle relaxant — take after breakfast and dinner for neck spasm',
+      },
+      {
+        id: 'tp-6-4',
+        name: 'Magnesium Glycinate + Vitamin B2',
+        strength: '400mg / 100mg',
+        form: 'tablet',
+        frequency: '0-0-1 (Night)',
+        duration: '60 days',
+        instructions: 'Nutritional neuro-protection for headache reduction',
+      },
+    ],
+    labTests: ['Serum Vitamin B12 & Vitamin D3', 'MRI Brain (Plain) review', 'Cervical Spine X-Ray AP/Lat'],
+    advice: 'Maintain a headache trigger diary. Strictly avoid skipping meals, irregular sleep, bright flickering screens, and excessive caffeine.',
+    followUp: 'Review after 4 Weeks with headache frequency diary',
+    language: 'en',
+  },
+
+  // 7. Multi-Section Boxed — Pediatrics
+  {
+    id: 'multi-section-boxed',
+    templateId: 'multi-section-boxed',
+    templateName: 'Multi-Section Boxed',
+    emoji: '📦',
+    specialty: 'Pediatrics & Child Health',
+    caseTitle: 'Pediatric Wheezy Bronchitis',
+    description: 'Distinct boxed layout for child complaint, weight-adjusted dosing, spacer inhaler.',
+    doctor: {
+      name: 'Dr. Arvind Joshi',
+      qualification: 'MBBS, MD (Pediatrics), FIAP',
+      specialization: 'Senior Pediatrician & Neonatologist',
+      regNo: 'G-28941',
+      clinicName: 'Little Angels Children Hospital',
+      address: 'Opp. Parimal Garden, C.G. Road, Ahmedabad - 380006',
+      phone: '+91 98790 11223',
+      email: 'dr.arvindjoshi@littleangels.in',
+    },
+    patient: {
+      name: 'Master Vivaan Patel',
+      age: '3.5 yrs',
+      gender: 'Male',
+      weight: '14.5 kg',
+      phone: '+91 98791 22334',
+      chiefComplaint: 'Chest wheezing sound while breathing, nocturnal coughing fits, runny nose for 4 days',
+      diagnosis: 'Acute Viral Wheezy Bronchitis (First Episode)',
+    },
+    symptoms: 'Expiratory wheeze, persistent dry cough worse at night, tachypnea, mild fever',
+    medicines: [
+      {
+        id: 'tp-7-1',
+        name: 'Levosalbutamol + Budesonide Inhaler',
+        strength: '50mcg / 100mcg',
+        form: 'inhaler',
+        frequency: '2 puffs BD',
+        duration: '5 days',
+        instructions: 'Administer using Pediatric Spacer with Face Mask. Rinse mouth after use',
+      },
+      {
+        id: 'tp-7-2',
+        name: 'Mefenamic Acid Suspension (Meftal-P)',
+        strength: '100mg/5ml',
+        form: 'syrup',
+        frequency: '4ml SOS',
+        duration: '3 days',
+        instructions: 'Give 4ml only if fever > 100°F or severe body ache. Max 3 times/day',
+      },
+      {
+        id: 'tp-7-3',
+        name: 'Cetirizine Syrup (Zyrtec)',
+        strength: '5mg/5ml',
+        form: 'syrup',
+        frequency: '2.5ml OD',
+        duration: '5 days',
+        instructions: 'Give 2.5ml once daily at night before sleep',
+      },
+      {
+        id: 'tp-7-4',
+        name: 'Saline Nasal Spray (Nasoclear)',
+        strength: '0.65% NaCl',
+        form: 'drops',
+        frequency: '2 puffs in each nostril',
+        duration: '5 days',
+        instructions: 'Administer 4 times daily before feeds to clear blocked nose',
+      },
+    ],
+    labTests: ['Chest X-Ray PA View (if wheezing does not improve in 48h)'],
+    advice: 'Steam inhalation twice daily. Keep child in warm environment. Avoid cold drinks, ice creams, and exposure to incense/smoke.',
+    followUp: 'Review after 48 Hours or immediately if chest indrawing or breathlessness occurs',
+    language: 'en',
+  },
+
+  // 8. Minimal Print Ruled — Dermatology
+  {
+    id: 'minimal-print-ruled',
+    templateId: 'minimal-print-ruled',
+    templateName: 'Minimal Print Ruled',
+    emoji: '✒️',
+    specialty: 'Dermatology & Cosmetology',
+    caseTitle: 'Acne Vulgaris (Grade III) & Erythema',
+    description: 'Clean hairline rules, topical retinoid timing and oral antibiotic regimen.',
+    doctor: {
+      name: 'Dr. Meera Kapoor',
+      qualification: 'MBBS, MD (Dermatology, Venereology & Leprosy)',
+      specialization: 'Consultant Dermatologist & Aesthetic Physician',
+      regNo: 'DMC-91024',
+      clinicName: 'SkinCraft Dermatology & Laser Clinic',
+      address: 'Galleria Market, Phase IV, DLF Gurgaon - 122009',
+      phone: '+91 98100 78901',
+      email: 'dr.meera@skincraftclinic.com',
+    },
+    patient: {
+      name: 'Riya Singhania',
+      age: '22',
+      gender: 'Female',
+      weight: '50 kg',
+      phone: '+91 98101 22334',
+      chiefComplaint: 'Painful inflammatory cystic pimples on both cheeks and jawline for past 4 months',
+      diagnosis: 'Moderate Inflammatory Acne Vulgaris (Grade III) with Post-Inflammatory Erythema',
+    },
+    symptoms: 'Papules, pustules, erythematous macules, oily T-zone skin, tender acne lesions',
+    medicines: [
+      {
+        id: 'tp-8-1',
+        name: 'Doxycycline',
+        strength: '100mg',
+        form: 'capsule',
+        frequency: '1-0-0 (OD)',
+        duration: '21 days',
+        instructions: 'Take post-lunch with a full glass of water. Do NOT lie down for 30 minutes',
+      },
+      {
+        id: 'tp-8-2',
+        name: 'Adapalene 0.1% + Benzoyl Peroxide 2.5% Gel',
+        strength: 'Topical Gel',
+        form: 'cream',
+        frequency: 'Night Application',
+        duration: '30 days',
+        instructions: 'Apply pea-sized amount over full face at night 20 mins after moisturizer',
+      },
+      {
+        id: 'tp-8-3',
+        name: 'Clindamycin 1% + Nicotinamide 4% Gel',
+        strength: 'Topical Gel',
+        form: 'cream',
+        frequency: 'Morning Application',
+        duration: '30 days',
+        instructions: 'Apply on active red pimples after morning face wash',
+      },
+      {
+        id: 'tp-8-4',
+        name: 'Mineral Sunscreen Gel (SPF 50 PA++++)',
+        strength: 'Matte Sunscreen',
+        form: 'cream',
+        frequency: 'Every Morning & Afternoon',
+        duration: 'Daily',
+        instructions: 'Apply 15 mins before sun exposure. Reapply every 3-4 hours outdoors',
+      },
+    ],
+    labTests: ['Serum Total Testosterone', 'Serum DHEA-S', 'Pelvic Ultrasound (rule out PCOD)'],
+    advice: 'Use gentle salicylic acid foaming cleanser twice daily. Strictly avoid picking/squeezing pimples. Avoid hair oil over forehead.',
+    followUp: 'Review after 3 Weeks for clinical evaluation',
+    language: 'en',
+  },
+
+  // 9. Bilingual Indian — General Practice (Hindi + English)
+  {
+    id: 'bilingual-indian',
+    templateId: 'bilingual-indian',
+    templateName: 'Bilingual Indian',
+    emoji: '🇮🇳',
+    specialty: 'Family Medicine / GP (द्विभाषी)',
+    caseTitle: 'मौसमी फ्लू, बलगमी खांसी व बदन दर्द',
+    description: 'English + Hindi labels side-by-side with dual language medicine instructions.',
+    doctor: {
+      name: 'Dr. Santosh Kumar Verma',
+      qualification: 'MBBS, PGDGM (Family Medicine)',
+      specialization: 'Senior Family Physician & General Practitioner',
+      regNo: 'UP-45210',
+      clinicName: 'Verma Health Clinic (वर्मा स्वास्थ्य केंद्र)',
+      address: '14, Civil Lines, Hazratganj, Lucknow - 226001',
+      phone: '+91 94150 12345',
+      email: 'dr.santosh@vermaclinic.in',
+    },
+    patient: {
+      name: 'Ram Prasad Yadav (राम प्रसाद)',
+      age: '46',
+      gender: 'Male',
+      weight: '65 kg',
+      phone: '+91 94151 77665',
+      chiefComplaint: 'बुखार, गले में तेज दर्द, बलगम वाली खांसी, बदन दर्द 4 दिनों से (Fever & productive cough)',
+      diagnosis: 'Seasonal Viral Influenza with Bronchitis (मौसमी फ्लू एवं बलगमी ब्रोंकाइटिस)',
+    },
+    symptoms: 'बुखार (101.5°F), पीले रंग का बलगम, गले में खराश, कमजोरी, छाती में जकड़न',
+    medicines: [
+      {
+        id: 'tp-9-1',
+        name: 'Paracetamol 650mg (पैरासिटामोल)',
+        strength: '650mg',
+        form: 'tablet',
+        frequency: '1-0-1 (सुबह-शाम)',
+        duration: '3 दिन',
+        instructions: 'खाना खाने के बाद (बुखार 100°F से अधिक होने पर लें)',
+      },
+      {
+        id: 'tp-9-2',
+        name: 'Cefixime 200mg (सेफिक्सिम)',
+        strength: '200mg',
+        form: 'tablet',
+        frequency: '1-0-1 (सुबह-शाम)',
+        duration: '5 दिन',
+        instructions: 'नाश्ते व रात के खाने के बाद। पूरा 5 दिन का कोर्स अनिवार्य है',
+      },
+      {
+        id: 'tp-9-3',
+        name: 'Ambroxol + Terbutaline Syrup (खांसी का सिरप)',
+        strength: '10ml',
+        form: 'syrup',
+        frequency: '10ml दिन में 3 बार',
+        duration: '5 दिन',
+        instructions: 'दो चम्मच गुनगुने पानी के साथ दिन में 3 बार पिएं',
+      },
+      {
+        id: 'tp-9-4',
+        name: 'Pantoprazole 40mg (गैस की गोली)',
+        strength: '40mg',
+        form: 'tablet',
+        frequency: '1-0-0 (सुबह)',
+        duration: '5 दिन',
+        instructions: 'सुबह खाली पेट नाश्ते से 30 मिनट पहले 1 गोली लें',
+      },
+    ],
+    labTests: ['सीबीसी खून की जांच (CBC)', 'मलेरिया कार्ड टेस्ट (Malaria Card Test)'],
+    advice: 'दिनभर केवल गुनगुना पानी पिएं। ठंडे पानी, तली-भुनी चीजों, चावल व दही से परहेज रखें। दिन में दो बार भाप (Steam) लें।',
+    followUp: '3 दिन बाद पुनः दिखाएं (Review after 3 days)',
+    language: 'hi',
+  },
+
+  // 10. Compartmentalized Grid — Orthopedics
+  {
+    id: 'compartmentalized-grid',
+    templateId: 'compartmentalized-grid',
+    templateName: 'Compartmentalized Grid',
+    emoji: '⚕️',
+    specialty: 'Orthopedics & Joint Surgery',
+    caseTitle: 'Bilateral Osteoarthritis Knee',
+    description: 'Multi-column grid table with NSAID, cartilage protector & calcium/D3 regimen.',
+    doctor: {
+      name: 'Dr. Rajesh Khanna',
+      qualification: 'MBBS, MS (Orthopedics), MCh (Ortho)',
+      specialization: 'Senior Joint Replacement & Spine Surgeon',
+      regNo: 'DMC-33981',
+      clinicName: 'Khanna Bone & Joint Super Speciality Clinic',
+      address: 'C-48, Hauz Khas Enclave, New Delhi - 110016',
+      phone: '+91 98110 99887',
+      email: 'dr.khanna@boneandjointdelhi.com',
+    },
+    patient: {
+      name: 'Kamla Devi',
+      age: '61',
+      gender: 'Female',
+      weight: '72 kg',
+      phone: '+91 98111 44556',
+      chiefComplaint: 'Severe bilateral knee pain on stairs, morning stiffness (20 mins), joint crepitus',
+      diagnosis: 'Bilateral Primary Osteoarthritis Knees (Grade II-III Kellgren-Lawrence)',
+    },
+    symptoms: 'Knee joint pain on weight bearing, difficulty squatting, joint tenderness, mild swelling',
+    medicines: [
+      {
+        id: 'tp-10-1',
+        name: 'Etoricoxib',
+        strength: '90mg',
+        form: 'tablet',
+        frequency: '0-0-1 (OD)',
+        duration: '7 days',
+        instructions: 'Take after dinner with water. SOS only for severe knee pain episodes',
+      },
+      {
+        id: 'tp-10-2',
+        name: 'Diacerein + Glucosamine Sulfate',
+        strength: '50mg / 750mg',
+        form: 'tablet',
+        frequency: '1-0-1 (BD)',
+        duration: '60 days',
+        instructions: 'Take after breakfast & dinner. Cartilage nutrition supplement',
+      },
+      {
+        id: 'tp-10-3',
+        name: 'Cholecalciferol (Vitamin D3 60,000 IU)',
+        strength: '60K Sachet',
+        form: 'powder',
+        frequency: '1 Sachet / Week',
+        duration: '8 weeks',
+        instructions: 'Mix 1 sachet in a glass of warm milk every Sunday after breakfast',
+      },
+      {
+        id: 'tp-10-4',
+        name: 'Diclofenac Gel 1.16%',
+        strength: 'Topical Gel',
+        form: 'cream',
+        frequency: 'Gently apply BD',
+        duration: '30 days',
+        instructions: 'Gently rub small quantity on both knees morning and night. Do not massage hard',
+      },
+    ],
+    labTests: ['Digital X-Ray Both Knees (Standing AP & Lateral View)', 'Serum Calcium & Vitamin D3', 'Serum Uric Acid'],
+    advice: 'Perform isometric quadriceps strengthening exercises daily. Strictly avoid squatting on the floor and cross-legged sitting. Use western toilet.',
+    followUp: 'Review after 2 Weeks with Knee X-Rays & Vitamin D3 report',
+    language: 'en',
+  },
+]
+
+// Helper function to get preset by template id
+export function getTestPresetByTemplateId(templateId: string): TestPreset {
+  const found = TEST_PRESETS.find(p => p.templateId === templateId)
+  return found || TEST_PRESETS[0]
+}

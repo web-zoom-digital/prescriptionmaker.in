@@ -9,6 +9,7 @@ import Svg, { Path } from 'react-native-svg'
 import * as Print from 'expo-print'
 import * as FileSystem from 'expo-file-system'
 import * as Sharing from 'expo-sharing'
+import { downloadPrescriptionPdf } from '../lib/pdf-export-service'
 
 const { width: SW, height: SH } = Dimensions.get('window')
 const CANVAS_W = SW - 32
@@ -133,10 +134,9 @@ export default function HandMode() {
         ${pathEls}
       </svg>`
 
-      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:20px;background:#fff;font-family:Arial,sans-serif;}h3{color:#0f766e;margin-bottom:10px;}.footer{color:#94a3b8;font-size:11px;margin-top:12px;}</style></head><body><h3>✍️ Hand-written Prescription</h3>${svg}<p class="footer">PrescriptionMaker.in · ${new Date().toLocaleDateString('en-IN')}</p></body></html>`
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>@page{size:A4 portrait;margin:0;}body{margin:0;padding:20px;background:#fff;font-family:Arial,sans-serif;-webkit-print-color-adjust:exact;}h3{color:#0f766e;margin-bottom:10px;}.footer{color:#94a3b8;font-size:11px;margin-top:12px;}</style></head><body><h3>✍️ Hand-written Prescription</h3>${svg}<p class="footer">PrescriptionMaker.in · ${new Date().toLocaleDateString('en-IN')}</p></body></html>`
 
-      const { uri } = await Print.printToFileAsync({ html, base64: false })
-      await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Share Prescription PDF' })
+      await downloadPrescriptionPdf({ html, filename: 'Handwritten_Prescription.pdf' })
     } catch (err: any) {
       Alert.alert('Error', err.message)
     } finally {

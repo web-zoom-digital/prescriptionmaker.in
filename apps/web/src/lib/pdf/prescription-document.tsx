@@ -92,6 +92,12 @@ export interface PrescriptionDocumentProps {
     gender?: string | null
     address?: string | null
     allergies?: string | null
+    insuranceNo?: string | null
+    careProvider?: string | null
+    mrn?: string | null
+    ward?: string | null
+    bedNo?: string | null
+    ipOpNo?: string | null
   }
   diagnosis?: string | null
   medicines: Array<{

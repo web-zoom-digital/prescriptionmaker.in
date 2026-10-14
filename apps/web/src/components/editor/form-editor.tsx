@@ -1,9 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Trash2, ChevronDown, ChevronUp, Search, X, Zap } from 'lucide-react'
+import { Plus, Trash2, ChevronDown, ChevronUp, Search, X, Zap, Check, CheckCircle } from 'lucide-react'
 import { prescriptionFormSchema, type PrescriptionFormValues } from '@prescriptionmaker/validation'
 import { DIAGNOSIS_TEMPLATES, searchTemplates, type DiagnosisTemplate } from '@/lib/diagnosis-templates'
 import { COMMON_LAB_TESTS, searchLabTests, TEST_PANELS } from '@/lib/lab-tests-db'
@@ -26,8 +27,10 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
   const SOAP_TEMPLATES = ['soap-clinical', 'vitals-first', 'medical-prescription-form']
   const isVitalsTemplate = SOAP_TEMPLATES.includes(template.slug)
 
+  const hasDoctorProfile = Boolean(initialData?.doctorName)
+
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    doctor: true,
+    doctor: !hasDoctorProfile,
     patient: true,
     vitals: true,
     medicines: true,
@@ -132,101 +135,12 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-4">
       {/* DEV AUTOFILL TOOLBAR */}
-      <div className="bg-teal-50/50 border border-teal-200 rounded-xl p-4 shadow-sm mb-2">
-        <div className="flex items-center gap-2 mb-3">
-          <Zap className="h-4 w-4 text-teal-600" />
-          <h3 className="text-xs font-bold text-teal-800 uppercase tracking-wide">Developer Autofill</h3>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              reset({
-                doctorName: 'Vatsalya Bhardwaj',
-                doctorQualifications: 'MBBS, MD (Medicine)',
-                doctorSpecialization: 'General Physician',
-                doctorRegNumber: 'MCI-12345',
-                clinicName: 'Zoom Digital Clinic',
-                clinicPhone: '+91 98765 43210',
-                clinicAddress: 'Sector 5, New Delhi',
-                patient: { name: 'Rahul Kumar', age: '34', gender: 'male' },
-                diagnosis: 'Viral Fever with URI',
-                medicines: [
-                  { id: '1', name: 'Paracetamol', strength: '650mg', form: 'tablet', frequency: 'TDS', timing: 'after_food', duration: '3 days', route: 'oral', instructions: 'Take if fever is above 100°F' },
-                  { id: '2', name: 'Azithromycin', strength: '500mg', form: 'tablet', frequency: 'OD', timing: 'after_food', duration: '3 days', route: 'oral', instructions: 'Complete the full course' },
-                  { id: '3', name: 'Levocetirizine', strength: '5mg', form: 'tablet', frequency: 'OD', timing: 'bedtime', duration: '5 days', route: 'oral', instructions: 'May cause drowsiness' }
-                ],
-                tests: [{ id: '1', name: 'Complete Blood Count (CBC)' }, { id: '2', name: 'Dengue NS1 Antigen' }],
-                advice: 'Drink plenty of warm fluids. Take complete rest.',
-                followUp: '3 days',
-                signatureDataUrl: watch('signatureDataUrl'),
-                clinicLogoUrl: watch('clinicLogoUrl'),
-                stampUrl: watch('stampUrl'),
-              })
-            }}
-            className="px-3 py-1.5 bg-teal-600 text-white text-xs font-bold rounded-md hover:bg-teal-700 transition active:scale-95"
-          >
-            Adult Fever Case
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              reset({
-                doctorName: 'Vatsalya Bhardwaj',
-                doctorQualifications: 'MBBS, DCH',
-                doctorSpecialization: 'Pediatrician',
-                doctorRegNumber: 'MCI-67890',
-                clinicName: 'Zoom Kids Clinic',
-                clinicPhone: '+91 98765 43210',
-                clinicAddress: 'Sector 5, New Delhi',
-                patient: { name: 'Aarav Sharma', age: '4 years', gender: 'male' },
-                diagnosis: 'Acute Otitis Media (Ear Infection)',
-                medicines: [
-                  { id: '1', name: 'Amoxicillin', strength: '250mg/5ml', form: 'syrup', frequency: 'TDS', timing: 'after_food', duration: '5 days', route: 'oral', instructions: 'Take 5ml three times a day' },
-                  { id: '2', name: 'Ibuprofen', strength: '100mg/5ml', form: 'syrup', frequency: 'SOS', timing: 'after_food', duration: '3 days', route: 'oral', instructions: 'Take 5ml if pain or fever' }
-                ],
-                tests: [],
-                advice: 'Do not allow water to enter the ears during bath.',
-                followUp: '5 days',
-                signatureDataUrl: watch('signatureDataUrl'),
-                clinicLogoUrl: watch('clinicLogoUrl'),
-                stampUrl: watch('stampUrl'),
-              })
-            }}
-            className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-md hover:bg-indigo-700 transition active:scale-95"
-          >
-            Pediatric Case
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              reset({
-                doctorName: 'Vatsalya Bhardwaj',
-                doctorQualifications: 'MD, DM (Cardiology)',
-                doctorSpecialization: 'Cardiologist',
-                doctorRegNumber: 'MCI-11223',
-                clinicName: 'Heart Care Center',
-                clinicPhone: '+91 98765 43210',
-                clinicAddress: 'Sector 5, New Delhi',
-                patient: { name: 'Ramesh Singh', age: '58', gender: 'male' },
-                diagnosis: 'Hypertension, Dyslipidemia',
-                medicines: [
-                  { id: '1', name: 'Telmisartan', strength: '40mg', form: 'tablet', frequency: 'OD', timing: 'before_food', duration: '30 days', route: 'oral', instructions: 'Take in morning' },
-                  { id: '2', name: 'Atorvastatin', strength: '20mg', form: 'tablet', frequency: 'OD', timing: 'bedtime', duration: '30 days', route: 'oral', instructions: '' },
-                  { id: '3', name: 'Aspirin', strength: '75mg', form: 'tablet', frequency: 'OD', timing: 'after_food', duration: '30 days', route: 'oral', instructions: 'Do not take on empty stomach' }
-                ],
-                tests: [{ id: '1', name: 'Lipid Profile' }, { id: '2', name: 'ECG' }],
-                advice: 'Strictly avoid oily food and salt. 30 mins walk daily.',
-                followUp: '1 month',
-                signatureDataUrl: watch('signatureDataUrl'),
-                clinicLogoUrl: watch('clinicLogoUrl'),
-                stampUrl: watch('stampUrl'),
-              })
-            }}
-            className="px-3 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-md hover:bg-rose-700 transition active:scale-95"
-          >
-            Cardiology Case
-          </button>
+      <div className="bg-gradient-to-r from-teal-50 to-blue-50 border border-teal-200/80 rounded-xl p-3.5 shadow-sm mb-3">
+        <div className="flex items-center justify-between gap-2 mb-2.5">
+          <div className="flex items-center gap-2">
+            <Zap className="h-4 w-4 text-teal-600 animate-pulse" />
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">⚡ 1-Click Auto-Fill Presets (All 10 Templates)</h3>
+          </div>
           <button
             type="button"
             onClick={() => reset({
@@ -234,9 +148,338 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
               patient: { name: '', age: '', gender: 'male' }, diagnosis: '', medicines: [{ id: '1', name: '', strength: '', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '5 days', route: 'oral' }], tests: [], advice: '', followUp: '',
               signatureDataUrl: watch('signatureDataUrl')
             })}
-            className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-md hover:bg-slate-50 transition active:scale-95 ml-auto"
+            className="px-2.5 py-1 bg-white border border-slate-300 text-slate-700 text-[11px] font-semibold rounded-md hover:bg-slate-100 transition active:scale-95 shadow-2xs"
           >
             Clear Form
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {/* 1. Classic Letterhead */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Rahul Sharma',
+                doctorQualifications: 'MBBS, MD (Medicine)',
+                doctorSpecialization: 'Senior Consultant Physician',
+                doctorRegNumber: 'MCI-48291',
+                clinicName: 'Apollo Clinic & Healthcare Centre',
+                clinicPhone: '+91 98110 23456',
+                clinicAddress: 'B-12, Green Park Main, South Ext., New Delhi',
+                patient: { name: 'Aarav Verma', age: '32', gender: 'male' },
+                diagnosis: 'Acute Viral Fever with Exudative Pharyngitis',
+                medicines: [
+                  { id: '1', name: 'Paracetamol', strength: '650mg', form: 'tablet', frequency: 'QID', timing: 'after_food', duration: '3 days', route: 'oral', instructions: 'SOS if temperature > 100°F' },
+                  { id: '2', name: 'Azithromycin', strength: '500mg', form: 'tablet', frequency: 'OD', timing: 'before_food', duration: '3 days', route: 'oral', instructions: '1 hr before breakfast. Complete full 3-day course' },
+                  { id: '3', name: 'Levocetirizine + Montelukast', strength: '5mg/10mg', form: 'tablet', frequency: 'OD', timing: 'bedtime', duration: '5 days', route: 'oral', instructions: 'Take at bedtime. May cause mild drowsiness' },
+                  { id: '4', name: 'Ascoril-D Cough Syrup', strength: '10ml', form: 'syrup', frequency: 'TDS', timing: 'after_food', duration: '5 days', route: 'oral', instructions: 'Take 2 tsp with lukewarm water' }
+                ],
+                tests: [{ id: '1', name: 'Complete Blood Count (CBC)' }, { id: '2', name: 'Dengue NS1 Antigen' }],
+                advice: 'Drink 3-4 liters warm water daily. Warm salt water gargles TDS. Complete bed rest for 3 days.',
+                followUp: '3 days',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-blue-700 text-white text-[11px] font-bold rounded-md hover:bg-blue-800 transition active:scale-95 shadow-2xs"
+          >
+            📜 1. Classic Letterhead
+          </button>
+
+          {/* 2. Two-Column Sidebar */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Priya Nair',
+                doctorQualifications: 'MBBS, MD, DM (Cardiology), FACC',
+                doctorSpecialization: 'Chief Interventional Cardiologist',
+                doctorRegNumber: 'KMC-72940',
+                clinicName: 'Metro Heart Institute',
+                clinicPhone: '+91 98450 12345',
+                clinicAddress: '42, Indiranagar 100ft Road, Bengaluru',
+                patient: { name: 'Ramesh Sundaram', age: '58', gender: 'male' },
+                diagnosis: 'Stage 2 Essential Hypertension & Dyslipidemia',
+                medicines: [
+                  { id: '1', name: 'Telmisartan + Amlodipine', strength: '40mg/5mg', form: 'tablet', frequency: 'OD', timing: 'after_food', duration: '30 days', route: 'oral', instructions: 'Every morning after breakfast regularly' },
+                  { id: '2', name: 'Atorvastatin', strength: '20mg', form: 'tablet', frequency: 'OD', timing: 'bedtime', duration: '30 days', route: 'oral', instructions: 'Take at night daily' },
+                  { id: '3', name: 'Ecosprin (Aspirin)', strength: '75mg', form: 'tablet', frequency: 'OD', timing: 'after_food', duration: '30 days', route: 'oral', instructions: 'Post-lunch only. Never on empty stomach' }
+                ],
+                tests: [{ id: '1', name: 'Fasting Lipid Profile' }, { id: '2', name: 'ECG 12-Lead' }, { id: '3', name: 'Serum Creatinine' }],
+                advice: 'Strict low sodium intake (< 2g/day). Avoid fried snacks. 40 min morning walk. Record daily BP chart.',
+                followUp: '1 month',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-indigo-700 text-white text-[11px] font-bold rounded-md hover:bg-indigo-800 transition active:scale-95 shadow-2xs"
+          >
+            🏥 2. Two-Column Sidebar
+          </button>
+
+          {/* 3. Hospital OPD Form */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Vikram Malhotra',
+                doctorQualifications: 'MBBS, DNB (Emergency Medicine)',
+                doctorSpecialization: 'Senior Medical Officer / OPD In-charge',
+                doctorRegNumber: 'DMC-88124',
+                clinicName: 'Civil Multi-Speciality Hospital',
+                clinicPhone: '+91 11 2659 8700',
+                clinicAddress: 'OPD Block C, Ring Road, New Delhi',
+                patient: { name: 'Sunita Devi', age: '28', gender: 'female' },
+                diagnosis: 'Acute Gastroenteritis & Dehydration',
+                medicines: [
+                  { id: '1', name: 'Ofloxacin + Ornidazole', strength: '200/500mg', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '5 days', route: 'oral', instructions: 'After meals with plenty of water' },
+                  { id: '2', name: 'Ondansetron (Vomikind MD)', strength: '4mg', form: 'tablet', frequency: 'SOS', timing: 'before_food', duration: '3 days', route: 'oral', instructions: 'Mouth dissolving 30 mins before food' },
+                  { id: '3', name: 'Racecadotril', strength: '100mg', form: 'capsule', frequency: 'TDS', timing: 'before_food', duration: '3 days', route: 'oral', instructions: 'Before food until diarrhea subsides' },
+                  { id: '4', name: 'WHO ORS (Electral)', strength: '21.8g Sachet', form: 'other', frequency: 'TDS', timing: 'after_food', duration: '3 days', route: 'oral', instructions: 'Dissolve in 1L water, sip throughout day' }
+                ],
+                tests: [{ id: '1', name: 'Stool Routine & Microscopy' }, { id: '2', name: 'Serum Electrolytes' }],
+                advice: 'Strict liquid diet for 24h (kanji, coconut water, light khichdi). Avoid dairy & outside food.',
+                followUp: '48 hours',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-slate-800 text-white text-[11px] font-bold rounded-md hover:bg-slate-900 transition active:scale-95 shadow-2xs"
+          >
+            🏛️ 3. Hospital OPD
+          </button>
+
+          {/* 4. SOAP Clinical */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Ananya Roy',
+                doctorQualifications: 'MBBS, MD, DNB (Endocrinology)',
+                doctorSpecialization: 'Consultant Endocrinologist',
+                doctorRegNumber: 'WBMC-63189',
+                clinicName: 'Fortis Diabetes & Endocrine Centre',
+                clinicPhone: '+91 98300 54321',
+                clinicAddress: '730, EM Bypass, Kolkata',
+                patient: { name: 'Mohan Lal Agarwal', age: '54', gender: 'male' },
+                diagnosis: 'Uncontrolled Type 2 Diabetes Mellitus with Neuropathy',
+                medicines: [
+                  { id: '1', name: 'Metformin SR', strength: '1000mg', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '30 days', route: 'oral', instructions: 'Take with breakfast & dinner' },
+                  { id: '2', name: 'Dapagliflozin', strength: '10mg', form: 'tablet', frequency: 'OD', timing: 'before_food', duration: '30 days', route: 'oral', instructions: 'Morning before breakfast with water' },
+                  { id: '3', name: 'Pregabalin + Methylcobalamin', strength: '75/1500mcg', form: 'capsule', frequency: 'OD', timing: 'bedtime', duration: '30 days', route: 'oral', instructions: 'Night for tingling & burning pain' }
+                ],
+                tests: [{ id: '1', name: 'HbA1c Glycated Hemoglobin' }, { id: '2', name: 'Urine Microalbumin/Creatinine' }, { id: '3', name: 'Fundoscopy' }],
+                advice: 'Strict diabetic diet. Zero direct sugar/sweets. 45 min daily brisk walking. Daily inspection of feet.',
+                followUp: '4 weeks',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-violet-700 text-white text-[11px] font-bold rounded-md hover:bg-violet-800 transition active:scale-95 shadow-2xs"
+          >
+            📋 4. SOAP Clinical
+          </button>
+
+          {/* 5. Vitals-First */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Siddharth Mehta',
+                doctorQualifications: 'MBBS, MD, DM, FACC',
+                doctorSpecialization: 'Director — Interventional Cardiology',
+                doctorRegNumber: 'MMC-39045',
+                clinicName: 'Lilavati Hospital & Research Centre',
+                clinicPhone: '+91 98200 67890',
+                clinicAddress: 'A-791, Bandra Reclamation, Mumbai',
+                patient: { name: 'Harshvardhan Patil', age: '64', gender: 'male' },
+                diagnosis: 'Post-PTCA (DES in LAD), Stable Ischemic Heart Disease',
+                medicines: [
+                  { id: '1', name: 'Ticagrelor (Brilinta)', strength: '90mg', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '90 days', route: 'oral', instructions: 'Do NOT skip any dose' },
+                  { id: '2', name: 'Aspirin Gastro-resistant', strength: '75mg', form: 'tablet', frequency: 'OD', timing: 'after_food', duration: '90 days', route: 'oral', instructions: 'After lunch with water' },
+                  { id: '3', name: 'Rosuvastatin + Ezetimibe', strength: '20mg/10mg', form: 'tablet', frequency: 'OD', timing: 'bedtime', duration: '90 days', route: 'oral', instructions: 'At bedtime daily' },
+                  { id: '4', name: 'Metoprolol Succinate ER', strength: '25mg', form: 'tablet', frequency: 'OD', timing: 'after_food', duration: '90 days', route: 'oral', instructions: 'Morning after food' }
+                ],
+                tests: [{ id: '1', name: '2D Echocardiography' }, { id: '2', name: 'Lipid Profile' }, { id: '3', name: 'Liver Function Tests' }],
+                advice: 'Low salt, zero trans-fat heart healthy diet. Daily 30 min morning walk. Keep SOS Sorbitrate 5mg handy.',
+                followUp: '3 months',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-rose-700 text-white text-[11px] font-bold rounded-md hover:bg-rose-800 transition active:scale-95 shadow-2xs"
+          >
+            ❤️ 5. Vitals-First
+          </button>
+
+          {/* 6. Detailed Drug Chart */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Shalini Deshmukh',
+                doctorQualifications: 'MBBS, MD, DM (Neurology)',
+                doctorSpecialization: 'Senior Consultant Neurologist',
+                doctorRegNumber: 'MMC-55412',
+                clinicName: 'Brain & Spine Institute',
+                clinicPhone: '+91 98900 45678',
+                clinicAddress: 'Plot 18, F.C. Road, Shivajinagar, Pune',
+                patient: { name: 'Sneha Kulkarni', age: '29', gender: 'female' },
+                diagnosis: 'Frequent Episodic Migraine with Aura & Cervical Spasm',
+                medicines: [
+                  { id: '1', name: 'Flunarizine', strength: '10mg', form: 'tablet', frequency: 'OD', timing: 'bedtime', duration: '30 days', route: 'oral', instructions: 'Night at bedtime for migraine prevention' },
+                  { id: '2', name: 'Naproxen + Domperidone', strength: '500/10mg', form: 'tablet', frequency: 'SOS', timing: 'after_food', duration: '10 days', route: 'oral', instructions: 'Take at first sign of aura with water' },
+                  { id: '3', name: 'Thiocolchicoside', strength: '4mg', form: 'capsule', frequency: 'BD', timing: 'after_food', duration: '5 days', route: 'oral', instructions: 'Muscle relaxant after meals' },
+                  { id: '4', name: 'Magnesium Glycinate', strength: '400mg', form: 'tablet', frequency: 'OD', timing: 'bedtime', duration: '60 days', route: 'oral', instructions: 'Night with water for neuro-protection' }
+                ],
+                tests: [{ id: '1', name: 'Serum Vitamin B12 & D3' }, { id: '2', name: 'MRI Brain (Plain) Review' }],
+                advice: 'Maintain migraine diary. Strictly avoid skipping meals, lack of sleep, and flashing screens.',
+                followUp: '4 weeks',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-emerald-700 text-white text-[11px] font-bold rounded-md hover:bg-emerald-800 transition active:scale-95 shadow-2xs"
+          >
+            💊 6. Detailed Drug Chart
+          </button>
+
+          {/* 7. Multi-Section Boxed (Pediatrics) */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Arvind Joshi',
+                doctorQualifications: 'MBBS, MD (Pediatrics), FIAP',
+                doctorSpecialization: 'Senior Pediatrician & Neonatologist',
+                doctorRegNumber: 'G-28941',
+                clinicName: 'Little Angels Children Hospital',
+                clinicPhone: '+91 98790 11223',
+                clinicAddress: 'Opp. Parimal Garden, C.G. Road, Ahmedabad',
+                patient: { name: 'Master Vivaan Patel', age: '3.5 yrs', gender: 'male' },
+                diagnosis: 'Acute Viral Wheezy Bronchitis (First Episode)',
+                medicines: [
+                  { id: '1', name: 'Levosalbutamol + Budesonide Inhaler', strength: '50/100mcg', form: 'inhaler', frequency: 'BD', timing: 'after_food', duration: '5 days', route: 'inhalation', instructions: '2 puffs via Pediatric Spacer with Face Mask' },
+                  { id: '2', name: 'Mefenamic Acid Suspension (Meftal-P)', strength: '100mg/5ml', form: 'syrup', frequency: 'SOS', timing: 'after_food', duration: '3 days', route: 'oral', instructions: '4ml only if fever > 100°F (Max TDS)' },
+                  { id: '3', name: 'Cetirizine Syrup (Zyrtec)', strength: '5mg/5ml', form: 'syrup', frequency: 'OD', timing: 'bedtime', duration: '5 days', route: 'oral', instructions: '2.5ml once daily at night' },
+                  { id: '4', name: 'Saline Nasal Drops (Nasoclear)', strength: '0.65% NaCl', form: 'drops', frequency: 'QID', timing: 'before_food', duration: '5 days', route: 'topical', instructions: '2 drops in each nostril before feeds' }
+                ],
+                tests: [{ id: '1', name: 'Chest X-Ray PA View (if wheeze persists)' }],
+                advice: 'Steam inhalation twice daily. Keep child in warm environment. Avoid cold drinks & ice creams.',
+                followUp: '48 hours',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-sky-700 text-white text-[11px] font-bold rounded-md hover:bg-sky-800 transition active:scale-95 shadow-2xs"
+          >
+            📦 7. Multi-Section Boxed (Pediatric)
+          </button>
+
+          {/* 8. Minimal Print Ruled (Dermatology) */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Meera Kapoor',
+                doctorQualifications: 'MBBS, MD (Dermatology, DVL)',
+                doctorSpecialization: 'Consultant Dermatologist & Aesthetician',
+                doctorRegNumber: 'DMC-91024',
+                clinicName: 'SkinCraft Dermatology & Laser Clinic',
+                clinicPhone: '+91 98100 78901',
+                clinicAddress: 'Galleria Market, Phase IV, DLF Gurgaon',
+                patient: { name: 'Riya Singhania', age: '22', gender: 'female' },
+                diagnosis: 'Moderate Inflammatory Acne Vulgaris (Grade III)',
+                medicines: [
+                  { id: '1', name: 'Doxycycline', strength: '100mg', form: 'capsule', frequency: 'OD', timing: 'after_food', duration: '21 days', route: 'oral', instructions: 'Post-lunch with full glass water. Do not lie down' },
+                  { id: '2', name: 'Adapalene 0.1% + Benzoyl Peroxide Gel', strength: 'Topical Gel', form: 'cream', frequency: 'OD', timing: 'bedtime', duration: '30 days', route: 'topical', instructions: 'Pea-sized amount at night 20m after moisturizer' },
+                  { id: '3', name: 'Clindamycin 1% + Nicotinamide 4% Gel', strength: 'Topical Gel', form: 'cream', frequency: 'OD', timing: 'after_food', duration: '30 days', route: 'topical', instructions: 'Apply on active red pimples morning' },
+                  { id: '4', name: 'Mineral Sunscreen Gel SPF 50', strength: 'Matte Gel', form: 'cream', frequency: 'BD', timing: 'before_food', duration: 'Daily', route: 'topical', instructions: 'Apply 15m before sun. Reapply every 4h outdoors' }
+                ],
+                tests: [{ id: '1', name: 'Serum Total Testosterone' }, { id: '2', name: 'Pelvic USG (PCOD)' }],
+                advice: 'Gentle salicylic acid wash twice daily. Do not pick/squeeze pimples. Avoid heavy cosmetics.',
+                followUp: '3 weeks',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-cyan-700 text-white text-[11px] font-bold rounded-md hover:bg-cyan-800 transition active:scale-95 shadow-2xs"
+          >
+            ✒️ 8. Minimal Print Ruled (Derma)
+          </button>
+
+          {/* 9. Bilingual Indian */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Santosh Kumar Verma',
+                doctorQualifications: 'MBBS, PGDGM (Family Medicine)',
+                doctorSpecialization: 'Senior Family Physician & GP',
+                doctorRegNumber: 'UP-45210',
+                clinicName: 'Verma Health Clinic (वर्मा स्वास्थ्य केंद्र)',
+                clinicPhone: '+91 94150 12345',
+                clinicAddress: '14, Civil Lines, Hazratganj, Lucknow',
+                patient: { name: 'Ram Prasad Yadav (राम प्रसाद)', age: '46', gender: 'male' },
+                diagnosis: 'Seasonal Viral Influenza & Bronchitis (मौसमी फ्लू एवं खांसी)',
+                medicines: [
+                  { id: '1', name: 'Paracetamol 650mg (पैरासिटामोल)', strength: '650mg', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '3 दिन', route: 'oral', instructions: 'खाना खाने के बाद (बुखार 100°F से ऊपर होने पर)' },
+                  { id: '2', name: 'Cefixime 200mg (सेफिक्सिम)', strength: '200mg', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '5 दिन', route: 'oral', instructions: 'सुबह-शाम भोजन के बाद। पूरा 5 दिन का कोर्स लें' },
+                  { id: '3', name: 'Ambroxol Cough Syrup (खांसी सिरप)', strength: '10ml', form: 'syrup', frequency: 'TDS', timing: 'after_food', duration: '5 दिन', route: 'oral', instructions: 'दो चम्मच गुनगुने पानी के साथ दिन में 3 बार' },
+                  { id: '4', name: 'Pantoprazole 40mg (गैस की गोली)', strength: '40mg', form: 'tablet', frequency: 'OD', timing: 'before_food', duration: '5 दिन', route: 'oral', instructions: 'सुबह खाली पेट नाश्ते से 30 मिनट पहले' }
+                ],
+                tests: [{ id: '1', name: 'सीबीसी (CBC)' }, { id: '2', name: 'मलेरिया कार्ड टेस्ट (Malaria Card)' }],
+                advice: 'केवल गुनगुना पानी पिएं। ठंडी चीजों व चावल से परहेज। दिन में दो बार भाप (Steam) लें।',
+                followUp: '3 दिन बाद (After 3 days)',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-amber-700 text-white text-[11px] font-bold rounded-md hover:bg-amber-800 transition active:scale-95 shadow-2xs"
+          >
+            🇮🇳 9. Bilingual Indian (द्विभाषी)
+          </button>
+
+          {/* 10. Compartmentalized Grid (Ortho) */}
+          <button
+            type="button"
+            onClick={() => {
+              reset({
+                doctorName: 'Dr. Rajesh Khanna',
+                doctorQualifications: 'MBBS, MS (Orthopedics), MCh',
+                doctorSpecialization: 'Joint Replacement & Spine Surgeon',
+                doctorRegNumber: 'DMC-33981',
+                clinicName: 'Khanna Bone & Joint Super Speciality Clinic',
+                clinicPhone: '+91 98110 99887',
+                clinicAddress: 'C-48, Hauz Khas Enclave, New Delhi',
+                patient: { name: 'Kamla Devi', age: '61', gender: 'female' },
+                diagnosis: 'Bilateral Primary Osteoarthritis Knees (Grade II-III)',
+                medicines: [
+                  { id: '1', name: 'Etoricoxib', strength: '90mg', form: 'tablet', frequency: 'OD', timing: 'after_food', duration: '7 days', route: 'oral', instructions: 'After dinner. SOS only for severe joint pain' },
+                  { id: '2', name: 'Diacerein + Glucosamine Sulfate', strength: '50/750mg', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '60 days', route: 'oral', instructions: 'After breakfast & dinner with water' },
+                  { id: '3', name: 'Cholecalciferol (Vitamin D3 60K)', strength: '60,000 IU', form: 'other', frequency: 'OD', timing: 'after_food', duration: '8 weeks', route: 'oral', instructions: '1 sachet in warm milk every Sunday' },
+                  { id: '4', name: 'Diclofenac Gel 1.16%', strength: 'Topical Gel', form: 'cream', frequency: 'BD', timing: 'after_food', duration: '30 days', route: 'topical', instructions: 'Gently apply on both knees morning and night' }
+                ],
+                tests: [{ id: '1', name: 'Digital X-Ray Both Knees AP/Lat' }, { id: '2', name: 'Serum Calcium & Vitamin D3' }, { id: '3', name: 'Serum Uric Acid' }],
+                advice: 'Quadriceps exercises daily. Avoid floor squatting and cross-legged sitting. Use western commode.',
+                followUp: '2 weeks',
+                signatureDataUrl: watch('signatureDataUrl'),
+                clinicLogoUrl: watch('clinicLogoUrl'),
+                stampUrl: watch('stampUrl'),
+              })
+            }}
+            className="px-2.5 py-1 bg-amber-900 text-white text-[11px] font-bold rounded-md hover:bg-amber-950 transition active:scale-95 shadow-2xs"
+          >
+            ⚕️ 10. Compartmentalized Grid (Ortho)
           </button>
         </div>
       </div>
@@ -244,9 +487,38 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
       {/* Doctor Information */}
       <EditorSection
         title="Doctor Information"
+        badge={
+          watch('doctorName') ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">
+              <Check className="h-3 w-3" /> Auto-filled from Profile
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 border border-amber-200">
+              Profile not set
+            </span>
+          )
+        }
+        summary={watch('doctorName') ? `Dr. ${watch('doctorName')}${watch('clinicName') ? ` · ${watch('clinicName')}` : ''}` : undefined}
         open={openSections['doctor']!}
         onToggle={() => toggleSection('doctor')}
       >
+        {watch('doctorName') && (
+          <div className="mb-4 flex items-center justify-between rounded-lg bg-emerald-50/80 p-3 border border-emerald-200/80 text-xs text-emerald-800">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+              <span>
+                <strong>Profile loaded:</strong> Dr. {watch('doctorName')}{watch('clinicName') ? ` (${watch('clinicName')})` : ''}. Auto-filled on prescription header.
+              </span>
+            </div>
+            <Link
+              href="/dashboard/profile"
+              target="_blank"
+              className="text-primary hover:underline font-semibold shrink-0 ml-2"
+            >
+              Account Profile ↗
+            </Link>
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormField id="doctor-name" label="Doctor Name" error={errors.doctorName?.message}>
             <input
@@ -980,32 +1252,46 @@ function EditorSection({
   onToggle,
   children,
   accent = false,
+  badge,
+  summary,
 }: {
   title: string
   open: boolean
   onToggle: () => void
   children: React.ReactNode
   accent?: boolean
+  badge?: React.ReactNode
+  summary?: React.ReactNode
 }) {
   return (
     <div className={cn(
-      'overflow-hidden rounded-lg border bg-white shadow-soft-sm',
+      'overflow-hidden rounded-lg border bg-white shadow-soft-sm transition-all',
       accent ? 'border-teal-200' : 'border-border'
     )}>
       <button
         type="button"
-        className="flex w-full items-center justify-between px-4 py-3 text-left"
+        className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-slate-50/70 transition-colors"
         onClick={onToggle}
         aria-expanded={open}
       >
-        <span className={cn('text-sm font-semibold', accent ? 'text-teal-800' : 'text-slate-900')}>
-          {title}
-        </span>
-        {open ? (
-          <ChevronUp className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-        ) : (
-          <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-        )}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span className={cn('text-sm font-semibold', accent ? 'text-teal-800' : 'text-slate-900')}>
+            {title}
+          </span>
+          {badge}
+        </div>
+        <div className="flex items-center gap-2">
+          {!open && summary && (
+            <span className="text-xs text-muted-foreground hidden sm:inline-block max-w-xs truncate font-medium">
+              {summary}
+            </span>
+          )}
+          {open ? (
+            <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
+          )}
+        </div>
       </button>
       {open && (
         <div className="border-t border-border px-4 pb-4 pt-3">
