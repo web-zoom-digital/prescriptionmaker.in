@@ -20,8 +20,8 @@ interface FormEditorProps {
   onDataChange: (data: Record<string, unknown>) => void
 }
 
-const DOSE_FREQUENCIES = [{label: 'Once daily (OD)', value: 'OD'}, {label: 'Twice daily (BD)', value: 'BD'}, {label: 'Three times (TDS)', value: 'TDS'}, {label: 'Four times (QID)', value: 'QID'}, {label: 'SOS', value: 'SOS'}, {label: '1-0-1', value: '1-0-1'}, {label: '1-1-1', value: '1-1-1'}, {label: '1-0-0', value: '1-0-0'}, {label: '0-0-1', value: '0-0-1'}]
-const DOSE_TIMINGS = [{label: 'Before food', value: 'before_food'}, {label: 'After food', value: 'after_food'}, {label: 'With food', value: 'with_food'}, {label: 'Empty stomach', value: 'empty_stomach'}, {label: 'At bedtime', value: 'bedtime'}]
+const DOSE_FREQUENCIES = [{ label: 'Once daily (OD)', value: 'OD' }, { label: 'Twice daily (BD)', value: 'BD' }, { label: 'Three times (TDS)', value: 'TDS' }, { label: 'Four times (QID)', value: 'QID' }, { label: 'SOS', value: 'SOS' }, { label: '1-0-1', value: '1-0-1' }, { label: '1-1-1', value: '1-1-1' }, { label: '1-0-0', value: '1-0-0' }, { label: '0-0-1', value: '0-0-1' }]
+const DOSE_TIMINGS = [{ label: 'Before food', value: 'before_food' }, { label: 'After food', value: 'after_food' }, { label: 'With food', value: 'with_food' }, { label: 'Empty stomach', value: 'empty_stomach' }, { label: 'At bedtime', value: 'bedtime' }]
 
 export function FormEditor({ template, initialData, onDataChange }: FormEditorProps) {
   const SOAP_TEMPLATES = ['soap-clinical', 'vitals-first', 'medical-prescription-form']
@@ -64,7 +64,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
   const [testSearch, setTestSearch] = useState('')
   const [showTestModal, setShowTestModal] = useState(false)
   const [activeMedIndex, setActiveMedIndex] = useState<number | null>(null)
-  
+
   // Hardcode language options since we have translations
   const LANGUAGES = [
     { code: 'en', label: 'English' },
@@ -91,7 +91,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
   const applyDiagnosisTemplate = (tpl: DiagnosisTemplate) => {
     // We use setValue from useForm to update fields directly
     control._formValues.diagnosis = tpl.diagnosis
-    
+
     // Add medicines from template
     const newMeds = tpl.medicines.map((m, i) => ({
       id: `tpl-${Date.now()}-${i}`,
@@ -104,30 +104,30 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
       form: 'tablet', // default
       route: 'oral'
     }))
-    
+
     // Append or replace
     const currentMeds = control._formValues.medicines || []
     if (currentMeds.length === 1 && !currentMeds[0].name) {
-       control._formValues.medicines = newMeds
+      control._formValues.medicines = newMeds
     } else {
-       control._formValues.medicines = [...currentMeds, ...newMeds]
+      control._formValues.medicines = [...currentMeds, ...newMeds]
     }
-    
+
     if (tpl.advice) {
       const prevAdvice = control._formValues.advice
       control._formValues.advice = prevAdvice ? `${prevAdvice}\n${tpl.advice}` : tpl.advice
     }
-    
+
     if (tpl.followUp) {
       control._formValues.followUpDate = tpl.followUp
     }
-    
+
     // Trigger re-render by doing a hard reset with the updated values
     const { reset } = require('react-hook-form')
     // We just trigger form update
     const formVals = { ...control._formValues }
     onDataChange(formVals)
-    
+
     setShowTemplateModal(false)
     setTemplateSearch('')
   }
@@ -219,38 +219,6 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             🏥 2. Two-Column Sidebar
           </button>
 
-          {/* 3. Hospital OPD Form */}
-          <button
-            type="button"
-            onClick={() => {
-              reset({
-                doctorName: 'Dr. Vikram Malhotra',
-                doctorQualifications: 'MBBS, DNB (Emergency Medicine)',
-                doctorSpecialization: 'Senior Medical Officer / OPD In-charge',
-                doctorRegNumber: 'DMC-88124',
-                clinicName: 'Civil Multi-Speciality Hospital',
-                clinicPhone: '+91 11 2659 8700',
-                clinicAddress: 'OPD Block C, Ring Road, New Delhi',
-                patient: { name: 'Sunita Devi', age: '28', gender: 'female' },
-                diagnosis: 'Acute Gastroenteritis & Dehydration',
-                medicines: [
-                  { id: '1', name: 'Ofloxacin + Ornidazole', strength: '200/500mg', form: 'tablet', frequency: 'BD', timing: 'after_food', duration: '5 days', route: 'oral', instructions: 'After meals with plenty of water' },
-                  { id: '2', name: 'Ondansetron (Vomikind MD)', strength: '4mg', form: 'tablet', frequency: 'SOS', timing: 'before_food', duration: '3 days', route: 'oral', instructions: 'Mouth dissolving 30 mins before food' },
-                  { id: '3', name: 'Racecadotril', strength: '100mg', form: 'capsule', frequency: 'TDS', timing: 'before_food', duration: '3 days', route: 'oral', instructions: 'Before food until diarrhea subsides' },
-                  { id: '4', name: 'WHO ORS (Electral)', strength: '21.8g Sachet', form: 'other', frequency: 'TDS', timing: 'after_food', duration: '3 days', route: 'oral', instructions: 'Dissolve in 1L water, sip throughout day' }
-                ],
-                tests: [{ id: '1', name: 'Stool Routine & Microscopy' }, { id: '2', name: 'Serum Electrolytes' }],
-                advice: 'Strict liquid diet for 24h (kanji, coconut water, light khichdi). Avoid dairy & outside food.',
-                followUp: '48 hours',
-                signatureDataUrl: watch('signatureDataUrl'),
-                clinicLogoUrl: watch('clinicLogoUrl'),
-                stampUrl: watch('stampUrl'),
-              })
-            }}
-            className="px-2.5 py-1 bg-slate-800 text-white text-[11px] font-bold rounded-md hover:bg-slate-900 transition active:scale-95 shadow-2xs"
-          >
-            🏛️ 3. Hospital OPD
-          </button>
 
           {/* 4. SOAP Clinical */}
           <button
@@ -698,28 +666,7 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
             </>
           )}
 
-          {template.slug === 'hospital-opd' && (
-            <>
-              <FormField id="patient-mrn" label="MRN No." className="sm:col-span-1" error={errors.patient?.mrn?.message}>
-                <input id="patient-mrn" type="text" {...register('patient.mrn')} className="form-input" placeholder="e.g. MRN-123" />
-              </FormField>
-              <FormField id="patient-ward" label="Ward" className="sm:col-span-1" error={errors.patient?.ward?.message}>
-                <input id="patient-ward" type="text" {...register('patient.ward')} className="form-input" placeholder="e.g. General" />
-              </FormField>
-              <FormField id="patient-bed" label="Bed No." className="sm:col-span-1" error={errors.patient?.bedNo?.message}>
-                <input id="patient-bed" type="text" {...register('patient.bedNo')} className="form-input" placeholder="e.g. 4B" />
-              </FormField>
-              <FormField id="patient-ipop" label="IP/OP No." className="sm:col-span-1" error={errors.patient?.ipOpNo?.message}>
-                <input id="patient-ipop" type="text" {...register('patient.ipOpNo')} className="form-input" placeholder="e.g. IP-123" />
-              </FormField>
-              <FormField id="patient-insurance" label="Insurance No." className="sm:col-span-2" error={errors.patient?.insuranceNo?.message}>
-                <input id="patient-insurance" type="text" {...register('patient.insuranceNo')} className="form-input" placeholder="e.g. INS-456" />
-              </FormField>
-              <FormField id="patient-provider" label="Care Provider" className="sm:col-span-2" error={errors.patient?.careProvider?.message}>
-                <input id="patient-provider" type="text" {...register('patient.careProvider')} className="form-input" placeholder="e.g. Star Health" />
-              </FormField>
-            </>
-          )}
+
 
           {template.slug === 'executive-gold' && (
             <>
@@ -934,16 +881,16 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
                                   setValue(`medicines.${index}.strength`, med.commonStrengths[0] || '', { shouldValidate: true })
                                   setValue(`medicines.${index}.frequency`, (med.commonFrequency as any) || '1-0-1', { shouldValidate: true })
                                   setValue(`medicines.${index}.duration`, med.commonDuration || '5 days', { shouldValidate: true })
-                                  
+
                                   // Guess form based on name/category
-                                  const formGuessed = med.name.toLowerCase().includes('syr') || med.category.toLowerCase().includes('syrup') ? 'syrup' 
-                                                    : med.name.toLowerCase().includes('inj') ? 'injection'
-                                                    : med.name.toLowerCase().includes('cap') ? 'capsule'
-                                                    : med.name.toLowerCase().includes('drop') ? 'drops'
-                                                    : med.name.toLowerCase().includes('cream') || med.name.toLowerCase().includes('oint') ? 'cream'
-                                                    : 'tablet';
+                                  const formGuessed = med.name.toLowerCase().includes('syr') || med.category.toLowerCase().includes('syrup') ? 'syrup'
+                                    : med.name.toLowerCase().includes('inj') ? 'injection'
+                                      : med.name.toLowerCase().includes('cap') ? 'capsule'
+                                        : med.name.toLowerCase().includes('drop') ? 'drops'
+                                          : med.name.toLowerCase().includes('cream') || med.name.toLowerCase().includes('oint') ? 'cream'
+                                            : 'tablet';
                                   setValue(`medicines.${index}.form`, formGuessed, { shouldValidate: true })
-                                  
+
                                   setActiveMedIndex(null)
                                 }}
                               >
@@ -1119,12 +1066,12 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
                 <X className="h-5 w-5" />
               </button>
             </div>
-            
+
             <div className="p-4 border-b border-border bg-slate-50/50">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={templateSearch}
                   onChange={(e) => setTemplateSearch(e.target.value)}
                   placeholder="Search templates (e.g. Viral Fever, Migraine)"
@@ -1172,12 +1119,12 @@ export function FormEditor({ template, initialData, onDataChange }: FormEditorPr
                 <X className="h-5 w-5" />
               </button>
             </div>
-            
+
             <div className="p-4 border-b border-border bg-slate-50/50">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={testSearch}
                   onChange={(e) => setTestSearch(e.target.value)}
                   placeholder="Search lab tests (e.g. CBC, Lipid)..."

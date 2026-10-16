@@ -129,9 +129,9 @@ export function PrescriptionDocument({
   const CanvasOverlay = () => {
     if (!canvasImage) return null
     return (
-      <Image 
-        src={canvasImage} 
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, objectFit: 'contain' }} 
+      <Image
+        src={canvasImage}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, objectFit: 'contain' }}
       />
     )
   }
@@ -547,175 +547,6 @@ export function PrescriptionDocument({
     )
   }
 
-  // ─── HOSPITAL OPD FORM PDF ───────────────────────────────────────────────
-  if (slug === 'hospital-opd') {
-    return (
-      <Document title={`Prescription — ${patient.name ?? 'Patient'}`} author={doctor.name ?? 'PrescriptionMaker'} creator="PrescriptionMaker" producer="PrescriptionMaker">
-        <Page size="A4" style={[S.page, { backgroundColor: bgColor }]}>
-          {/* Hospital banner */}
-          <View style={{ backgroundColor: pc, padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <View style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ fontSize: 18, fontFamily: 'Helvetica-Bold', color: '#fff' }}>Rx</Text>
-              </View>
-              <View>
-                <Text style={{ fontSize: 16, fontFamily: 'Helvetica-Bold', color: '#fff' }}>{doctor.clinicName || 'City Hospital'}</Text>
-                {doctor.address ? <Text style={{ fontSize: 8, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>{doctor.address}</Text> : null}
-              </View>
-            </View>
-            <View style={{ alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 11, fontFamily: 'Helvetica-Bold', color: '#fff' }}>OPD / PRESCRIPTION</Text>
-              <Text style={{ fontSize: 8.5, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>Date: {today}</Text>
-            </View>
-          </View>
-
-          <View style={{ paddingHorizontal: 16, paddingTop: 10 }}>
-            {/* MRN / Ward / Bed row */}
-            <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: `${pc}40`, borderRadius: 4, marginBottom: 8 }}>
-              {[
-                { label: 'MRN No.', value: '' },
-                { label: 'Ward', value: '' },
-                { label: 'Bed No.', value: '' },
-                { label: 'IP/OP No.', value: '' },
-              ].map((f, i) => (
-                <View key={i} style={{ flex: 1, padding: 6, borderRightWidth: i < 3 ? 1 : 0, borderRightColor: `${pc}30`, backgroundColor: i % 2 === 0 ? '#fff' : `${pc}05` }}>
-                  <Text style={{ fontSize: 7, color: '#64748b', fontFamily: 'Helvetica-Bold' }}>{f.label}</Text>
-                  <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#1e293b', marginTop: 2 }}> </Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Attending Physician */}
-            <View style={{ backgroundColor: `${ac}20`, borderWidth: 1, borderColor: `${ac}40`, borderRadius: 4, padding: 8, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 9 }}>
-                <Text style={{ fontFamily: 'Helvetica-Bold', color: pc }}>ATTENDING PHYSICIAN: </Text>
-                <Text style={{ fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. ______________'}</Text>
-                {doctor.qualifications ? <Text style={{ color: '#64748b' }}> {doctor.qualifications}</Text> : null}
-              </Text>
-              <Text style={{ fontSize: 9 }}>
-                <Text style={{ fontFamily: 'Helvetica-Bold', color: pc }}>SPECIALTY: </Text>
-                <Text style={{ color: '#1e293b' }}>{doctor.specialization || '________________'}</Text>
-              </Text>
-            </View>
-
-            {/* Patient info table */}
-            <View style={{ borderWidth: 1, borderColor: `${pc}40`, marginBottom: 8 }}>
-              <View style={{ backgroundColor: `${pc}15`, padding: 6, borderBottomWidth: 1, borderBottomColor: `${pc}25` }}>
-                <Text style={{ fontFamily: 'Helvetica-Bold', color: pc, fontSize: 8 }}>PATIENT INFORMATION</Text>
-              </View>
-              <View style={{ padding: 6, borderBottomWidth: 1, borderBottomColor: `${pc}25`, flexDirection: 'row' }}>
-                <Text style={{ color: '#64748b', fontSize: 9 }}>Patient Name: </Text>
-                <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 10, color: '#1e293b' }}>{patient.name || '___________________________'}</Text>
-              </View>
-              <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: `${pc}25` }}>
-                <View style={{ flex: 1, padding: 6, borderRightWidth: 1, borderRightColor: `${pc}25`, flexDirection: 'row' }}>
-                  <Text style={{ color: '#64748b', fontSize: 9 }}>MRN: </Text>
-                </View>
-                <View style={{ flex: 1, padding: 6, borderRightWidth: 1, borderRightColor: `${pc}25`, flexDirection: 'row' }}>
-                  <Text style={{ color: '#64748b', fontSize: 9 }}>Age: </Text>
-                  <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 9, color: '#1e293b' }}>{patient.age || '____'}</Text>
-                </View>
-                <View style={{ flex: 1, padding: 6, borderRightWidth: 1, borderRightColor: `${pc}25`, flexDirection: 'row' }}>
-                  <Text style={{ color: '#64748b', fontSize: 9 }}>Sex: </Text>
-                  <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 9, color: '#1e293b' }}>{patient.gender || '____'}</Text>
-                </View>
-                <View style={{ flex: 1, padding: 6, flexDirection: 'row' }}>
-                  <Text style={{ color: '#64748b', fontSize: 9 }}>Ward: </Text>
-                </View>
-              </View>
-              <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: `${pc}25` }}>
-                <View style={{ flex: 2, padding: 6, borderRightWidth: 1, borderRightColor: `${pc}25`, flexDirection: 'row' }}>
-                  <Text style={{ color: '#64748b', fontSize: 9 }}>Insurance No: </Text>
-                </View>
-                <View style={{ flex: 2, padding: 6, flexDirection: 'row' }}>
-                  <Text style={{ color: '#64748b', fontSize: 9 }}>Care Provider: </Text>
-                </View>
-              </View>
-              <View style={{ padding: 6, flexDirection: 'row' }}>
-                <Text style={{ color: '#64748b', fontSize: 9 }}>Diagnosis: </Text>
-                <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 9, color: '#1e293b' }}>{diagnosis || '___________________________'}</Text>
-              </View>
-            </View>
-
-            {/* Rx + Medicine table */}
-            <Text style={{ fontSize: 18, fontFamily: 'Helvetica-Bold', color: pc, marginBottom: 4 }}>Rx</Text>
-            <View style={{ borderWidth: 1, borderColor: `${pc}40`, marginBottom: 8 }}>
-              <View style={{ backgroundColor: pc, flexDirection: 'row', padding: 6 }}>
-                <Text style={{ flex: 3.5, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#fff' }}>Medication / Strength</Text>
-                <Text style={{ flex: 2.5, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#fff', textAlign: 'center' }}>Dosage / Frequency</Text>
-                <Text style={{ flex: 1.5, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#fff', textAlign: 'center' }}>Route</Text>
-                <Text style={{ flex: 1.5, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#fff', textAlign: 'center' }}>Quantity</Text>
-                <Text style={{ flex: 2, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#fff' }}>Duration / Notes</Text>
-              </View>
-              {filledMeds.length > 0 ? filledMeds.map((med, idx) => (
-                <View key={idx} style={{ flexDirection: 'row', padding: 6, backgroundColor: idx % 2 === 0 ? '#fff' : `${pc}05`, borderTopWidth: 1, borderTopColor: `${pc}20` }}>
-                  <Text style={{ flex: 3.5, fontSize: 8.5 }}>
-                    <Text style={{ fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{med.name}</Text>
-                    {med.strength ? <Text style={{ color: '#64748b' }}> / {med.strength}</Text> : ''}
-                  </Text>
-                  <Text style={{ flex: 2.5, fontSize: 8.5, textAlign: 'center', color: '#1e293b' }}>{med.frequency || '—'}</Text>
-                  <Text style={{ flex: 1.5, fontSize: 8.5, textAlign: 'center', color: '#1e293b' }}>Oral</Text>
-                  <Text style={{ flex: 1.5, fontSize: 8.5, textAlign: 'center', color: '#1e293b' }}> </Text>
-                  <Text style={{ flex: 2, fontSize: 8.5, color: '#1e293b' }}>{med.duration || '—'}</Text>
-                </View>
-              )) : Array.from({ length: 5 }, (_, idx) => (
-                <View key={idx} style={{ flexDirection: 'row', padding: 6, backgroundColor: idx % 2 === 0 ? '#fff' : `${pc}05`, borderTopWidth: 1, borderTopColor: `${pc}20` }}>
-                  <Text style={{ flex: 3.5, fontSize: 8.5 }}> </Text>
-                  <Text style={{ flex: 2.5, fontSize: 8.5 }}> </Text>
-                  <Text style={{ flex: 1.5, fontSize: 8.5 }}> </Text>
-                  <Text style={{ flex: 1.5, fontSize: 8.5 }}> </Text>
-                  <Text style={{ flex: 2, fontSize: 8.5 }}> </Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Investigations */}
-            {labTests ? (
-              <View style={{ borderWidth: 1, borderColor: `${pc}30`, borderRadius: 4, padding: 8, marginBottom: 8 }}>
-                <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: pc, textTransform: 'uppercase', marginBottom: 4 }}>Investigations Ordered</Text>
-                <Text style={{ fontSize: 9, color: '#374151' }}>{labTests}</Text>
-              </View>
-            ) : null}
-
-            {/* Advice */}
-            {advice ? (
-              <View style={{ borderWidth: 1, borderColor: `${pc}30`, borderRadius: 4, padding: 8, marginBottom: 8 }}>
-                <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: pc, textTransform: 'uppercase', marginBottom: 4 }}>Instructions / Advice</Text>
-                <Text style={{ fontSize: 9, color: '#374151' }}>{advice}</Text>
-              </View>
-            ) : null}
-
-            {followUpDate ? (
-              <View style={{ marginBottom: 8 }}>
-                <Text style={{ fontSize: 9, color: '#64748b' }}>
-                  Review Date: <Text style={{ fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{followUpDate}</Text>
-                </Text>
-              </View>
-            ) : null}
-
-            {/* Dual signatures */}
-            <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
-              <View style={{ flex: 1, borderWidth: 1, borderColor: `${pc}30`, borderRadius: 4, padding: 10 }}>
-                <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#64748b', marginBottom: 30 }}>HOD SIGNATURE</Text>
-                <View style={{ borderTopWidth: 1, borderTopColor: '#94a3b8' }} />
-                <Text style={{ fontSize: 7.5, color: '#94a3b8', marginTop: 4 }}>Head of Department</Text>
-              </View>
-              <View style={{ flex: 1, borderWidth: 1, borderColor: `${pc}30`, borderRadius: 4, padding: 10 }}>
-                <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#64748b', marginBottom: 4 }}>DOCTOR SIGNATURE</Text>
-                {doctor.signatureUrl
-                  ? <Image src={doctor.signatureUrl} style={{ width: 70, height: 26, objectFit: 'contain' }} />
-                  : <View style={{ height: 26 }} />}
-                <View style={{ borderTopWidth: 1, borderTopColor: '#94a3b8' }} />
-                <Text style={{ fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#1e293b', marginTop: 4 }}>Dr. {doctor.name || '____________'}</Text>
-                {doctor.registrationNumber ? <Text style={{ fontSize: 7, color: '#94a3b8' }}>Reg: {doctor.registrationNumber}</Text> : null}
-              </View>
-            </View>
-          </View>
-          <CanvasOverlay />
-        </Page>
-      </Document>
-    )
-  }
 
   // ─── CLASSIC LETTERHEAD ─────────────────────────────────────────────────
   if (slug === 'classic-letterhead') {
@@ -824,7 +655,7 @@ export function PrescriptionDocument({
           <View style={{ marginTop: 30, borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 12, alignItems: 'flex-end' }}>
             <SigBlock />
           </View>
-          
+
           <CanvasOverlay />
         </Page>
       </Document>
@@ -963,7 +794,7 @@ export function PrescriptionDocument({
               <SigBlock />
             </View>
           </View>
-          
+
           <View style={{ backgroundColor: pc, padding: '6px 24px', flexDirection: 'row', justifyContent: 'space-between' }}>
             <Text style={{ color: '#fff', fontSize: 9 }}>{doctor.clinicName || ''}</Text>
             <Text style={{ color: '#fff', fontSize: 9 }}>prescriptionmaker.in</Text>
@@ -1024,12 +855,12 @@ export function PrescriptionDocument({
           </View>
 
           {/* S - Subjective */}
-          {soapBlock('S', 'Subjective — Chief Complaint & History', '#8b5cf6', 
+          {soapBlock('S', 'Subjective — Chief Complaint & History', '#8b5cf6',
             <Text style={{ fontSize: 9, color: '#374151' }}>{diagnosis || 'Acute presentation...'}</Text>
           )}
 
           {/* O - Objective */}
-          {soapBlock('O', 'Objective — Vitals & Examination Findings', '#1d4ed8', 
+          {soapBlock('O', 'Objective — Vitals & Examination Findings', '#1d4ed8',
             <View>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 6 }}>
                 {[
@@ -1057,21 +888,21 @@ export function PrescriptionDocument({
           )}
 
           {/* A - Assessment */}
-          {soapBlock('A', 'Assessment — Diagnosis', '#065f46', 
+          {soapBlock('A', 'Assessment — Diagnosis', '#065f46',
             <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#374151' }}>{diagnosis || 'Primary Diagnosis'}</Text>
           )}
 
           {/* P - Plan */}
-          {soapBlock('P', 'Plan — Medications, Investigations & Advice', pc, 
+          {soapBlock('P', 'Plan — Medications, Investigations & Advice', pc,
             <View>
               <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: pc, marginBottom: 4 }}>℞ Medications</Text>
-              
+
               <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#cbd5e1', paddingBottom: 4, marginBottom: 4 }}>
                 <Text style={{ flex: 2, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#475569' }}>Drug</Text>
                 <Text style={{ flex: 1, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#475569', textAlign: 'center' }}>Dose & Freq</Text>
                 <Text style={{ flex: 1, fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#475569', textAlign: 'center' }}>Duration</Text>
               </View>
-              
+
               {medicines.filter(m => m.name).length > 0 ? medicines.filter(m => m.name).map((med, idx) => (
                 <View key={idx} style={{ flexDirection: 'row', marginBottom: 4 }}>
                   <Text style={{ flex: 2, fontSize: 8.5, fontFamily: 'Helvetica-Bold', color: '#1e293b' }}>{med.name} {med.strength ? ` ${med.strength}` : null}</Text>
@@ -1095,7 +926,7 @@ export function PrescriptionDocument({
                   <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: pc }}>Advice: <Text style={{ fontFamily: 'Helvetica', color: '#374151' }}>{advice}</Text></Text>
                 </View>
               ) : null}
-              
+
               {followUpDate ? (
                 <View style={{ marginTop: 6 }}>
                   <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: pc }}>Follow-up: <Text style={{ fontFamily: 'Helvetica', color: '#374151' }}>{followUpDate}</Text></Text>
@@ -1577,7 +1408,7 @@ export function PrescriptionDocument({
       </Document>
     );
   }
-  
+
   // ─── COMPARTMENTALIZED GRID ──────────────────────────────────────────────
   if (slug === 'compartmentalized-grid') {
     return (
@@ -1696,11 +1527,11 @@ export function PrescriptionDocument({
   // ─── MEDICAL PRESCRIPTION FORM PDF ───────────────────────────────────────
   if (slug === 'medical-prescription-form') {
     const borderColor = `${pc}60`
-    
+
     return (
       <Document title={`Prescription — ${patient.name ?? 'Patient'}`} author={doctor.name ?? 'PrescriptionMaker'} creator="PrescriptionMaker" producer="PrescriptionMaker">
         <Page size="A4" style={[{ backgroundColor: '#f4f4f8', padding: 25, fontFamily: 'Helvetica', position: 'relative' }]}>
-          
+
           {/* Decorative circles — top right */}
           <View style={{ position: 'absolute', top: 6, right: 6, flexDirection: 'column', gap: 6 }}>
             <View style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 1.5, borderColor: `${pc}40`, alignSelf: 'flex-end' }} />
@@ -1886,7 +1717,7 @@ export function PrescriptionDocument({
           <View style={{ marginTop: 8, alignItems: 'center' }}>
             <Text style={{ fontSize: 6.5, color: `${pc}50`, letterSpacing: 1 }}>prescriptionmaker.in</Text>
           </View>
-          
+
           <CanvasOverlay />
         </Page>
       </Document>

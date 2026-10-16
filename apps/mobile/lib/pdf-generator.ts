@@ -293,151 +293,169 @@ function layoutTwoColumn(data: PrescriptionData): string {
   </div></div></body></html>`
 }
 
-// ── LAYOUT: HOSPITAL OPD (institutional, tables, full-width) ───────
-function layoutHospitalOPD(data: PrescriptionData): string {
-  const { doctorInfo, patientInfo, diagnosis, medicines, advice, followUp, labTests, date, template } = data
-  const { primaryColor, accentColor, bgColor } = template.styles
-  const medRows = medicines.map((m, i) => `
-    <tr>
-      <td style="padding:7px 10px;border:1px solid ${primaryColor}30;">${i + 1}</td>
-      <td style="padding:7px 10px;border:1px solid ${primaryColor}30;font-weight:600;">${m.name} ${m.strength || ''}</td>
-      <td style="padding:7px 10px;border:1px solid ${primaryColor}30;text-align:center;">${m.form || 'Tab'}</td>
-      <td style="padding:7px 10px;border:1px solid ${primaryColor}30;text-align:center;">${m.frequency ? t(m.frequency, data.language) : '-'}</td>
-      <td style="padding:7px 10px;border:1px solid ${primaryColor}30;text-align:center;">${m.duration || '-'}</td>
-      <td style="padding:7px 10px;border:1px solid ${primaryColor}30;font-style:italic;color:#64748b;">${m.instructions ? t(m.instructions, data.language) : '-'}</td>
-    </tr>`).join('')
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-    ${baseCSS(primaryColor, accentColor, bgColor, template.styles.fontFamily)}
-    .hosp-header { background:${primaryColor}; color:#fff; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; }
-    .hosp-name { font-size:20px; font-weight:800; }
-    .hosp-sub { font-size:11px; opacity:0.8; margin-top:2px; }
-    .opd-band { background:${accentColor}; color:#fff; padding:5px 20px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; text-align:center; }
-    .info-grid { display:flex; padding:12px 20px; gap:0; border-bottom:2px solid ${primaryColor}; }
-    .info-col { flex:1; padding:0 12px; border-right:1px solid ${primaryColor}20; }
-    .info-col:first-child { padding-left:0; }
-    .info-col:last-child { border-right:none; }
-    .irow { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px dotted #e2e8f0; font-size:11px; }
-    .irow-label { color:#64748b; font-weight:600; }
-    .body { padding:16px 20px; }
-    .diag-box { background:${primaryColor}10; border:1px solid ${primaryColor}30; border-radius:4px; padding:8px 14px; margin-bottom:14px; font-size:12px; }
-    .diag-box b { color:${primaryColor}; }
-  </style></head><body><div class="page">
-    <div class="hosp-header">
-      <div style="display:flex;align-items:center;gap:12px;">
-        ${doctorInfo.logoUrl ? `<img src="${doctorInfo.logoUrl}" style="width:40px;height:40px;border-radius:20px;background:#fff;padding:2px;object-fit:contain;" />` : ''}
-        <div>
-          <div class="hosp-name">${doctorInfo.clinicName || 'Government Hospital'}</div>
-          <div class="hosp-sub">OPD Prescription Slip</div>
-        </div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-size:13px;font-weight:700;">Dr. ${doctorInfo.name}</div>
-        <div style="font-size:10px;opacity:0.8;">${doctorInfo.qualification}${doctorInfo.specialization ? ' | ' + doctorInfo.specialization : ''}</div>
-        ${doctorInfo.regNo ? `<div style="font-size:10px;opacity:0.7;">Reg: ${doctorInfo.regNo}</div>` : ''}
-      </div>
-    </div>
-    <div class="opd-band">Out-Patient Department (OPD)</div>
-    <div class="info-grid">
-      <div class="info-col">
-        <div class="irow"><span class="irow-label">Patient Name:</span><span>${patientInfo.name || '—'}</span></div>
-        <div class="irow"><span class="irow-label">Age / Sex:</span><span>${patientInfo.age || '—'} / ${patientInfo.gender || '—'}</span></div>
-        <div class="irow"><span class="irow-label">Weight:</span><span>${patientInfo.weight || '—'}</span></div>
-      </div>
-      <div class="info-col">
-        <div class="irow"><span class="irow-label">Date:</span><span>${date}</span></div>
-        <div class="irow"><span class="irow-label">Phone:</span><span>${patientInfo.phone || '—'}</span></div>
-        <div class="irow"><span class="irow-label">Address:</span><span>${doctorInfo.address || '—'}</span></div>
-      </div>
-    </div>
-    <div class="body">
-      ${diagnosis ? `<div class="diag-box"><b>Diagnosis:</b> ${diagnosis}</div>` : ''}
-      <div class="section-title">Rx — Medicines Prescribed</div>
-      <table>
-        <thead><tr>
-          <th style="width:5%;text-align:center">S.No</th>
-          <th style="width:30%">Medicine Name</th>
-          <th style="width:10%;text-align:center">Form</th>
-          <th style="width:18%;text-align:center">Frequency</th>
-          <th style="width:12%;text-align:center">Duration</th>
-          <th style="width:25%">Instructions</th>
-        </tr></thead>
-        <tbody>${medRows}</tbody>
-      </table>
-      ${labTests && labTests.length > 0 ? `<div class="section-title">Investigations Advised</div><ul style="padding-left:20px;line-height:1.8;">${labTests.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
-      ${advice ? `<div class="section-title">Advice</div><div class="advice-box">${t(advice, data.language)}</div>` : ''}
-      ${followUp ? `<div class="section-title">Follow-up</div><div class="advice-box">${followUp}</div>` : ''}
-    </div>
-    <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-end;">
-      <div style="width:40%;">
-        <div style="width:100%;border-bottom:1px solid #cbd5e1;height:24px;margin-bottom:4px;"></div>
-        <div style="font-size:9px;color:#64748b;font-weight:600;">HOD SIGNATURE</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:16px;">
-        ${doctorInfo.stampUrl ? `<img src="${doctorInfo.stampUrl}" style="width:50px;height:50px;object-fit:contain;opacity:0.8;" />` : ''}
-        <div style="display:flex;flex-direction:column;align-items:center;">
-          ${doctorInfo.signature ? `<img src="${doctorInfo.signature}" style="width:70px;height:30px;object-fit:contain;margin-bottom:4px;" />` : `<div style="width:80px;border-bottom:1px solid #cbd5e1;height:24px;margin-bottom:4px;"></div>`}
-          <div style="font-size:9px;color:#64748b;font-weight:600;">DOCTOR SIGNATURE<br>Dr. ${doctorInfo.name}</div>
-        </div>
-      </div>
-    </div>
-    <div style="background:#f1f5f9;padding:6px 20px;font-size:8px;color:#94a3b8;text-align:center;">prescriptionmaker.in — ${template.name}</div>
-  </div></body></html>`
-}
 
 // ── LAYOUT: SOAP CLINICAL NOTES ────────────────────────────────────
 function layoutSOAP(data: PrescriptionData): string {
   const { doctorInfo, patientInfo, diagnosis, symptoms, medicines, advice, followUp, labTests, date, template } = data
-  const { primaryColor, accentColor, bgColor } = template.styles
-  const medList = medicines.map((m, i) => `<div style="padding:6px 0;border-bottom:1px solid ${primaryColor}15;display:flex;gap:12px;align-items:flex-start;">
-    <span style="font-weight:700;color:${primaryColor};min-width:22px;">${i + 1}.</span>
-    <div><b>${m.name} ${m.strength || ''}</b><br><span style="color:#64748b;font-size:11px;">${m.frequency ? t(m.frequency, data.language) : ''} × ${m.duration || ''} ${m.instructions ? '| ' + t(m.instructions, data.language) : ''}</span></div>
-  </div>`).join('')
-  const soapSection = (letter: string, title: string, content: string) =>
-    `<div style="margin-bottom:14px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><div style="width:26px;height:26px;border-radius:50%;background:${primaryColor};color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;">${letter}</div><div style="font-size:12px;font-weight:700;color:${primaryColor};text-transform:uppercase;letter-spacing:0.5px;">${title}</div></div><div style="padding:8px 14px;background:${primaryColor}06;border-radius:4px;border-left:3px solid ${accentColor};font-size:12px;line-height:1.6;">${content}</div></div>`
+  const primaryColor = '#312e81'
+  const accentColor = '#6366f1'
+  const bgColor = '#ffffff'
+
+  const rawDoc = (doctorInfo.name || '').trim().replace(/^(Dr|Dra)\.?\s*/i, '')
+  const doctorDisplayName = rawDoc ? `Dr. ${rawDoc}` : 'Dr. Doctor Name'
+  const qualSpec = [doctorInfo.qualification, doctorInfo.specialization].filter(Boolean).join(' · ') || 'MBBS, MD · General Medicine'
+
+  const vitalsList = [
+    { label: 'BP', value: patientInfo.bp },
+    { label: 'HR (bpm)', value: patientInfo.pulse },
+    { label: 'Temp (°F)', value: patientInfo.temp },
+    { label: 'SpO₂ (%)', value: patientInfo.spo2 },
+    { label: 'Weight (kg)', value: patientInfo.weight },
+    { label: 'RR (/min)', value: patientInfo.height }
+  ]
+
+  const vitalsHtml = vitalsList.map(v => `
+    <div style="border: 1px solid #dbeafe; border-radius: 4px; padding: 4px 8px; font-size: 10px; background: #eff6ff; display: inline-flex; align-items: center; gap: 4px;">
+      <span style="color: #64748b;">${v.label}:</span>
+      <span style="font-weight: 700; color: #1e293b;">${v.value || '______'}</span>
+    </div>
+  `).join('')
+
+  const medTableRows = medicines.map((m, i) => `
+    <tr style="border-bottom: 1px solid ${primaryColor}15;">
+      <td style="padding: 6px 8px; font-weight: 600; color: #1e293b;">${m.name} ${m.strength || ''}</td>
+      <td style="padding: 6px 8px; text-align: center; color: #475569;">${m.form || '—'}</td>
+      <td style="padding: 6px 8px; text-align: center; color: #475569;">${m.frequency ? t(m.frequency, data.language) : '—'}</td>
+      <td style="padding: 6px 8px; text-align: center; color: #475569;">${m.duration || '—'}</td>
+    </tr>
+  `).join('')
+
+  const emptyMedRows = medicines.length === 0 ? `
+    <tr style="border-bottom: 1px solid ${primaryColor}10;"><td style="padding: 8px;">—</td><td style="padding: 8px; text-align: center;">—</td><td style="padding: 8px; text-align: center;">—</td><td style="padding: 8px; text-align: center;">—</td></tr>
+  ` : ''
+
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
     ${baseCSS(primaryColor, accentColor, bgColor, template.styles.fontFamily)}
-    .soap-header { padding:18px 24px; border-bottom:3px solid ${primaryColor}; display:flex; justify-content:space-between; }
-    .soap-title { font-size:11px; font-weight:700; color:${primaryColor}; text-transform:uppercase; letter-spacing:1px; }
-    .patient-band { background:${primaryColor}; color:#fff; padding:8px 24px; display:flex; gap:20px; font-size:11px; }
-    .body { padding:18px 24px; }
-  </style></head><body><div class="page">
-    <div class="soap-header">
-      <div style="display:flex;align-items:center;gap:12px;">
-        ${doctorInfo.logoUrl ? `<img src="${doctorInfo.logoUrl}" style="width:44px;height:44px;border-radius:22px;background:#fff;padding:2px;object-fit:contain;" />` : ''}
+    .soap-box { margin: 0 20px 10px; border-radius: 6px; overflow: hidden; background: #ffffff; }
+    .soap-hdr { padding: 5px 12px; color: #ffffff; display: flex; align-items: center; gap: 8px; }
+    .soap-letter { font-family: Georgia, serif; font-weight: 900; font-size: 14px; line-height: 1; }
+    .soap-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+  </style></head><body><div class="page" style="padding-bottom: 24px;">
+    <!-- Header Banner (Deep Indigo) -->
+    <div style="background: ${primaryColor}; color: #ffffff; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        ${doctorInfo.logoUrl ? `<img src="${doctorInfo.logoUrl}" style="width: 42px; height: 42px; border-radius: 21px; background: #fff; padding: 2px; object-fit: contain;" />` : ''}
         <div>
-          <div style="font-size:20px;font-weight:800;color:${primaryColor};">${doctorInfo.clinicName || 'Clinical Notes'}</div>
-          <div class="soap-title">SOAP Clinical Note</div>
+          <div style="font-size: 16px; font-weight: 800; color: #ffffff;">${doctorDisplayName}</div>
+          <div style="font-size: 10px; color: #c7d2fe; margin-top: 2px;">${qualSpec}</div>
+          ${doctorInfo.regNo ? `<div style="font-size: 9px; color: #a5b4fc; margin-top: 1px;">Reg: ${doctorInfo.regNo}</div>` : ''}
         </div>
       </div>
-      <div style="text-align:right;">
-        <div style="font-weight:700;">Dr. ${doctorInfo.name}</div>
-        <div style="font-size:10px;color:${accentColor};">${doctorInfo.qualification}${doctorInfo.specialization ? ' | ' + doctorInfo.specialization : ''}</div>
-        <div style="font-size:10px;color:#64748b;">${date}</div>
+      <div style="text-align: right;">
+        <div style="font-size: 13px; font-weight: 700; color: #c7d2fe;">${doctorInfo.clinicName || 'Clinical Care Centre'}</div>
+        ${doctorInfo.phone ? `<div style="font-size: 9.5px; color: #c7d2fe; margin-top: 2px;">☎ ${doctorInfo.phone}</div>` : ''}
+        ${doctorInfo.address ? `<div style="font-size: 9px; color: #c7d2fe; margin-top: 1px;">📍 ${doctorInfo.address}</div>` : ''}
       </div>
     </div>
-    <div class="patient-band">
-      <span><b>Patient:</b> ${patientInfo.name || '—'}</span>
-      <span><b>Age/Sex:</b> ${patientInfo.age || '—'} / ${patientInfo.gender || '—'}</span>
-      ${patientInfo.weight ? `<span><b>Wt:</b> ${patientInfo.weight}</span>` : ''}
-      ${patientInfo.phone ? `<span><b>Ph:</b> ${patientInfo.phone}</span>` : ''}
+
+    <!-- Patient + Date Bar (Lavender Card) -->
+    <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 4px; padding: 7px 14px; margin: 12px 20px 10px; display: flex; justify-content: space-between; font-size: 10.5px;">
+      <div>
+        <span style="color: #64748b;">Patient: </span>
+        <strong style="color: #0f172a; font-size: 11px;">${patientInfo.name || '___________________________'}</strong>
+        <span style="color: #64748b; margin-left: 12px;">${[patientInfo.age ? `Age ${patientInfo.age}` : '', patientInfo.gender].filter(Boolean).join(' / ') || 'Age 34 / Male'}</span>
+      </div>
+      <div>
+        <span style="color: #64748b;">Date: </span>
+        <strong style="color: #0f172a;">${date || new Date().toLocaleDateString('en-IN')}</strong>
+      </div>
     </div>
-    <div class="body">
-      ${soapSection('S', 'Subjective (Chief Complaint)', symptoms || diagnosis || '—')}
-      ${soapSection('O', 'Objective / Findings', `Diagnosis: <b>${diagnosis || '—'}</b>`)}
-      ${soapSection('A', 'Assessment (Diagnosis)', diagnosis || '—')}
-      <div style="margin-bottom:14px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><div style="width:26px;height:26px;border-radius:50%;background:${primaryColor};color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;">P</div><div style="font-size:12px;font-weight:700;color:${primaryColor};text-transform:uppercase;letter-spacing:0.5px;">Plan (Rx — Medicines)</div></div><div style="padding:8px 14px;background:${primaryColor}06;border-radius:4px;border-left:3px solid ${accentColor};">${medList}</div></div>
-      ${labTests && labTests.length > 0 ? `<div class="section-title">Investigations</div><ul style="padding-left:20px;line-height:1.8;">${labTests.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
-      ${advice ? `<div class="section-title">Advice</div><div class="advice-box">${t(advice, data.language)}</div>` : ''}
-      ${followUp ? `<div class="section-title">Follow-up</div><div class="advice-box">${followUp}</div>` : ''}
+
+    <!-- S — SUBJECTIVE Box -->
+    <div class="soap-box" style="border: 1px solid #7c3aed40;">
+      <div class="soap-hdr" style="background: #7c3aed;">
+        <span class="soap-letter">S</span>
+        <span class="soap-label">SUBJECTIVE — CHIEF COMPLAINT &amp; HISTORY</span>
+      </div>
+      <div style="padding: 8px 12px; font-size: 10.5px; color: #374151;">
+        ${symptoms || diagnosis || 'Acute Pharyngitis'}
+      </div>
     </div>
-    <div style="padding:16px 24px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid ${primaryColor}20;">
-      <div style="font-size:9px;color:#94a3b8;">prescriptionmaker.in — ${template.name}</div>
-      <div style="display:flex;align-items:center;gap:16px;">
-        ${doctorInfo.stampUrl ? `<img src="${doctorInfo.stampUrl}" style="width:50px;height:50px;object-fit:contain;opacity:0.8;" />` : ''}
-        <div style="display:flex;flex-direction:column;align-items:center;">
-          ${doctorInfo.signature ? `<img src="${doctorInfo.signature}" style="width:70px;height:30px;object-fit:contain;margin-bottom:4px;" />` : `<div style="width:70px;height:16px;border-bottom:1px solid #cbd5e1;margin-bottom:4px;"></div>`}
-          <div style="font-size:9px;color:#64748b;font-weight:600;">Dr. ${doctorInfo.name}</div>
+
+    <!-- O — OBJECTIVE Box -->
+    <div class="soap-box" style="border: 1px solid #1d4ed840;">
+      <div class="soap-hdr" style="background: #1d4ed8;">
+        <span class="soap-letter">O</span>
+        <span class="soap-label">OBJECTIVE — VITALS &amp; EXAMINATION FINDINGS</span>
+      </div>
+      <div style="padding: 8px 12px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;">
+          ${vitalsHtml}
         </div>
+        <div style="font-size: 10px; color: #64748b;">
+          Examination findings: Normal heart sounds, clear chest, abdomen soft.
+        </div>
+      </div>
+    </div>
+
+    <!-- A — ASSESSMENT Box -->
+    <div class="soap-box" style="border: 1px solid #065f4640;">
+      <div class="soap-hdr" style="background: #065f46;">
+        <span class="soap-letter">A</span>
+        <span class="soap-label">ASSESSMENT — DIAGNOSIS</span>
+      </div>
+      <div style="padding: 8px 12px; font-size: 11px; font-weight: 700; color: #065f46;">
+        ${diagnosis || 'Acute Pharyngitis'}
+      </div>
+    </div>
+
+    <!-- P — PLAN Box -->
+    <div class="soap-box" style="border: 1px solid ${primaryColor}40;">
+      <div class="soap-hdr" style="background: ${primaryColor};">
+        <span class="soap-letter">P</span>
+        <span class="soap-label">PLAN — MEDICATIONS, INVESTIGATIONS &amp; ADVICE</span>
+      </div>
+      <div style="padding: 8px 12px;">
+        <div style="font-size: 10.5px; font-weight: 700; color: ${primaryColor}; margin-bottom: 6px;">℞ Medications</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 8px;">
+          <thead>
+            <tr style="background: #e0e7ff;">
+              <th style="padding: 4px 8px; text-align: left; width: 38%; color: ${primaryColor}; font-weight: 700;">Drug</th>
+              <th style="padding: 4px 8px; text-align: center; width: 20%; color: ${primaryColor}; font-weight: 700;">Dose</th>
+              <th style="padding: 4px 8px; text-align: center; width: 22%; color: ${primaryColor}; font-weight: 700;">Frequency</th>
+              <th style="padding: 4px 8px; text-align: center; width: 20%; color: ${primaryColor}; font-weight: 700;">Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${medTableRows}
+            ${emptyMedRows}
+          </tbody>
+        </table>
+
+        ${labTests && labTests.length > 0 ? `
+          <div style="font-size: 10px; margin-top: 6px;">
+            <strong style="color: ${primaryColor};">Investigations: </strong>
+            <span style="color: #374151;">${labTests.join(', ')}</span>
+          </div>
+        ` : ''}
+        ${advice ? `
+          <div style="font-size: 10px; margin-top: 4px;">
+            <strong style="color: ${primaryColor};">Advice: </strong>
+            <span style="color: #374151;">${t(advice, data.language)}</span>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+
+    <!-- Footer / Signature Area -->
+    <div style="margin: 16px 20px 0; padding-top: 10px; display: flex; justify-content: space-between; align-items: flex-end;">
+      <div style="font-size: 9.5px; color: #64748b;">
+        ${followUp ? `<strong style="color: ${primaryColor};">Follow-up: </strong>${followUp}` : '<span style="color:#94a3b8;">SOAP Clinical Notes · prescriptionmaker.in</span>'}
+      </div>
+      <div style="text-align: center; min-width: 140px;">
+        ${doctorInfo.signature ? `<img src="${doctorInfo.signature}" style="height: 32px; max-width: 120px; object-fit: contain; margin-bottom: 4px;" />` : ''}
+        <div style="border-top: 1px solid #94a3b8; padding-top: 4px; font-size: 10px; font-weight: 700; color: #475569;">Doctor's Signature</div>
+        <div style="font-size: 9.5px; color: #64748b; margin-top: 1px;">${doctorDisplayName}</div>
       </div>
     </div>
   </div></body></html>`
@@ -1028,14 +1046,352 @@ function layoutGrid(data: PrescriptionData): string {
   </div></body></html>`
 }
 
+// ── LAYOUT 11: DENTAL & CLINIC RX ──────────────────────────────────
+function layoutDentalClinic(data: PrescriptionData): string {
+  const { doctorInfo, patientInfo, diagnosis, medicines, advice, followUp, labTests, date, template } = data
+  const { primaryColor, accentColor, bgColor } = template.styles || { primaryColor: '#111827', accentColor: '#374151', bgColor: '#ffffff' }
+
+  const clinicName = doctorInfo.clinicName ? doctorInfo.clinicName.toUpperCase() : 'MARQUEZ DENTAL CLINIC'
+  const clinicAddress = doctorInfo.address || 'Brgy. San Jose, San Nicolas, Ilocos Norte'
+  const clinicPhone = doctorInfo.phone || '09178302001'
+  const doctorName = doctorInfo.name ? (doctorInfo.name.startsWith('Dr') ? doctorInfo.name : `Dr. ${doctorInfo.name}`) : 'Dra. Lois Gabrielle F. Marquez'
+  const qual = doctorInfo.qualification || 'DMD'
+  const regNo = doctorInfo.regNo || 'PRC-0078921'
+  const spec = doctorInfo.specialization || 'PTR-1234567'
+
+  const medRows = medicines.map((m, i) => `
+    <tr style="border-bottom:1px solid #e2e8f0;">
+      <td style="padding:10px 8px;font-weight:700;color:#111827;font-size:12px;">
+        ${i + 1}. ${m.name} ${m.strength ? `<span style="font-weight:400;color:#64748b;">${m.strength}</span>` : ''}
+      </td>
+      <td style="padding:10px 8px;text-align:center;color:#475569;font-size:11px;">${m.form || 'Tab'}</td>
+      <td style="padding:10px 8px;text-align:center;font-weight:600;color:#111827;font-size:11px;">${m.frequency ? t(m.frequency, data.language) : '—'}</td>
+      <td style="padding:10px 8px;text-align:center;color:#475569;font-size:11px;">${m.duration || '—'}</td>
+      <td style="padding:10px 8px;color:#475569;font-style:italic;font-size:11px;">${m.instructions ? t(m.instructions, data.language) : '—'}</td>
+    </tr>
+  `).join('')
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+    ${baseCSS(primaryColor, accentColor, bgColor, 'serif')}
+    .header-table { width:100%; border-collapse:collapse; margin-bottom:14px; }
+    .header-rx { width:120px; vertical-align:middle; text-align:center; }
+    .rx-large { font-size:72px; font-family:"Times New Roman", Georgia, serif; font-weight:normal; color:#111827; line-height:1; }
+    .clinic-cell { vertical-align:middle; padding-left:14px; }
+    .clinic-title { font-size:22px; font-weight:800; font-family:"Times New Roman", Georgia, serif; color:#111827; letter-spacing:0.5px; }
+    .clinic-address { font-size:11px; font-family:"Times New Roman", Georgia, serif; color:#374151; margin-top:3px; }
+    .clinic-phone { font-size:11px; font-weight:700; color:#111827; margin-top:4px; }
+    .clinic-hours { font-size:10px; font-family:"Times New Roman", Georgia, serif; color:#4b5563; margin-top:4px; line-height:1.4; }
+    .divider-black { height:2.5px; background:#111827; width:100%; margin:4px 0 16px; }
+    .patient-grid { width:100%; margin-bottom:18px; font-family:"Times New Roman", Georgia, serif; }
+    .patient-row { display:flex; align-items:flex-end; margin-bottom:10px; font-size:12px; }
+    .label { color:#111827; white-space:nowrap; margin-right:6px; font-weight:600; }
+    .field-underlined { border-bottom:1px solid #111827; flex:1; min-height:18px; padding:0 4px; font-weight:600; color:#111827; }
+    .content-area { min-height:550px; padding:0 6px; }
+    .rx-symbol-small { font-size:32px; font-family:"Times New Roman", Georgia, serif; font-weight:bold; color:#111827; margin:10px 0 6px; }
+    .meds-table { width:100%; border-collapse:collapse; margin-top:12px; }
+    .meds-table thead tr { background:#111827; }
+    .meds-table th { color:#fff; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; padding:8px; font-family:"Times New Roman", Georgia, serif; }
+    .advice-section { margin-top:20px; padding:10px 14px; background:#f8fafc; border-left:3px solid #111827; }
+    .advice-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#111827; font-family:"Times New Roman", Georgia, serif; margin-bottom:4px; }
+    .footer-doctor { display:flex; justify-content:flex-end; margin-top:40px; padding-right:16px; }
+    .doctor-block { text-align:left; min-width:240px; font-family:"Times New Roman", Georgia, serif; }
+    .doctor-name-title { font-size:14px; font-weight:800; color:#111827; }
+    .doctor-subline { font-size:11.5px; color:#111827; margin-top:6px; display:flex; align-items:flex-end; }
+    .underlined-val { border-bottom:1px solid #111827; flex:1; margin-left:6px; min-height:14px; font-weight:600; }
+  </style></head><body>
+    <div class="page" style="padding:32px 36px 40px;">
+      <!-- Header -->
+      <table class="header-table">
+        <tr>
+          <td class="header-rx">
+            <div class="rx-large">℞</div>
+          </td>
+          <td class="clinic-cell">
+            <div class="clinic-title">${clinicName}</div>
+            <div class="clinic-address">${clinicAddress}</div>
+            <div class="clinic-phone">📞 ${clinicPhone}</div>
+            <div class="clinic-hours">
+              Clinic Hours: Monday – Saturday &nbsp;|&nbsp; 9:00 AM – 12:00 NN &nbsp; 1:00 PM – 5:00 PM<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sunday &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp; By appointment
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Solid Divider Line -->
+      <div class="divider-black"></div>
+
+      <!-- Underlined Patient Form -->
+      <div class="patient-grid">
+        <div class="patient-row">
+          <div class="label">Patient's Name:</div>
+          <div class="field-underlined" style="flex:3;">${patientInfo.name || ''}</div>
+          <div class="label" style="margin-left:18px;">Age:</div>
+          <div class="field-underlined" style="flex:1;">${patientInfo.age || ''}</div>
+          <div class="label" style="margin-left:18px;">Gender:</div>
+          <div class="field-underlined" style="flex:1;">${patientInfo.gender || ''}</div>
+        </div>
+        <div class="patient-row" style="margin-top:12px;">
+          <div class="label">Address:</div>
+          <div class="field-underlined" style="flex:3;">${patientInfo.phone || doctorInfo.address || ''}</div>
+          <div class="label" style="margin-left:18px;">Date:</div>
+          <div class="field-underlined" style="flex:1.5;">${date}</div>
+        </div>
+        ${diagnosis ? `
+          <div class="patient-row" style="margin-top:12px;">
+            <div class="label">Diagnosis / Dental Condition:</div>
+            <div class="field-underlined" style="flex:1;font-weight:700;">${diagnosis}</div>
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- Prescriptions Body -->
+      <div class="content-area">
+        ${medicines && medicines.length > 0 ? `
+          <table class="meds-table">
+            <thead>
+              <tr>
+                <th style="width:38%;">Medicine / Drug Prescribed</th>
+                <th style="width:12%;text-align:center;">Form</th>
+                <th style="width:16%;text-align:center;">Frequency</th>
+                <th style="width:14%;text-align:center;">Duration</th>
+                <th style="width:20%;">Instructions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${medRows}
+            </tbody>
+          </table>
+        ` : `
+          <div style="min-height:360px;"></div>
+        `}
+
+        ${labTests && labTests.length > 0 ? `
+          <div class="advice-section" style="margin-top:16px;">
+            <div class="advice-title">Dental Investigations / Imaging</div>
+            <div style="font-size:11px;color:#374151;line-height:1.6;">${labTests.join(' &nbsp;•&nbsp; ')}</div>
+          </div>
+        ` : ''}
+
+        ${advice ? `
+          <div class="advice-section" style="margin-top:14px;">
+            <div class="advice-title">Dental Advice &amp; Post-Op Precautions</div>
+            <div style="font-size:11px;color:#374151;line-height:1.6;">${t(advice, data.language)}</div>
+          </div>
+        ` : ''}
+
+        ${followUp ? `
+          <div class="advice-section" style="margin-top:14px;">
+            <div class="advice-title">Follow-up / Next Appointment</div>
+            <div style="font-size:11px;color:#374151;">${followUp}</div>
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- Doctor Signature & Credentials -->
+      <div class="footer-doctor">
+        <div class="doctor-block">
+          ${doctorInfo.signature ? `
+            <div style="text-align:center;margin-bottom:6px;">
+              <img src="${doctorInfo.signature}" style="max-height:45px;max-width:140px;object-fit:contain;" />
+            </div>
+          ` : ''}
+          <div class="doctor-name-title">${doctorName}, ${qual}</div>
+          <div class="doctor-subline">
+            <span>License No.</span>
+            <span class="underlined-val">${regNo}</span>
+          </div>
+          <div class="doctor-subline">
+            <span>PTR No.</span>
+            <span class="underlined-val">${spec}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body></html>`
+}
+
+// ── LAYOUT 12: MODERN TEAL RIBBON ──────────────────────────────────
+function layoutModernTealRibbon(data: PrescriptionData): string {
+  const { doctorInfo, patientInfo, diagnosis, medicines, advice, followUp, labTests, date, template } = data
+  const tealColor = '#00C4CC'
+  const navyColor = '#0f2330'
+
+  const doctorName = doctorInfo.name || 'Doctor Name'
+  const qual = (doctorInfo.qualification || 'QUALIFICATION').toUpperCase()
+  const otherDetails = doctorInfo.specialization || doctorInfo.clinicName || 'Add other details'
+  const clinicAddress = doctorInfo.address || '24 Dummy Street Area'
+  const clinicPhone = doctorInfo.phone || '+12-345 678 9012'
+
+  const medRows = medicines.map((m, i) => `
+    <tr style="border-bottom:1px solid #e2e8f0;background:${i % 2 === 0 ? '#ffffff' : '#f0fdfe'};">
+      <td style="padding:10px 12px;font-weight:700;color:#0e3860;font-size:12px;">
+        ${i + 1}. ${m.name} ${m.strength ? `<span style="font-weight:400;color:#64748b;">${m.strength}</span>` : ''}
+      </td>
+      <td style="padding:10px 8px;text-align:center;color:#475569;font-size:11px;">${m.form || 'Tab'}</td>
+      <td style="padding:10px 8px;text-align:center;font-weight:600;color:#0f2330;font-size:11px;">${m.frequency ? t(m.frequency, data.language) : '—'}</td>
+      <td style="padding:10px 8px;text-align:center;color:#475569;font-size:11px;">${m.duration || '—'}</td>
+      <td style="padding:10px 10px;color:#475569;font-style:italic;font-size:11px;">${m.instructions ? t(m.instructions, data.language) : '—'}</td>
+    </tr>
+  `).join('')
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+    ${baseCSS(tealColor, navyColor, '#ffffff', 'sans-serif')}
+    .top-ribbon { position:absolute; top:0; right:0; width:380px; height:160px; z-index:1; }
+    .header-info { padding:36px 36px 12px; }
+    .doc-title { font-size:26px; font-weight:900; color:#0e3860; }
+    .doc-title span { font-weight:400; color:#1e3a5f; }
+    .doc-qual { font-size:11px; font-weight:800; letter-spacing:2.5px; color:#64748b; margin-top:4px; text-transform:uppercase; }
+    .doc-rule { width:110px; height:2px; background:#cbd5e1; margin:6px 0 8px; }
+    .doc-other { font-size:11px; font-style:italic; color:#64748b; }
+    .patient-strip { padding:14px 36px; }
+    .pat-line { display:flex; align-items:flex-end; margin-bottom:12px; font-size:12px; color:#334155; }
+    .pat-label { white-space:nowrap; margin-right:8px; font-weight:600; }
+    .pat-underlined { border-bottom:1px solid #cbd5e1; flex:1; min-height:18px; padding:0 4px; font-weight:600; color:#0f2330; }
+    .main-content { padding:8px 36px 20px; min-height:550px; }
+    .meds-table { width:100%; border-collapse:collapse; margin-top:14px; border-radius:6px; overflow:hidden; }
+    .meds-table thead tr { background:${navyColor}; }
+    .meds-table th { color:#fff; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; padding:9px 10px; }
+    .caduceus-box { position:absolute; bottom:52px; left:36px; display:flex; align-items:center; }
+    .caduceus-svg { width:56px; height:56px; }
+    .corner-ribbon { position:absolute; bottom:0; left:0; width:220px; height:90px; }
+    .sig-area { text-align:center; min-width:180px; }
+    .sig-line-teal { border-top:1px solid #cbd5e1; padding-top:6px; font-size:11px; color:#64748b; margin-top:30px; }
+    .footer-bar { position:absolute; bottom:14px; left:230px; right:36px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; font-size:11px; color:#475569; }
+  </style></head><body>
+    <div class="page">
+      <!-- Top-Right Geometric Ribbon (Clean V-shape matching Image 1) -->
+      <svg class="top-ribbon" viewBox="0 0 380 160">
+        <polygon points="230,0 380,0 240,160 180,80" fill="${navyColor}" />
+        <polygon points="0,0 120,0 240,160 120,160" fill="${tealColor}" />
+      </svg>
+
+      <!-- Doctor Header -->
+      <div class="header-info" style="display:flex;align-items:center;gap:16px;">
+        ${doctorInfo.logoUrl ? `<img src="${doctorInfo.logoUrl}" style="width:52px;height:52px;border-radius:50%;object-fit:contain;border:1px solid #e2e8f0;background:#ffffff;" />` : ''}
+        <div>
+          <div class="doc-title">Dr. <span>${doctorName.replace(/^Dr\.?\s*/i, '')}</span></div>
+          <div class="doc-qual">${qual}</div>
+          <div class="doc-rule"></div>
+          <div class="doc-other">${otherDetails}</div>
+        </div>
+      </div>
+
+      <!-- 3-Row Underlined Patient Strip -->
+      <div class="patient-strip">
+        <div class="pat-line">
+          <div class="pat-label">Patient Name:</div>
+          <div class="pat-underlined" style="flex:2.5;">${patientInfo.name || ''}</div>
+          <div class="pat-label" style="margin-left:24px;">Date:</div>
+          <div class="pat-underlined" style="flex:1;">${date}</div>
+        </div>
+        <div class="pat-line">
+          <div class="pat-label">Age:</div>
+          <div class="pat-underlined" style="flex:1;">${patientInfo.age || ''}</div>
+          <div class="pat-label" style="margin-left:20px;">Gender:</div>
+          <div class="pat-underlined" style="flex:1;">${patientInfo.gender || ''}</div>
+          <div class="pat-label" style="margin-left:20px;">Weight:</div>
+          <div class="pat-underlined" style="flex:1;">${patientInfo.weight || ''}</div>
+        </div>
+        <div class="pat-line">
+          <div class="pat-label">Diagnosis:</div>
+          <div class="pat-underlined" style="flex:1;font-weight:700;">${diagnosis || ''}</div>
+        </div>
+      </div>
+
+      <!-- Main Prescriptions Area -->
+      <div class="main-content">
+        ${medicines && medicines.length > 0 ? `
+          <table class="meds-table">
+            <thead>
+              <tr>
+                <th style="width:38%;">Medicine / Drug Prescribed</th>
+                <th style="width:12%;text-align:center;">Form</th>
+                <th style="width:16%;text-align:center;">Frequency</th>
+                <th style="width:14%;text-align:center;">Duration</th>
+                <th style="width:20%;">Instructions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${medRows}
+            </tbody>
+          </table>
+        ` : `
+          <div style="min-height:360px;"></div>
+        `}
+
+        ${labTests && labTests.length > 0 ? `
+          <div style="margin-top:16px;padding:10px 14px;background:#f0fdfe;border-left:3px solid ${tealColor};border-radius:0 4px 4px 0;">
+            <div style="font-size:10px;font-weight:800;color:#0e3860;text-transform:uppercase;letter-spacing:0.5px;">Recommended Investigations</div>
+            <div style="font-size:11px;color:#334155;margin-top:4px;">${labTests.join(' &nbsp;•&nbsp; ')}</div>
+          </div>
+        ` : ''}
+
+        ${advice ? `
+          <div style="margin-top:14px;padding:10px 14px;background:#f0fdfe;border-left:3px solid ${tealColor};border-radius:0 4px 4px 0;">
+            <div style="font-size:10px;font-weight:800;color:#0e3860;text-transform:uppercase;letter-spacing:0.5px;">Medical Advice &amp; Instructions</div>
+            <div style="font-size:11px;color:#334155;margin-top:4px;line-height:1.5;">${t(advice, data.language)}</div>
+          </div>
+        ` : ''}
+
+        ${followUp ? `
+          <div style="margin-top:14px;padding:10px 14px;background:#f8fafc;border-left:3px solid ${navyColor};border-radius:0 4px 4px 0;">
+            <div style="font-size:10px;font-weight:800;color:#0e3860;text-transform:uppercase;letter-spacing:0.5px;">Follow-up Visit</div>
+            <div style="font-size:11px;color:#334155;margin-top:4px;">${followUp}</div>
+          </div>
+        ` : ''}
+
+        <!-- Signature Block -->
+        <div style="display:flex;justify-content:flex-end;margin-top:36px;padding-right:20px;">
+          <div class="sig-area">
+            ${doctorInfo.signature ? `<img src="${doctorInfo.signature}" style="max-height:40px;max-width:140px;object-fit:contain;margin-bottom:4px;" />` : ''}
+            <div class="sig-line-teal">Signature</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Caduceus Emblem & Corner Ribbon (Matching Image 1) -->
+      <svg class="corner-ribbon" viewBox="0 0 220 90">
+        <polygon points="0,90 60,0 96,48 84,90" fill="${navyColor}" />
+        <polygon points="60,0 140,0 220,90 132,90" fill="${tealColor}" />
+      </svg>
+
+      <div class="caduceus-box">
+        <svg class="caduceus-svg" viewBox="0 0 100 100">
+          <circle cx="50" cy="18" r="5" fill="${tealColor}" />
+          <line x1="50" y1="23" x2="50" y2="88" stroke="${tealColor}" stroke-width="3" stroke-linecap="round" />
+          <circle cx="50" cy="88" r="3" fill="${tealColor}" />
+          <!-- Left Wing -->
+          <path d="M 48 34 C 30 18 14 18 2 28 C 14 38 20 40 18 46 C 28 46 32 50 32 54 C 42 54 46 50 48 44 Z" fill="${tealColor}" />
+          <!-- Right Wing -->
+          <path d="M 52 34 C 70 18 86 18 98 28 C 86 38 80 40 82 46 C 72 46 68 50 68 54 C 58 54 54 50 52 44 Z" fill="${tealColor}" />
+          <!-- Serpents -->
+          <path d="M 46 38 C 34 44 35 50 50 54 C 66 58 66 68 50 72 C 38 76 40 82 48 84" fill="none" stroke="${tealColor}" stroke-width="2.5" stroke-linecap="round" />
+          <path d="M 54 38 C 66 44 65 50 50 54 C 34 58 34 68 50 72 C 62 76 60 82 52 84" fill="none" stroke="${tealColor}" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="46" cy="38" r="2.5" fill="${tealColor}" />
+          <circle cx="54" cy="38" r="2.5" fill="${tealColor}" />
+        </svg>
+      </div>
+
+      <!-- Footer Bar -->
+      <div class="footer-bar">
+        <span>📍 ${clinicAddress}</span>
+        <span>📞 ${clinicPhone}</span>
+      </div>
+    </div>
+  </body></html>`
+}
+
 // ── MAIN EXPORT — routes to the correct layout ─────────────────────
 export function generatePrescriptionHTML(data: PrescriptionData): string {
   const templateId = data.template?.id || ''
   switch (templateId) {
+    case 'dental-clinic':
+      return layoutDentalClinic(data)
+    case 'modern-teal-ribbon':
+      return layoutModernTealRibbon(data)
     case 'two-column-sidebar':
       return layoutTwoColumn(data)
-    case 'hospital-opd':
-      return layoutHospitalOPD(data)
     case 'soap-clinical':
       return layoutSOAP(data)
     case 'vitals-first':
@@ -1057,7 +1413,6 @@ export function generatePrescriptionHTML(data: PrescriptionData): string {
       if (layout === 'classic') return layoutClassic(data)
       if (layout === 'two-column') return layoutTwoColumn(data)
       if (layout === 'soap') return layoutSOAP(data)
-      if (layout === 'modern') return layoutHospitalOPD(data)
       return layoutGeneric(data)
     }
   }

@@ -15,6 +15,9 @@ export interface TabletExportData {
     clinicAddress?: string
     specialization?: string
     registrationNumber?: string
+    signature?: string
+    stampUrl?: string
+    logoUrl?: string
   }
   patient: {
     patientName: string
@@ -23,6 +26,9 @@ export interface TabletExportData {
     date?: string
     chiefComplaint?: string
     diagnosis?: string
+    advice?: string
+    investigations?: string
+    followUp?: string
     address?: string
     allergies?: string
     bp?: string
@@ -32,6 +38,10 @@ export interface TabletExportData {
     weight?: string
     height?: string
     opdRef?: string
+    examination?: string
+    symptoms?: string
+    respiratoryRate?: string
+    rr?: string
   }
   template?: Template
   paths: Array<{ d: string; color: string; width: number }>
@@ -51,6 +61,58 @@ function escapeXml(unsafe: string | undefined | null): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;')
+}
+
+/**
+ * Renders doctor signature onto SVG canvas.
+ * If signature image (data URL or URI) exists, renders high-res image.
+ * If not, renders flowing calligraphy cursive signature text of the doctor's name!
+ */
+function renderSvgDoctorSignature(
+  doctor: { doctorName?: string; signature?: string },
+  sigCenterX: number,
+  sigBaselineY: number,
+  maxW: number = 85,
+  maxH: number = 24,
+  fontFam: string = 'serif'
+): string {
+  if (doctor.signature && doctor.signature.trim()) {
+    const x = Math.round(sigCenterX - maxW / 2)
+    const y = Math.round(sigBaselineY - maxH - 2)
+    return `<image href="${escapeXml(doctor.signature)}" x="${x}" y="${y}" width="${maxW}" height="${maxH}" preserveAspectRatio="xMidYMid meet" />`
+  }
+  if (doctor.doctorName && doctor.doctorName.trim()) {
+    const cleanDoc = doctor.doctorName.trim().replace(/^(Dr|Dra)\.?\s*/i, '')
+    const fullDoc = cleanDoc ? `Dr. ${cleanDoc}` : ''
+    const fs = fullDoc.length > 22 ? 10 : fullDoc.length > 17 ? 11 : 12.5
+    return `<text x="${sigCenterX}" y="${sigBaselineY - 3}" text-anchor="middle" font-size="${fs}" font-family="'Brush Script MT', 'Dancing Script', 'Great Vibes', 'Segoe Script', cursive, ${fontFam}" font-style="italic" font-weight="bold" fill="#0f172a">${escapeXml(fullDoc)}</text>`
+  }
+  return ''
+}
+
+/**
+ * Helper to render clinic/hospital logo or doctor avatar on SVG templates.
+ */
+function renderSvgClinicLogo(
+  logoUrl: string | undefined,
+  centerX: number,
+  centerY: number,
+  radius: number = 22
+): string {
+  if (logoUrl && logoUrl.trim()) {
+    const size = Math.round((radius - 1.5) * 2)
+    const x = Math.round(centerX - size / 2)
+    const y = Math.round(centerY - size / 2)
+    return `
+  <!-- Clinic / Hospital Logo -->
+  <circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="#ffffff" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" />
+  <image href="${escapeXml(logoUrl)}" xlink:href="${escapeXml(logoUrl)}" x="${x}" y="${y}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet" />`
+  }
+  return `
+  <!-- Avatar Circle -->
+  <circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" />
+  <circle cx="${centerX}" cy="${centerY}" r="${Math.round(radius * 0.8)}" fill="rgba(255,255,255,0.22)" />
+  <text x="${centerX}" y="${centerY + 6}" text-anchor="middle" font-size="${Math.round(radius * 0.72)}">👨‍⚕️</text>`
 }
 
 /**
@@ -127,7 +189,8 @@ function generateTwoColumnSidebarSVG(data: TabletExportData): string {
   const rxY = diagBoxY + diagBoxH + 12
   const thH = 20
   const tableY = rxY + 12
-  const lineCount = 14
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const lineCount = Math.max(14, Math.round(14 * (h / baseH)))
 
   const patientNameClean = safeTruncate(patient.patientName, 26) || 'Patient full name'
   const diagnosisClean = safeTruncate(patient.diagnosis, 32) || 'Acute Pharyngitis / Clinical Assessment'
@@ -142,10 +205,8 @@ function generateTwoColumnSidebarSVG(data: TabletExportData): string {
   <!-- ── Left Sidebar (Doctor & Clinic Info) ── -->
   <rect x="0" y="0" width="${sbW}" height="${h}" fill="${primaryColor}" />
 
-  <!-- Avatar Circle -->
-  <circle cx="${sbW / 2}" cy="42" r="22" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" />
-  <circle cx="${sbW / 2}" cy="42" r="18" fill="rgba(255,255,255,0.22)" />
-  <text x="${sbW / 2}" y="48" text-anchor="middle" font-size="16">👨‍⚕️</text>
+  <!-- Clinic Logo or Avatar Circle -->
+  ${renderSvgClinicLogo(doctor.logoUrl, sbW / 2, 42, 22)}
 
   <!-- Doctor Name & Credentials -->
   <text x="${sbW / 2}" y="78" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff" font-family="${fontFam}">${escapeXml(doctorClean)}</text>
@@ -223,180 +284,180 @@ function generateTwoColumnSidebarSVG(data: TabletExportData): string {
 
   <!-- Footer -->
   <line x1="${mainX + 10}" y1="${h - 32}" x2="${w - 10}" y2="${h - 32}" stroke="#cbd5e1" stroke-width="0.8" />
-  <text x="${mainX + 14}" y="${h - 18}" font-size="7" fill="#64748b" font-family="${fontFam}">Doctor's Signature: __________________</text>
-  <text x="${w - 14}" y="${h - 18}" text-anchor="end" font-size="6.5" fill="#94a3b8" font-family="${fontFam}">Two-Column Sidebar · PrescriptionMaker.in</text>
+  <text x="${mainX + 14}" y="${h - 16}" font-size="7" font-weight="${patient.followUp ? 'bold' : 'normal'}" fill="${patient.followUp ? '#1e293b' : '#64748b'}" font-family="${fontFam}">Follow-up: ${patient.followUp ? escapeXml(patient.followUp) : '____________'}</text>
+  ${renderSvgDoctorSignature(doctor, w - 60, h - 18, 80, 22, fontFam)}
+  <line x1="${w - 105}" y1="${h - 16}" x2="${w - 14}" y2="${h - 16}" stroke="#cbd5e1" stroke-width="0.8" />
+  <text x="${w - 60}" y="${h - 7}" text-anchor="middle" font-size="6.5" fill="#64748b" font-family="${fontFam}">Doctor's Signature</text>
 </svg>`
 }
 
-// ── 2. Hospital OPD Form SVG Layout ───────────────────────────────────────────
-function generateHospitalOPDSVG(data: TabletExportData): string {
-  const { w, h, doctor, patient, template, paths } = data
-  const tpl = template || MOBILE_TEMPLATES.find(t => t.id === 'hospital-opd') || MOBILE_TEMPLATES[2]
-  const primaryColor = tpl.styles?.primaryColor || '#0B1B3D'
-  const accentColor = tpl.styles?.accentColor || '#155EEF'
-  const fontFam = 'Arial, Helvetica, sans-serif'
-
-  const topBannerH = 18
-  const hospH = Math.round(h * 0.11)
-  const metaBarY = topBannerH + hospH
-  const metaBarH = 18
-  const docBarY = metaBarY + metaBarH
-  const docBarH = 20
-  const patY = docBarY + docBarH + 6
-  const patH = 38
-  const rxY = patY + patH + 8
-  const thH = 20
-  const tableY = rxY + 14
-  const lineCount = 11
-
-  const patientNameClean = safeTruncate(patient.patientName, 26) || '___________________________'
-  const complaintClean = safeTruncate(patient.chiefComplaint, 24) || '—'
-  const diagnosisClean = safeTruncate(patient.diagnosis, 28) || 'Clinical Assessment / OP Admission'
-  const clinicClean = safeTruncate(doctor.clinicName, 32) || 'ALL INDIA GENERAL HOSPITAL'
-  const doctorClean = safeTruncate(doctor.doctorName ? `Dr. ${doctor.doctorName}` : 'Dr. Attending Consultant', 28)
-
-  const writingLines = generateWritingLines(tableY + thH + 6, h - 55, lineCount, 10, w - 10)
-  const strokesSVG = paths.map(p => `<path d="${p.d}" stroke="${p.color}" stroke-width="${p.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('\n')
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:#ffffff;display:block;">
-  <!-- Top Red Strip -->
-  <rect x="0" y="0" width="${w}" height="${topBannerH}" fill="#b91c1c" />
-  <text x="12" y="12" font-size="6.5" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">EMERGENCY / HELPLINE: 102 / 108 · 24x7 TRAUMA CARE</text>
-  <rect x="${w - 78}" y="2" width="68" height="14" fill="#ffffff" rx="2" />
-  <text x="${w - 44}" y="12" text-anchor="middle" font-size="6.5" font-weight="bold" fill="#b91c1c" font-family="${fontFam}">OP-SLIP / A4</text>
-
-  <!-- Hospital Banner -->
-  <rect x="0" y="${topBannerH}" width="${w}" height="${hospH}" fill="${primaryColor}" />
-  <text x="${w / 2}" y="${topBannerH + hospH * 0.35}" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1" font-family="${fontFam}">${escapeXml(clinicClean.toUpperCase())}</text>
-  <text x="${w / 2}" y="${topBannerH + hospH * 0.62}" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,0.85)" font-family="${fontFam}">CENTRAL GOVT. & ACCREDITED TERTIARY CARE HEALTH SYSTEM</text>
-  <text x="${w / 2}" y="${topBannerH + hospH * 0.85}" text-anchor="middle" font-size="6.5" fill="rgba(255,255,255,0.7)" font-family="${fontFam}">${escapeXml(doctor.clinicAddress || 'Hospital Complex, Medical Enclave')} · Tel: ${escapeXml(doctor.phone || '011-26588500')}</text>
-
-  <!-- MRN / Ward / Bed / IP-OP Bar -->
-  <rect x="0" y="${metaBarY}" width="${w}" height="${metaBarH}" fill="#e2e8f0" />
-  <text x="12" y="${metaBarY + 12}" font-size="6.5" font-weight="bold" fill="#1e293b" font-family="${fontFam}">MRN: <tspan font-weight="normal">2026-${escapeXml(doctor.registrationNumber ? doctor.registrationNumber.slice(-5) : '89421')}</tspan></text>
-  <text x="${w * 0.30}" y="${metaBarY + 12}" font-size="6.5" font-weight="bold" fill="#1e293b" font-family="${fontFam}">DEPT: <tspan font-weight="normal">GENERAL OPD</tspan></text>
-  <text x="${w * 0.60}" y="${metaBarY + 12}" font-size="6.5" font-weight="bold" fill="#1e293b" font-family="${fontFam}">UNIT: <tspan font-weight="normal">MED-II (ROOM 14)</tspan></text>
-  <text x="${w - 12}" y="${metaBarY + 12}" text-anchor="end" font-size="6.5" font-weight="bold" fill="#b91c1c" font-family="${fontFam}">TYPE: REGULAR OP</text>
-
-  <!-- Attending Physician & Specialty Bar -->
-  <rect x="0" y="${docBarY}" width="${w}" height="${docBarH}" fill="${accentColor}18" />
-  <text x="12" y="${docBarY + 14}" font-size="7.5" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">ATTENDING PHYSICIAN: ${escapeXml(doctorClean)}</text>
-  <text x="${w - 12}" y="${docBarY + 14}" text-anchor="end" font-size="7" fill="#64748b" font-family="${fontFam}">${escapeXml(doctor.qualification || 'MBBS, MD')} · REG: ${escapeXml(doctor.registrationNumber || 'MCI-88219')}</text>
-
-  <!-- Patient Information Box -->
-  <rect x="10" y="${patY}" width="${w - 20}" height="${patH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="1" rx="4" />
-  <text x="16" y="${patY + 13}" font-size="6.5" fill="#64748b" font-family="${fontFam}">PATIENT NAME</text>
-  <text x="16" y="${patY + 25}" font-size="10.5" font-weight="bold" fill="#0f172a" font-family="${fontFam}">${escapeXml(patientNameClean)}</text>
-  <text x="16" y="${patY + 35}" font-size="7" fill="#64748b" font-family="${fontFam}">${escapeXml(patient.age ? `Age: ${patient.age}y` : 'Age: —')} · ${escapeXml(patient.sex || '—')} · Ph: ${escapeXml(doctor.phone || '—')}</text>
-
-  <text x="${w * 0.58}" y="${patY + 13}" font-size="6.5" fill="#64748b" font-family="${fontFam}">DIAGNOSIS / CHIEF COMPLAINT</text>
-  <text x="${w * 0.58}" y="${patY + 25}" font-size="9" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">${escapeXml(diagnosisClean)}</text>
-  <text x="${w * 0.58}" y="${patY + 35}" font-size="7" fill="#64748b" font-family="${fontFam}">Date: ${escapeXml(patient.date || new Date().toLocaleDateString('en-IN'))} · Time: 10:30 AM</text>
-
-  <!-- Rx symbol -->
-  <text x="12" y="${rxY + 8}" font-size="16" font-family="Georgia,serif" font-weight="bold" fill="${primaryColor}">℞</text>
-  <text x="32" y="${rxY + 5}" font-size="7.5" font-weight="bold" fill="${primaryColor}" letter-spacing="0.5" font-family="${fontFam}">OPD PRESCRIPTION / MEDICATION ORDER</text>
-
-  <!-- 6-Column OPD Table Header -->
-  <rect x="10" y="${tableY}" width="${w - 20}" height="${thH}" fill="${primaryColor}" rx="2" />
-  <text x="16" y="${tableY + 13}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">#</text>
-  <text x="32" y="${tableY + 13}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Medicine Name &amp; Strength</text>
-  <text x="${w * 0.44}" y="${tableY + 13}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Dosage</text>
-  <text x="${w * 0.58}" y="${tableY + 13}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Frequency</text>
-  <text x="${w * 0.74}" y="${tableY + 13}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Duration</text>
-  <text x="${w * 0.88}" y="${tableY + 13}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Qty</text>
-
-  ${writingLines}
-  ${strokesSVG}
-
-  <!-- Dual Signatures Footer -->
-  <line x1="10" y1="${h - 40}" x2="${w - 10}" y2="${h - 40}" stroke="#cbd5e1" stroke-width="0.8" />
-  <line x1="16" y1="${h - 20}" x2="110" y2="${h - 20}" stroke="#94a3b8" stroke-width="0.8" />
-  <text x="16" y="${h - 8}" font-size="6.5" font-weight="bold" fill="#64748b" font-family="${fontFam}">RESIDENT MEDICAL OFFICER</text>
-  
-  <line x1="${w - 120}" y1="${h - 20}" x2="${w - 16}" y2="${h - 20}" stroke="#94a3b8" stroke-width="0.8" />
-  <text x="${w - 16}" y="${h - 8}" text-anchor="end" font-size="6.5" font-weight="bold" fill="#64748b" font-family="${fontFam}">ATTENDING CONSULTANT</text>
-</svg>`
-}
 
 // ── 3. SOAP Clinical Notes SVG Layout ─────────────────────────────────────────
 function generateSOAPSVG(data: TabletExportData): string {
   const { w, h, doctor, patient, template, paths } = data
   const tpl = template || MOBILE_TEMPLATES.find(t => t.id === 'soap-clinical') || MOBILE_TEMPLATES[3]
-  const primaryColor = tpl.styles?.primaryColor || '#0f766e'
-  const accentColor = tpl.styles?.accentColor || '#14b8a6'
+  const primaryColor = tpl.styles?.primaryColor || '#312e81' // Deep Indigo
+  const accentColor = tpl.styles?.accentColor || '#6366f1'
   const fontFam = 'Arial, Helvetica, sans-serif'
 
-  const headH = Math.round(h * 0.11)
-  const patH = 24
-  const sBoxH = 30
-  const oBoxH = 34
-  const aBoxH = 30
-  const pY = headH + patH + sBoxH + oBoxH + aBoxH + 8
-  const thH = 18
-  const tableY = pY + 12
-  const lineCount = 11
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const headH = Math.round(baseH * 0.10)
+  const contentW = w - 20
+
+  // Sanitize Doctor Name to prevent duplicate "Dr. Dr."
+  const rawDoc = (doctor.doctorName || '').trim().replace(/^(Dr|Dra)\.?\s*/i, '')
+  const doctorDisplayName = rawDoc ? `Dr. ${rawDoc}` : 'Dr. Doctor Name'
+  const qualSpec = [doctor.qualification, doctor.specialization].filter(Boolean).join(' · ') || 'MBBS, MD · General Medicine'
+  const clinicClean = safeTruncate(doctor.clinicName, 32) || 'Name of your clinic'
 
   const patientNameClean = safeTruncate(patient.patientName, 26) || '___________________________'
-  const complaintClean = safeTruncate(patient.chiefComplaint, 40) || 'Patient presents with symptoms...'
-  const diagnosisClean = safeTruncate(patient.diagnosis, 36) || 'Primary clinical diagnosis'
-  const clinicClean = safeTruncate(doctor.clinicName, 32) || 'Clinical Care Centre'
-  const doctorClean = safeTruncate(doctor.doctorName ? `Dr. ${doctor.doctorName}` : 'Doctor Name', 28)
+  const complaintClean = safeTruncate(patient.chiefComplaint, 45) || 'Acute Pharyngitis'
+  const diagnosisClean = safeTruncate(patient.diagnosis, 40) || 'Acute Pharyngitis'
+  const examClean = safeTruncate(patient.examination || patient.symptoms, 60) || 'Examination findings...'
+  const dateStr = patient.date || new Date().toLocaleDateString('en-IN')
+  const patientAgeSex = [patient.age ? `Age ${patient.age}` : '', patient.sex].filter(Boolean).join(' / ') || 'Age 34 / Male'
 
-  const writingLines = generateWritingLines(tableY + thH + 5, h - 45, lineCount, 10, w - 10)
+  // Proportional font sizing
+  const fDoc = Math.max(12, Math.round(w * 0.034))
+  const fSub = Math.max(7.5, Math.round(w * 0.020))
+  const fClinic = Math.max(9.5, Math.round(w * 0.024))
+  const fHdrLetter = Math.max(12, Math.round(w * 0.032))
+  const fHdrTitle = Math.max(7.2, Math.round(w * 0.019))
+  const fText = Math.max(7.5, Math.round(w * 0.020))
+  const fPill = Math.max(6.5, Math.round(w * 0.017))
+  const fTh = Math.max(7, Math.round(w * 0.018))
+
+  // Section Heights & Vertical Positions
+  const patCardY = headH + 8
+  const patCardH = Math.max(22, Math.round(baseH * 0.038))
+
+  const hdrH = Math.max(16, Math.round(baseH * 0.028))
+
+  // S — Subjective Box
+  const sBoxY = patCardY + patCardH + 8
+  const sBodyH = Math.max(26, Math.round(baseH * 0.046))
+  const sBoxH = hdrH + sBodyH
+
+  // O — Objective Box (contains 6 vitals badges + examination findings)
+  const oBoxY = sBoxY + sBoxH + 8
+  const pillH = Math.max(16, Math.round(baseH * 0.028))
+  const oBodyH = pillH + 22
+  const oBoxH = hdrH + oBodyH
+
+  // A — Assessment Box
+  const aBoxY = oBoxY + oBoxH + 8
+  const aBodyH = Math.max(24, Math.round(baseH * 0.042))
+  const aBoxH = hdrH + aBodyH
+
+  // P — Plan Box (fills down to signature area)
+  const pBoxY = aBoxY + aBoxH + 8
+  const pBoxH = Math.max(140, (h - 48) - pBoxY)
+  const medTitleY = pBoxY + hdrH + 13
+  const thY = medTitleY + 5
+  const thH = Math.max(15, Math.round(baseH * 0.026))
+
+  // 6 Vitals Badges Calculation
+  const vitalsPills = [
+    { label: 'BP', val: patient.bp || '______' },
+    { label: 'HR (bpm)', val: patient.pulse ? `${patient.pulse}` : '______' },
+    { label: 'Temp (°F)', val: patient.temp ? `${patient.temp}` : '______' },
+    { label: 'SpO₂ (%)', val: patient.spo2 ? `${patient.spo2}` : '______' },
+    { label: 'Weight (kg)', val: patient.weight ? `${patient.weight}` : '______' },
+    { label: 'RR (/min)', val: patient.respiratoryRate || (patient as any).rr || '______' },
+  ]
+  const pillsAvailableW = contentW - 16
+  const pillGap = 5
+  const pillW = Math.floor((pillsAvailableW - 5 * pillGap) / 6)
+  const pillsY = oBoxY + hdrH + 5
+  const pillsSvg = vitalsPills.map((vp, idx) => {
+    const px = 18 + idx * (pillW + pillGap)
+    return `
+    <rect x="${px}" y="${pillsY}" width="${pillW}" height="${pillH}" fill="#eff6ff" stroke="#dbeafe" stroke-width="0.8" rx="3" />
+    <text x="${px + pillW / 2}" y="${pillsY + pillH * 0.68}" text-anchor="middle" font-size="${fPill}" font-family="${fontFam}">
+      <tspan fill="#64748b">${escapeXml(vp.label)}: </tspan><tspan font-weight="bold" fill="#1e293b">${escapeXml(vp.val)}</tspan>
+    </text>`
+  }).join('')
+
+  // 4-Column Table Header in Plan Box
+  const pTableW = contentW - 12
+  const colDrugX = 22
+  const colDoseX = 16 + pTableW * 0.44
+  const colFreqX = 16 + pTableW * 0.68
+  const colDurX = 16 + pTableW * 0.88
+
+  // Ruled writing lines inside Plan box
+  const linesStartY = thY + thH + 6
+  const linesEndY = pBoxY + pBoxH - 8
+  const lineCount = Math.max(9, Math.round((linesEndY - linesStartY) / 20))
+  const writingLines = generateWritingLines(linesStartY, linesEndY, lineCount, 16, w - 16)
   const strokesSVG = paths.map(p => `<path d="${p.d}" stroke="${p.color}" stroke-width="${p.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('\n')
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:#ffffff;display:block;">
-  <!-- Header -->
-  <rect x="0" y="0" width="${w}" height="${headH}" fill="${primaryColor}" />
-  <text x="14" y="${headH * 0.38}" font-size="14" font-weight="bold" fill="#ffffff" font-family="${fontFam}">${escapeXml(clinicClean)}</text>
-  <text x="14" y="${headH * 0.68}" font-size="7" font-weight="bold" fill="${accentColor}" letter-spacing="0.5" font-family="${fontFam}">SOAP CLINICAL PROGRESS NOTE · AMBULATORY CARE</text>
-  <text x="${w - 14}" y="${headH * 0.38}" text-anchor="end" font-size="10.5" font-weight="bold" fill="#ffffff" font-family="${fontFam}">${escapeXml(doctorClean)}</text>
-  <text x="${w - 14}" y="${headH * 0.68}" text-anchor="end" font-size="6.5" fill="rgba(255,255,255,0.85)" font-family="${fontFam}">Reg: ${escapeXml(doctor.registrationNumber || 'DOC-REG-01')}</text>
+  const sigCenterY = h - 24
 
-  <!-- Patient Strip -->
-  <rect x="0" y="${headH}" width="${w}" height="${patH}" fill="#e6fffa" />
-  <line x1="0" y1="${headH + patH}" x2="${w}" y2="${headH + patH}" stroke="${primaryColor}30" stroke-width="0.8" />
-  <text x="12" y="${headH + 16}" font-size="7.5" fill="#0f766e" font-family="${fontFam}">
-    <tspan font-weight="bold">PATIENT:</tspan> ${escapeXml(patientNameClean)}   |   <tspan font-weight="bold">Age/Sex:</tspan> ${escapeXml(patient.age ? `${patient.age}y` : '—')} / ${escapeXml(patient.sex || '—')}   |   <tspan font-weight="bold">Date:</tspan> ${escapeXml(patient.date || new Date().toLocaleDateString('en-IN'))}
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:#ffffff;display:block;">
+  <!-- Header Banner (Deep Indigo) -->
+  <rect x="0" y="0" width="${w}" height="${headH}" fill="${primaryColor}" />
+  <text x="14" y="${headH * 0.42}" font-size="${fDoc}" font-weight="bold" fill="#ffffff" font-family="${fontFam}">${escapeXml(doctorDisplayName)}</text>
+  <text x="14" y="${headH * 0.72}" font-size="${fSub}" fill="#c7d2fe" font-family="${fontFam}">${escapeXml(qualSpec)}</text>
+  <text x="${w - 14}" y="${headH * 0.42}" text-anchor="end" font-size="${fClinic}" font-weight="bold" fill="#c7d2fe" font-family="${fontFam}">${escapeXml(clinicClean)}</text>
+  ${doctor.phone ? `<text x="${w - 14}" y="${headH * 0.72}" text-anchor="end" font-size="${fSub}" fill="#c7d2fe" font-family="${fontFam}">☎ ${escapeXml(doctor.phone)}</text>` : (doctor.registrationNumber ? `<text x="${w - 14}" y="${headH * 0.72}" text-anchor="end" font-size="${fSub}" fill="#a5b4fc" font-family="${fontFam}">Reg: ${escapeXml(doctor.registrationNumber)}</text>` : '')}
+
+  <!-- Patient + Date Bar (Lavender Card) -->
+  <rect x="10" y="${patCardY}" width="${contentW}" height="${patCardH}" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.8" rx="4" />
+  <text x="18" y="${patCardY + patCardH * 0.65}" font-size="${fText}" font-family="${fontFam}">
+    <tspan fill="#64748b">Patient: </tspan><tspan font-weight="bold" fill="#0f172a">${escapeXml(patientNameClean)}</tspan><tspan fill="#64748b">   ${escapeXml(patientAgeSex)}</tspan>
+  </text>
+  <text x="${w - 18}" y="${patCardY + patCardH * 0.65}" text-anchor="end" font-size="${fText}" font-family="${fontFam}">
+    <tspan fill="#64748b">Date: </tspan><tspan font-weight="bold" fill="#0f172a">${escapeXml(dateStr)}</tspan>
   </text>
 
-  <!-- S Box -->
-  <rect x="10" y="${headH + patH + 4}" width="${w - 20}" height="${sBoxH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="0.8" rx="3" />
-  <rect x="10" y="${headH + patH + 4}" width="22" height="${sBoxH}" fill="${primaryColor}" rx="2" />
-  <text x="21" y="${headH + patH + 23}" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff" font-family="${fontFam}">S</text>
-  <text x="38" y="${headH + patH + 15}" font-size="6.5" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">SUBJECTIVE (CHIEF COMPLAINT &amp; HPI)</text>
-  <text x="38" y="${headH + patH + 26}" font-size="7.5" fill="#334155" font-family="${fontFam}">${escapeXml(complaintClean)}</text>
+  <!-- S — SUBJECTIVE Box (Purple) -->
+  <rect x="10" y="${sBoxY}" width="${contentW}" height="${sBoxH}" fill="#ffffff" stroke="#7c3aed40" stroke-width="0.8" rx="5" />
+  <rect x="10" y="${sBoxY}" width="${contentW}" height="${hdrH}" fill="#7c3aed" rx="4" />
+  <text x="18" y="${sBoxY + hdrH * 0.75}" font-size="${fHdrLetter}" font-family="Georgia, serif" font-weight="900" fill="#ffffff">S</text>
+  <text x="34" y="${sBoxY + hdrH * 0.70}" font-size="${fHdrTitle}" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">SUBJECTIVE — CHIEF COMPLAINT &amp; HISTORY</text>
+  <text x="18" y="${sBoxY + hdrH + sBodyH * 0.58}" font-size="${fText}" fill="#334155" font-family="${fontFam}">${escapeXml(complaintClean)}</text>
 
-  <!-- O Box -->
-  <rect x="10" y="${headH + patH + sBoxH + 8}" width="${w - 20}" height="${oBoxH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="0.8" rx="3" />
-  <rect x="10" y="${headH + patH + sBoxH + 8}" width="22" height="${oBoxH}" fill="${primaryColor}" rx="2" />
-  <text x="21" y="${headH + patH + sBoxH + 28}" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff" font-family="${fontFam}">O</text>
-  <text x="38" y="${headH + patH + sBoxH + 19}" font-size="6.5" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">OBJECTIVE (VITALS: BP 120/80 · HR 74 · Temp 98.4°F · SpO₂ 99% · Wt 68kg · RR 16)</text>
-  <text x="38" y="${headH + patH + sBoxH + 31}" font-size="7" fill="#64748b" font-family="${fontFam}">Physical Exam: Chest clear, S1/S2 heard, abdomen soft, no pedal edema</text>
+  <!-- O — OBJECTIVE Box (Royal Blue + 6 Vitals Badges) -->
+  <rect x="10" y="${oBoxY}" width="${contentW}" height="${oBoxH}" fill="#ffffff" stroke="#1d4ed840" stroke-width="0.8" rx="5" />
+  <rect x="10" y="${oBoxY}" width="${contentW}" height="${hdrH}" fill="#1d4ed8" rx="4" />
+  <text x="18" y="${oBoxY + hdrH * 0.75}" font-size="${fHdrLetter}" font-family="Georgia, serif" font-weight="900" fill="#ffffff">O</text>
+  <text x="34" y="${oBoxY + hdrH * 0.70}" font-size="${fHdrTitle}" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">OBJECTIVE — VITALS &amp; EXAMINATION FINDINGS</text>
+  ${pillsSvg}
+  <text x="18" y="${pillsY + pillH + 13}" font-size="${fText}" fill="${patient.examination || patient.symptoms ? '#334155' : '#94a3b8'}" font-family="${fontFam}">${escapeXml(examClean)}</text>
 
-  <!-- A Box -->
-  <rect x="10" y="${headH + patH + sBoxH + oBoxH + 12}" width="${w - 20}" height="${aBoxH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="0.8" rx="3" />
-  <rect x="10" y="${headH + patH + sBoxH + oBoxH + 12}" width="22" height="${aBoxH}" fill="${primaryColor}" rx="2" />
-  <text x="21" y="${headH + patH + sBoxH + oBoxH + 31}" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff" font-family="${fontFam}">A</text>
-  <text x="38" y="${headH + patH + sBoxH + oBoxH + 23}" font-size="6.5" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">ASSESSMENT (PRIMARY CLINICAL DIAGNOSIS)</text>
-  <text x="38" y="${headH + patH + sBoxH + oBoxH + 34}" font-size="8" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">${escapeXml(diagnosisClean)}</text>
+  <!-- A — ASSESSMENT Box (Emerald Green) -->
+  <rect x="10" y="${aBoxY}" width="${contentW}" height="${aBoxH}" fill="#ffffff" stroke="#065f4640" stroke-width="0.8" rx="5" />
+  <rect x="10" y="${aBoxY}" width="${contentW}" height="${hdrH}" fill="#065f46" rx="4" />
+  <text x="18" y="${aBoxY + hdrH * 0.75}" font-size="${fHdrLetter}" font-family="Georgia, serif" font-weight="900" fill="#ffffff">A</text>
+  <text x="34" y="${aBoxY + hdrH * 0.70}" font-size="${fHdrTitle}" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">ASSESSMENT — DIAGNOSIS</text>
+  <text x="18" y="${aBoxY + hdrH + aBodyH * 0.58}" font-size="${fText}" font-weight="bold" fill="#065f46" font-family="${fontFam}">${escapeXml(diagnosisClean)}</text>
 
-  <!-- P Box -->
-  <rect x="10" y="${pY}" width="${w - 20}" height="${thH}" fill="${accentColor}" rx="2" />
-  <text x="16" y="${pY + 12}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">P — PLAN (℞ PRESCRIPTION ORDER)</text>
-  <text x="${w * 0.44}" y="${pY + 12}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Dose / Route</text>
-  <text x="${w * 0.65}" y="${pY + 12}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Frequency</text>
-  <text x="${w * 0.85}" y="${pY + 12}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Duration</text>
+  <!-- P — PLAN Box (Deep Indigo + Medications Sub-table) -->
+  <rect x="10" y="${pBoxY}" width="${contentW}" height="${pBoxH}" fill="#ffffff" stroke="${primaryColor}40" stroke-width="0.8" rx="5" />
+  <rect x="10" y="${pBoxY}" width="${contentW}" height="${hdrH}" fill="${primaryColor}" rx="4" />
+  <text x="18" y="${pBoxY + hdrH * 0.75}" font-size="${fHdrLetter}" font-family="Georgia, serif" font-weight="900" fill="#ffffff">P</text>
+  <text x="34" y="${pBoxY + hdrH * 0.70}" font-size="${fHdrTitle}" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">PLAN — MEDICATIONS, INVESTIGATIONS &amp; ADVICE</text>
+  <text x="18" y="${medTitleY}" font-size="${fText}" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">℞ Medications</text>
+
+  <!-- 4-Column Table Header -->
+  <rect x="16" y="${thY}" width="${pTableW}" height="${thH}" fill="#e0e7ff" rx="3" />
+  <text x="${colDrugX}" y="${thY + thH * 0.68}" font-size="${fTh}" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">Drug</text>
+  <text x="${colDoseX}" y="${thY + thH * 0.68}" text-anchor="middle" font-size="${fTh}" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">Dose</text>
+  <text x="${colFreqX}" y="${thY + thH * 0.68}" text-anchor="middle" font-size="${fTh}" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">Frequency</text>
+  <text x="${colDurX}" y="${thY + thH * 0.68}" text-anchor="middle" font-size="${fTh}" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">Duration</text>
 
   ${writingLines}
   ${strokesSVG}
 
-  <!-- Footer -->
-  <line x1="10" y1="${h - 32}" x2="${w - 10}" y2="${h - 32}" stroke="#cbd5e1" stroke-width="0.8" />
-  <text x="14" y="${h - 18}" font-size="6.5" fill="#64748b" font-family="${fontFam}">Review Date: _________________</text>
-  <line x1="${w - 110}" y1="${h - 20}" x2="${w - 14}" y2="${h - 20}" stroke="#94a3b8" stroke-width="0.8" />
-  <text x="${w - 62}" y="${h - 8}" text-anchor="middle" font-size="6.5" fill="#94a3b8" font-family="${fontFam}">Attending Physician Signature</text>
+  <!-- Footer / Doctor Signature Area (Exact match to Screenshot 1) -->
+  ${renderSvgDoctorSignature(doctor, w - 68, sigCenterY, 85, 22, fontFam)}
+  <line x1="${w - 120}" y1="${sigCenterY}" x2="${w - 16}" y2="${sigCenterY}" stroke="#94a3b8" stroke-width="0.8" />
+  <text x="${w - 68}" y="${sigCenterY + 10}" text-anchor="middle" font-size="${fSub}" font-weight="bold" fill="#475569" font-family="${fontFam}">Doctor's Signature</text>
+  <text x="${w - 68}" y="${sigCenterY + 19}" text-anchor="middle" font-size="${fSub * 0.9}" fill="#64748b" font-family="${fontFam}">${escapeXml(doctorDisplayName)}</text>
+
+  <!-- Footer Left: Follow-up -->
+  ${patient.followUp ? `<text x="16" y="${sigCenterY + 10}" font-size="${fSub}" fill="#64748b" font-family="${fontFam}"><tspan font-weight="bold" fill="${primaryColor}">Follow-up: </tspan>${escapeXml(patient.followUp)}</text>` : `<text x="16" y="${sigCenterY + 10}" font-size="${fSub * 0.9}" fill="#94a3b8" font-family="${fontFam}">SOAP Clinical Notes · prescriptionmaker.in</text>`}
 </svg>`
 }
 
@@ -413,7 +474,8 @@ function generateMinimalSVG(data: TabletExportData): string {
   const diagY = patY + patH + 4
   const diagH = 20
   const rxY = diagY + diagH + 10
-  const lineCount = 14
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const lineCount = Math.max(14, Math.round(14 * (h / baseH)))
 
   const patientNameClean = safeTruncate(patient.patientName, 26) || '___________________________'
   const complaintClean = safeTruncate(patient.chiefComplaint, 24) || '—'
@@ -450,6 +512,7 @@ function generateMinimalSVG(data: TabletExportData): string {
   ${strokesSVG}
 
   <!-- Footer -->
+  ${renderSvgDoctorSignature(doctor, w - 52, h - 28, 80, 22, fontFam)}
   <line x1="${w - 95}" y1="${h - 26}" x2="${w - 12}" y2="${h - 26}" stroke="#cbd5e1" stroke-width="0.8" />
   <text x="${w - 52}" y="${h - 14}" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="Arial,sans-serif">Signature</text>
   <text x="12" y="${h - 14}" font-size="6.5" fill="#cbd5e1" letter-spacing="1" font-family="Arial,sans-serif">MINIMAL PRINT RULED</text>
@@ -464,15 +527,16 @@ function generateBilingualSVG(data: TabletExportData): string {
   const accentColor = tpl.styles?.accentColor || '#a78bfa'
   const fontFam = 'Arial, Helvetica, sans-serif'
 
-  const headH = Math.round(h * 0.13)
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const headH = Math.round(baseH * 0.13)
   const patBoxY = headH + 8
-  const patBoxH = Math.round(h * 0.12)
+  const patBoxH = Math.round(baseH * 0.12)
   const diagY = patBoxY + patBoxH + 6
   const diagH = 24
   const rxY = diagY + diagH + 10
   const thH = 20
   const tableY = rxY + 16
-  const lineCount = 13
+  const lineCount = Math.max(13, Math.round(13 * (h / baseH)))
 
   const patientNameClean = safeTruncate(patient.patientName, 26) || '___________________________'
   const complaintClean = safeTruncate(patient.chiefComplaint, 24) || '—'
@@ -537,12 +601,13 @@ function generateBilingualSVG(data: TabletExportData): string {
   ${strokesSVG}
 
   <!-- Investigations / Advice notice -->
-  <text x="14" y="${h - 40}" font-size="7" fill="#64748b" font-family="${fontFam}">जाँच / Investigations: ___________________</text>
-  <text x="${w * 0.52}" y="${h - 40}" font-size="7" fill="#64748b" font-family="${fontFam}">सलाह / Advice: ________________________</text>
+  <text x="14" y="${h - 40}" font-size="7" font-weight="${patient.investigations ? 'bold' : 'normal'}" fill="${patient.investigations ? '#0f172a' : '#64748b'}" font-family="${fontFam}">जाँच / Investigations: ${escapeXml(patient.investigations ? safeTruncate(patient.investigations, 24) : '___________________')}</text>
+  <text x="${w * 0.52}" y="${h - 40}" font-size="7" font-weight="${patient.advice ? 'bold' : 'normal'}" fill="${patient.advice ? '#0f172a' : '#64748b'}" font-family="${fontFam}">सलाह / Advice: ${escapeXml(patient.advice ? safeTruncate(patient.advice, 28) : '________________________')}</text>
 
   <!-- Footer -->
   <line x1="10" y1="${h - 30}" x2="${w - 10}" y2="${h - 30}" stroke="#cbd5e1" stroke-width="0.8" />
-  <text x="14" y="${h - 18}" font-size="7" fill="#64748b" font-family="${fontFam}">Next Visit / अगली मुलाकात: ____________</text>
+  <text x="14" y="${h - 18}" font-size="7" font-weight="${patient.followUp ? 'bold' : 'normal'}" fill="${patient.followUp ? '#0f172a' : '#64748b'}" font-family="${fontFam}">Next Visit / अगली मुलाकात: ${escapeXml(patient.followUp ? patient.followUp : '____________')}</text>
+  ${renderSvgDoctorSignature(doctor, w - 67, h - 20, 85, 22, fontFam)}
   <line x1="${w - 120}" y1="${h - 18}" x2="${w - 14}" y2="${h - 18}" stroke="#94a3b8" stroke-width="0.8" />
   <text x="${w - 67}" y="${h - 8}" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="${fontFam}">डॉक्टर के हस्ताक्षर / Signature</text>
   <text x="14" y="${h - 8}" font-size="6" fill="#94a3b8" font-family="${fontFam}">PrescriptionMaker.in · द्विभाषी पर्ची</text>
@@ -557,7 +622,8 @@ function generateVitalsFirstSVG(data: TabletExportData): string {
   const accentColor = tpl.styles?.accentColor || '#e53e3e'
   const fontFam = 'Arial, Helvetica, sans-serif'
 
-  const headH = Math.round(h * 0.11)
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const headH = Math.round(baseH * 0.11)
   const patBoxY = headH + 6
   const patBoxH = 26
   const vitalsBoxY = patBoxY + patBoxH + 6
@@ -567,7 +633,7 @@ function generateVitalsFirstSVG(data: TabletExportData): string {
   const rxY = diagY + diagH + 10
   const thH = 18
   const tableY = rxY + 14
-  const lineCount = 11
+  const lineCount = Math.max(11, Math.round(11 * (h / baseH)))
 
   const patientNameClean = safeTruncate(patient.patientName, 26) || '___________________________'
   const complaintClean = safeTruncate(patient.chiefComplaint, 24) || '—'
@@ -656,7 +722,8 @@ function generateVitalsFirstSVG(data: TabletExportData): string {
 
   <!-- Footer -->
   <line x1="10" y1="${h - 24}" x2="${w - 10}" y2="${h - 24}" stroke="#e2e8f0" stroke-width="0.8" />
-  <text x="14" y="${h - 10}" font-size="6" fill="#94a3b8" font-family="${fontFam}">Follow-up: _________________</text>
+  <text x="14" y="${h - 10}" font-size="6" font-weight="${patient.followUp ? 'bold' : 'normal'}" fill="${patient.followUp ? '#0f172a' : '#94a3b8'}" font-family="${fontFam}">Follow-up: ${patient.followUp ? escapeXml(patient.followUp) : '_________________'}</text>
+  ${renderSvgDoctorSignature(doctor, w - 62, h - 16, 85, 20, fontFam)}
   <line x1="${w - 110}" y1="${h - 14}" x2="${w - 14}" y2="${h - 14}" stroke="#94a3b8" stroke-width="0.8" />
   <text x="${w - 62}" y="${h - 6}" text-anchor="middle" font-size="6" fill="#94a3b8" font-family="${fontFam}">Cardiologist Signature</text>
 </svg>`
@@ -665,94 +732,133 @@ function generateVitalsFirstSVG(data: TabletExportData): string {
 // ── 7. Multi-Section Boxed SVG Layout ─────────────────────────────────────────
 function generateBoxedSVG(data: TabletExportData): string {
   const { w, h, doctor, patient, template, paths } = data
-  const tpl = template || MOBILE_TEMPLATES.find(t => t.id === 'multi-section-boxed') || MOBILE_TEMPLATES[6]
+  const tpl = template || MOBILE_TEMPLATES.find(t => t.id === 'multi-section-boxed') || MOBILE_TEMPLATES[7]
   const primaryColor = tpl.styles?.primaryColor || '#0c4a6e'
   const accentColor = tpl.styles?.accentColor || '#38bdf8'
+  const bgColor = tpl.styles?.bgColor || '#f0f9ff'
   const fontFam = 'Arial, Helvetica, sans-serif'
 
-  const headH = Math.round(h * 0.11)
-  const pad = 10
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const headH = Math.round(baseH * 0.065)
+  const pad = 12
   const boxW2 = (w - pad * 2 - 8) / 2
+  const stripH = 16
 
+  // Row 1: Patient Information & Date/Reference
   const row1Y = headH + 8
-  const row1H = 38
+  const row1H = 46
+
+  // Box 2: Chief Complaint
   const ccY = row1Y + row1H + 6
-  const ccH = 26
+  const ccH = 34
+
+  // Box 3: Diagnosis
   const diagY = ccY + ccH + 6
-  const diagH = 26
+  const diagH = 34
+
+  // Box 5: Investigations & Advice (anchored to bottom with proper footer clearance)
+  const invH = 36
+  const invY = h - 90
+
+  // Box 4: ℞ Prescription (stretches between Diagnosis and Investigations)
   const rxY = diagY + diagH + 6
-  const rxThH = 18
-  const lineCount = 11
+  const rxBoxH = invY - rxY - 6
+  const subThY = rxY + stripH
+  const subThH = 16
+  const lineCount = Math.max(10, Math.round(10 * (h / baseH)))
 
-  const patientNameClean = safeTruncate(patient.patientName, 22) || '___________________________'
-  const complaintClean = safeTruncate(patient.chiefComplaint, 32) || 'Patient complaint and clinical history...'
-  const diagnosisClean = safeTruncate(patient.diagnosis, 32) || 'Clinical diagnosis...'
-  const clinicClean = safeTruncate(doctor.clinicName, 32) || 'Family & Child Health Clinic'
-  const doctorClean = safeTruncate(doctor.doctorName ? `Dr. ${doctor.doctorName}` : 'Doctor Name', 28)
+  const patientNameClean = safeTruncate(patient.patientName, 26) || 'Patient full name'
+  const complaintClean = safeTruncate(patient.chiefComplaint, 45) || 'Acute Pharyngitis'
+  const diagnosisClean = safeTruncate(patient.diagnosis, 45) || 'Acute Pharyngitis'
+  const clinicClean = safeTruncate(doctor.clinicName, 32) || 'Name of your clinic'
+  const doctorClean = safeTruncate(doctor.doctorName ? (doctor.doctorName.startsWith('Dr.') ? doctor.doctorName : `Dr. ${doctor.doctorName}`) : 'Dr. Full Name', 28)
+  const docSub = [doctor.qualification, doctor.specialization].filter(Boolean).join(' · ') || 'MBBS, MD · General Medicine'
+  const dateStr = patient.date || new Date().toLocaleDateString('en-IN')
+  const patientAgeSex = [patient.age ? `Age: ${patient.age}` : 'Age: 34', patient.sex ? `Sex: ${patient.sex}` : 'Sex: Male'].filter(Boolean).join(' · ')
+  const patientReg = doctor.registrationNumber ? `Reg: ${doctor.registrationNumber}` : 'Reg: ___________'
 
-  const writingLines = generateWritingLines(rxY + rxThH + 5, h - 68, lineCount, pad + 2, w - pad - 2)
+  const sigLineY = h - 24
+  const sigLineW = Math.min(115, Math.round(boxW2 * 0.95))
+  const sigX2 = w - pad
+  const sigX1 = sigX2 - sigLineW
+  const sigCenterX = sigX1 + sigLineW / 2
+
+  const writingLines = generateWritingLines(subThY + subThH + 12, rxY + rxBoxH - 10, lineCount, pad + 6, w - pad - 6)
   const strokesSVG = paths.map(p => `<path d="${p.d}" stroke="${p.color}" stroke-width="${p.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('\n')
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:#ffffff;display:block;">
-  <!-- Deep Blue Header -->
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:${bgColor};display:block;">
+  <!-- Light Blue Background -->
+  <rect x="0" y="0" width="${w}" height="${h}" fill="${bgColor}" />
+
+  <!-- Deep Blue Header Bar -->
   <rect x="0" y="0" width="${w}" height="${headH}" fill="${primaryColor}" />
-  <text x="14" y="${headH * 0.38}" font-size="14" font-weight="bold" fill="#ffffff" font-family="${fontFam}">${escapeXml(doctorClean)}</text>
-  <text x="14" y="${headH * 0.68}" font-size="7" fill="${accentColor}" font-family="${fontFam}">${escapeXml(doctor.qualification || 'MBBS, MD')} · ${escapeXml(doctor.specialization || 'Consultant')}</text>
-  <text x="${w - 14}" y="${headH * 0.38}" text-anchor="end" font-size="10" font-weight="bold" fill="#ffffff" font-family="${fontFam}">${escapeXml(clinicClean)}</text>
-  <text x="${w - 14}" y="${headH * 0.68}" text-anchor="end" font-size="7" fill="rgba(255,255,255,0.85)" font-family="${fontFam}">Reg: ${escapeXml(doctor.registrationNumber || 'DOC-74892')}</text>
+  <text x="16" y="${Math.round(headH * 0.44)}" font-size="14" font-weight="bold" fill="#ffffff" font-family="${fontFam}">${escapeXml(doctorClean)}</text>
+  <text x="16" y="${Math.round(headH * 0.76)}" font-size="7.5" fill="${accentColor}" font-family="${fontFam}">${escapeXml(docSub)}</text>
+  <text x="${w - 16}" y="${Math.round(headH * 0.54)}" text-anchor="end" font-size="10" font-weight="bold" fill="#ffffff" font-family="${fontFam}">${escapeXml(clinicClean)}</text>
 
   <!-- Row 1 Left: PATIENT INFORMATION -->
-  <rect x="${pad}" y="${row1Y}" width="${boxW2}" height="${row1H}" fill="#ffffff" stroke="${accentColor}50" stroke-width="1" rx="4" />
-  <rect x="${pad}" y="${row1Y}" width="${boxW2}" height="14" fill="${primaryColor}" rx="3" />
-  <text x="${pad + 8}" y="${row1Y + 10}" font-size="6" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">PATIENT INFORMATION</text>
-  <text x="${pad + 8}" y="${row1Y + 24}" font-size="10" font-weight="bold" fill="#0f172a" font-family="${fontFam}">${escapeXml(patientNameClean)}</text>
-  <text x="${pad + 8}" y="${row1Y + 34}" font-size="7" fill="#64748b" font-family="${fontFam}">${escapeXml(patient.age ? `Age: ${patient.age}` : 'Age: —')}  ·  ${escapeXml(patient.sex ? `Sex: ${patient.sex}` : 'Sex: —')}</text>
+  <rect x="${pad}" y="${row1Y}" width="${boxW2}" height="${row1H}" fill="#ffffff" stroke="${accentColor}40" stroke-width="1.2" rx="4" />
+  <rect x="${pad}" y="${row1Y}" width="${boxW2}" height="${stripH}" fill="${accentColor}" rx="3" />
+  <text x="${pad + 8}" y="${row1Y + 11}" font-size="6.5" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">PATIENT INFORMATION</text>
+  <text x="${pad + 8}" y="${row1Y + 28}" font-size="10" font-weight="bold" fill="#0f172a" font-family="${fontFam}">${escapeXml(patientNameClean)}</text>
+  <text x="${pad + 8}" y="${row1Y + 39}" font-size="7" fill="#64748b" font-family="${fontFam}">${escapeXml(patientAgeSex)}</text>
 
   <!-- Row 1 Right: DATE & REFERENCE -->
-  <rect x="${pad + boxW2 + 8}" y="${row1Y}" width="${boxW2}" height="${row1H}" fill="#ffffff" stroke="${accentColor}50" stroke-width="1" rx="4" />
-  <rect x="${pad + boxW2 + 8}" y="${row1Y}" width="${boxW2}" height="14" fill="${primaryColor}" rx="3" />
-  <text x="${pad + boxW2 + 16}" y="${row1Y + 10}" font-size="6" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">DATE &amp; REFERENCE</text>
-  <text x="${pad + boxW2 + 16}" y="${row1Y + 24}" font-size="8" fill="#0f172a" font-family="${fontFam}">Date: ${escapeXml(patient.date || new Date().toLocaleDateString('en-IN'))}</text>
-  <text x="${pad + boxW2 + 16}" y="${row1Y + 34}" font-size="7" fill="#64748b" font-family="${fontFam}">Ref ID: ${escapeXml(doctor.registrationNumber || 'OPD-8821')}</text>
+  <rect x="${pad + boxW2 + 8}" y="${row1Y}" width="${boxW2}" height="${row1H}" fill="#ffffff" stroke="${accentColor}40" stroke-width="1.2" rx="4" />
+  <rect x="${pad + boxW2 + 8}" y="${row1Y}" width="${boxW2}" height="${stripH}" fill="${accentColor}" rx="3" />
+  <text x="${pad + boxW2 + 16}" y="${row1Y + 11}" font-size="6.5" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">DATE &amp; REFERENCE</text>
+  <text x="${pad + boxW2 + 16}" y="${row1Y + 28}" font-size="7.5" fill="#64748b" font-family="${fontFam}">Date: <tspan font-weight="bold" fill="#0f172a">${escapeXml(dateStr)}</tspan></text>
+  <text x="${pad + boxW2 + 16}" y="${row1Y + 39}" font-size="7" fill="#64748b" font-family="${fontFam}">${escapeXml(patientReg)}</text>
 
   <!-- Box 2: CHIEF COMPLAINT -->
-  <rect x="${pad}" y="${ccY}" width="${w - pad * 2}" height="${ccH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="1" rx="4" />
-  <rect x="${pad}" y="${ccY}" width="${w - pad * 2}" height="13" fill="${primaryColor}" rx="3" />
-  <text x="${pad + 8}" y="${ccY + 9}" font-size="6" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">CHIEF COMPLAINT &amp; HISTORY</text>
-  <text x="${pad + 8}" y="${ccY + 22}" font-size="7" fill="#334155" font-family="${fontFam}">${escapeXml(complaintClean)}</text>
+  <rect x="${pad}" y="${ccY}" width="${w - pad * 2}" height="${ccH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="1.2" rx="4" />
+  <rect x="${pad}" y="${ccY}" width="${w - pad * 2}" height="${stripH}" fill="${primaryColor}" rx="3" />
+  <text x="${pad + 8}" y="${ccY + 11}" font-size="6.5" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">CHIEF COMPLAINT</text>
+  <text x="${pad + 8}" y="${ccY + 26}" font-size="7.5" fill="#334155" font-family="${fontFam}">${escapeXml(complaintClean)}</text>
 
   <!-- Box 3: DIAGNOSIS -->
-  <rect x="${pad}" y="${diagY}" width="${w - pad * 2}" height="${diagH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="1" rx="4" />
-  <rect x="${pad}" y="${diagY}" width="${w - pad * 2}" height="13" fill="${primaryColor}" rx="3" />
-  <text x="${pad + 8}" y="${diagY + 9}" font-size="6" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">CLINICAL DIAGNOSIS</text>
-  <text x="${pad + 8}" y="${diagY + 22}" font-size="8" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">${escapeXml(diagnosisClean)}</text>
+  <rect x="${pad}" y="${diagY}" width="${w - pad * 2}" height="${diagH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="1.2" rx="4" />
+  <rect x="${pad}" y="${diagY}" width="${w - pad * 2}" height="${stripH}" fill="${primaryColor}" rx="3" />
+  <text x="${pad + 8}" y="${diagY + 11}" font-size="6.5" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">DIAGNOSIS</text>
+  <text x="${pad + 8}" y="${diagY + 26}" font-size="8" font-weight="bold" fill="#0f172a" font-family="${fontFam}">${escapeXml(diagnosisClean)}</text>
 
-  <!-- Box 4: ℞ PRESCRIPTION with table header -->
-  <rect x="${pad}" y="${rxY}" width="${w - pad * 2}" height="${rxThH}" fill="${primaryColor}" rx="3" />
-  <text x="${pad + 8}" y="${rxY + 12}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">℞ Drug</text>
-  <text x="${w * 0.46}" y="${rxY + 12}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Unit</text>
-  <text x="${w * 0.62}" y="${rxY + 12}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Frequency</text>
-  <text x="${w * 0.82}" y="${rxY + 12}" font-size="7" font-weight="bold" fill="#ffffff" font-family="${fontFam}">Duration</text>
+  <!-- Box 4: ℞ PRESCRIPTION (Contains header, sub-table header, and writing area) -->
+  <rect x="${pad}" y="${rxY}" width="${w - pad * 2}" height="${rxBoxH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="1.2" rx="4" />
+  <rect x="${pad}" y="${rxY}" width="${w - pad * 2}" height="${stripH}" fill="${primaryColor}" rx="3" />
+  <text x="${pad + 8}" y="${rxY + 11}" font-size="7" font-weight="bold" fill="#ffffff" letter-spacing="0.6" font-family="${fontFam}">℞ PRESCRIPTION</text>
+
+  <!-- Sub-table header inside Prescription box -->
+  <rect x="${pad}" y="${subThY}" width="${w - pad * 2}" height="${subThH}" fill="${primaryColor}10" />
+  <line x1="${pad}" y1="${subThY + subThH}" x2="${w - pad}" y2="${subThY + subThH}" stroke="${primaryColor}20" stroke-width="0.8" />
+  <text x="${pad + 10}" y="${subThY + 11}" font-size="7" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">Drug</text>
+  <text x="${pad + (w - pad * 2) * 0.44}" y="${subThY + 11}" text-anchor="middle" font-size="7" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">Unit</text>
+  <text x="${pad + (w - pad * 2) * 0.65}" y="${subThY + 11}" text-anchor="middle" font-size="7" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">Frequency</text>
+  <text x="${pad + (w - pad * 2) * 0.88}" y="${subThY + 11}" text-anchor="middle" font-size="7" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">Duration</text>
 
   ${writingLines}
   ${strokesSVG}
 
-  <!-- Investigations & Advice Two-Column Boxes -->
-  <rect x="${pad}" y="${h - 60}" width="${boxW2}" height="32" fill="#ffffff" stroke="${primaryColor}30" stroke-width="0.8" rx="3" />
-  <rect x="${pad}" y="${h - 60}" width="${boxW2}" height="11" fill="${primaryColor}18" rx="2" />
-  <text x="${pad + 6}" y="${h - 52}" font-size="6" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">INVESTIGATIONS</text>
-  <text x="${pad + 6}" y="${h - 38}" font-size="6" fill="#64748b" font-family="${fontFam}">Lab tests / Imaging: _______</text>
+  <!-- Box 5 Left: INVESTIGATIONS -->
+  <rect x="${pad}" y="${invY}" width="${boxW2}" height="${invH}" fill="#ffffff" stroke="${accentColor}40" stroke-width="1.2" rx="4" />
+  <rect x="${pad}" y="${invY}" width="${boxW2}" height="${stripH}" fill="${accentColor}" rx="3" />
+  <text x="${pad + 8}" y="${invY + 11}" font-size="6.5" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">INVESTIGATIONS</text>
+  <text x="${pad + 8}" y="${invY + 25}" font-size="7" fill="${patient.investigations ? '#0f172a' : '#94a3b8'}" font-family="${fontFam}">${patient.investigations ? escapeXml(safeTruncate(patient.investigations, 32)) : 'Tests ordered...'}</text>
 
-  <rect x="${pad + boxW2 + 8}" y="${h - 60}" width="${boxW2}" height="32" fill="#ffffff" stroke="${primaryColor}30" stroke-width="0.8" rx="3" />
-  <rect x="${pad + boxW2 + 8}" y="${h - 60}" width="${boxW2}" height="11" fill="${primaryColor}18" rx="2" />
-  <text x="${pad + boxW2 + 14}" y="${h - 52}" font-size="6" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">ADVICE &amp; INSTRUCTIONS</text>
-  <text x="${pad + boxW2 + 14}" y="${h - 38}" font-size="6" fill="#64748b" font-family="${fontFam}">Diet / Precaution: _________</text>
+  <!-- Box 5 Right: ADVICE -->
+  <rect x="${pad + boxW2 + 8}" y="${invY}" width="${boxW2}" height="${invH}" fill="#ffffff" stroke="${accentColor}40" stroke-width="1.2" rx="4" />
+  <rect x="${pad + boxW2 + 8}" y="${invY}" width="${boxW2}" height="${stripH}" fill="${accentColor}" rx="3" />
+  <text x="${pad + boxW2 + 16}" y="${invY + 11}" font-size="6.5" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">ADVICE</text>
+  <text x="${pad + boxW2 + 16}" y="${invY + 25}" font-size="7" fill="${patient.advice ? '#0f172a' : '#94a3b8'}" font-family="${fontFam}">${patient.advice ? escapeXml(safeTruncate(patient.advice, 32)) : 'Patient advice...'}</text>
 
-  <!-- Footer -->
-  <line x1="${pad}" y1="${h - 22}" x2="${w - pad}" y2="${h - 22}" stroke="#cbd5e1" stroke-width="0.8" />
-  <text x="${pad}" y="${h - 10}" font-size="6" fill="#94a3b8" font-family="${fontFam}">Review on: ________________</text>
-  <line x1="${w - 110}" y1="${h - 14}" x2="${w - pad}" y2="${h - 14}" stroke="#94a3b8" stroke-width="0.8" />
-  <text x="${w - 60}" y="${h - 6}" text-anchor="middle" font-size="6" fill="#94a3b8" font-family="${fontFam}">Doctor's Signature</text>
+  <!-- Footer Left: Follow-up / Next Visit (aligned under Investigations) -->
+  <text x="${pad}" y="${sigLineY + 6}" font-size="7" fill="#475569" font-family="${fontFam}">Next visit: <tspan font-weight="bold" fill="${primaryColor}">${escapeXml(patient.followUp?.trim() ? safeTruncate(patient.followUp.trim(), 28) : 'As advised')}</tspan></text>
+  <text x="${pad}" y="${sigLineY + 16}" font-size="6" fill="#94a3b8" font-family="${fontFam}">Bring this prescription on next visit</text>
+
+  <!-- Footer Right: Doctor's Signature (aligned under Advice) -->
+  ${renderSvgDoctorSignature(doctor, sigCenterX, sigLineY - 2, Math.min(85, sigLineW), 20, fontFam)}
+  <line x1="${sigX1}" y1="${sigLineY}" x2="${sigX2}" y2="${sigLineY}" stroke="#94a3b8" stroke-width="0.8" />
+  <text x="${sigCenterX}" y="${sigLineY + 9}" text-anchor="middle" font-size="6.5" font-weight="bold" fill="#475569" font-family="${fontFam}">Doctor's Signature</text>
+  <text x="${sigCenterX}" y="${sigLineY + 17}" text-anchor="middle" font-size="6" fill="#64748b" font-family="${fontFam}">${escapeXml(doctorClean)}</text>
 </svg>`
 }
 
@@ -765,14 +871,15 @@ function generateGridSVG(data: TabletExportData): string {
   const bgColor = tpl.styles?.bgColor || '#fffbeb'
   const fontFam = 'Arial, Helvetica, sans-serif'
 
-  const headH = Math.round(h * 0.11)
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const headH = Math.round(baseH * 0.11)
   const patH = 34
   const ccH = 20
   const diagH = 20
   const rxY = headH + patH + ccH + diagH + 8
   const thH = 18
   const tableY = rxY + 12
-  const lineCount = 11
+  const lineCount = Math.max(11, Math.round(11 * (h / baseH)))
 
   const patientNameClean = safeTruncate(patient.patientName, 22) || '___________________________'
   const complaintClean = safeTruncate(patient.chiefComplaint, 32) || 'General consultation & clinical history...'
@@ -843,11 +950,12 @@ function generateGridSVG(data: TabletExportData): string {
   <!-- 2-Column Footer: Advice | Follow-up + Signature -->
   <rect x="10" y="${h - 52}" width="${(w - 28) * 0.5}" height="34" fill="#ffffff" stroke="${accentColor}50" stroke-width="0.8" rx="3" />
   <text x="16" y="${h - 42}" font-size="6" font-weight="bold" fill="${accentColor}" letter-spacing="0.5" font-family="${fontFam}">ADVICE &amp; TESTS</text>
-  <text x="16" y="${h - 30}" font-size="6" fill="#64748b" font-family="${fontFam}">Diet &amp; precautions: _________</text>
+  <text x="16" y="${h - 30}" font-size="6.5" font-weight="${(patient.advice || patient.investigations) ? 'bold' : 'normal'}" fill="${(patient.advice || patient.investigations) ? '#0f172a' : '#64748b'}" font-family="${fontFam}">${escapeXml(safeTruncate(patient.advice || patient.investigations || 'Diet & precautions: _________', 32))}</text>
 
   <rect x="${14 + (w - 28) * 0.5}" y="${h - 52}" width="${(w - 28) * 0.5}" height="34" fill="#ffffff" stroke="${primaryColor}40" stroke-width="0.8" rx="3" />
   <text x="${20 + (w - 28) * 0.5}" y="${h - 42}" font-size="6" font-weight="bold" fill="${primaryColor}" letter-spacing="0.5" font-family="${fontFam}">FOLLOW-UP &amp; SIGNATURE</text>
-  <text x="${20 + (w - 28) * 0.5}" y="${h - 30}" font-size="6" fill="#64748b" font-family="${fontFam}">Review: ___________________</text>
+  <text x="${20 + (w - 28) * 0.5}" y="${h - 30}" font-size="6" font-weight="${patient.followUp ? 'bold' : 'normal'}" fill="${patient.followUp ? '#0f172a' : '#64748b'}" font-family="${fontFam}">Review: ${patient.followUp ? escapeXml(patient.followUp) : '___________________'}</text>
+  ${renderSvgDoctorSignature(doctor, 20 + (w - 28) * 0.5 + ((w - 28) * 0.5) / 2, h - 18, 70, 16, fontFam)}
 
   <!-- Bottom band -->
   <rect x="0" y="${h - 14}" width="${w}" height="14" fill="${primaryColor}" />
@@ -864,7 +972,8 @@ function generateDetailedChartSVG(data: TabletExportData): string {
   const accentColor = tpl.styles?.accentColor || '#10b981'
   const fontFam = 'Arial, Helvetica, sans-serif'
 
-  const headH = Math.round(h * 0.11)
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const headH = Math.round(baseH * 0.11)
   const pad = 10
   const patRowY = headH + 8
   const patRowH = 38
@@ -874,7 +983,7 @@ function generateDetailedChartSVG(data: TabletExportData): string {
   const rxY = patRowY + patRowH + 8
   const thH = 20
   const tableY = rxY + 12
-  const lineCount = 11
+  const lineCount = Math.max(11, Math.round(11 * (h / baseH)))
 
   const patientNameClean = safeTruncate(patient.patientName, 22) || '___________________________'
   const complaintClean = safeTruncate(patient.chiefComplaint, 24) || '—'
@@ -882,7 +991,17 @@ function generateDetailedChartSVG(data: TabletExportData): string {
   const clinicClean = safeTruncate(doctor.clinicName, 28) || 'Specialty Medical Center'
   const doctorClean = safeTruncate(doctor.doctorName ? `Dr. ${doctor.doctorName}` : 'Doctor Name', 28)
 
-  const writingLines = generateWritingLines(tableY + thH + 5, h - 58, lineCount, 10, w - 10)
+  const boxY = h - 90
+  const boxH = 34
+  const boxW = (w - 28) * 0.5
+
+  const sigLineY = h - 24
+  const sigLineW = Math.min(120, Math.round(boxW * 0.95))
+  const sigX2 = w - 14
+  const sigX1 = sigX2 - sigLineW
+  const sigCenterX = sigX1 + sigLineW / 2
+
+  const writingLines = generateWritingLines(tableY + thH + 5, boxY - 6, lineCount, 10, w - 10)
   const strokesSVG = paths.map(p => `<path d="${p.d}" stroke="${p.color}" stroke-width="${p.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('\n')
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:#ffffff;display:block;">
@@ -921,19 +1040,23 @@ function generateDetailedChartSVG(data: TabletExportData): string {
   ${strokesSVG}
 
   <!-- Lab Investigations & Advice Box -->
-  <rect x="10" y="${h - 52}" width="${(w - 28) * 0.5}" height="34" fill="#ffffff" stroke="${accentColor}40" stroke-width="0.8" rx="3" />
-  <text x="16" y="${h - 42}" font-size="6" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">LAB INVESTIGATIONS</text>
-  <text x="16" y="${h - 30}" font-size="6" fill="#64748b" font-family="${fontFam}">CBC, LFT, KFT, Urine R/M: ______</text>
+  <rect x="10" y="${boxY}" width="${boxW}" height="${boxH}" fill="#ffffff" stroke="${accentColor}40" stroke-width="0.8" rx="3" />
+  <text x="16" y="${boxY + 11}" font-size="6" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">LAB INVESTIGATIONS</text>
+  <text x="16" y="${boxY + 23}" font-size="6.5" font-weight="${patient.investigations ? 'bold' : 'normal'}" fill="${patient.investigations ? '#0f172a' : '#64748b'}" font-family="${fontFam}">${patient.investigations ? escapeXml(safeTruncate(patient.investigations, 30)) : 'CBC, LFT, KFT, Urine R/M: ______'}</text>
 
-  <rect x="${14 + (w - 28) * 0.5}" y="${h - 52}" width="${(w - 28) * 0.5}" height="34" fill="#ffffff" stroke="${primaryColor}30" stroke-width="0.8" rx="3" />
-  <text x="${20 + (w - 28) * 0.5}" y="${h - 42}" font-size="6" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">SPECIAL INSTRUCTIONS</text>
-  <text x="${20 + (w - 28) * 0.5}" y="${h - 30}" font-size="6" fill="#64748b" font-family="${fontFam}">Take after meals with water</text>
+  <rect x="${14 + boxW}" y="${boxY}" width="${boxW}" height="${boxH}" fill="#ffffff" stroke="${primaryColor}30" stroke-width="0.8" rx="3" />
+  <text x="${20 + boxW}" y="${boxY + 11}" font-size="6" font-weight="bold" fill="${primaryColor}" font-family="${fontFam}">SPECIAL INSTRUCTIONS</text>
+  <text x="${20 + boxW}" y="${boxY + 23}" font-size="6.5" font-weight="${patient.advice ? 'bold' : 'normal'}" fill="${patient.advice ? '#0f172a' : '#64748b'}" font-family="${fontFam}">${patient.advice ? escapeXml(safeTruncate(patient.advice, 30)) : 'Take after meals with water'}</text>
 
-  <!-- Footer -->
-  <line x1="10" y1="${h - 16}" x2="${w - 10}" y2="${h - 16}" stroke="#cbd5e1" stroke-width="0.8" />
-  <text x="14" y="${h - 6}" font-size="6" fill="#94a3b8" font-family="${fontFam}">Follow-up: ______________</text>
-  <line x1="${w - 110}" y1="${h - 10}" x2="${w - 14}" y2="${h - 10}" stroke="#94a3b8" stroke-width="0.8" />
-  <text x="${w - 62}" y="${h - 4}" text-anchor="middle" font-size="6" fill="#94a3b8" font-family="${fontFam}">Doctor's Signature</text>
+  <!-- Footer Left: Follow-up -->
+  <text x="14" y="${sigLineY + 6}" font-size="7" fill="#475569" font-family="${fontFam}">Follow-up: <tspan font-weight="bold" fill="${primaryColor}">${escapeXml(patient.followUp?.trim() ? safeTruncate(patient.followUp.trim(), 28) : 'As advised')}</tspan></text>
+  <text x="14" y="${sigLineY + 16}" font-size="6" fill="#94a3b8" font-family="${fontFam}">Please bring this prescription for your next consultation</text>
+
+  <!-- Footer Right: Doctor's Signature -->
+  ${renderSvgDoctorSignature(doctor, sigCenterX, sigLineY - 2, Math.min(85, sigLineW), 20, fontFam)}
+  <line x1="${sigX1}" y1="${sigLineY}" x2="${sigX2}" y2="${sigLineY}" stroke="#94a3b8" stroke-width="0.8" />
+  <text x="${sigCenterX}" y="${sigLineY + 9}" text-anchor="middle" font-size="6.5" font-weight="bold" fill="#475569" font-family="${fontFam}">Doctor's Signature</text>
+  <text x="${sigCenterX}" y="${sigLineY + 17}" text-anchor="middle" font-size="6" fill="#64748b" font-family="${fontFam}">${escapeXml(doctorClean)}</text>
 </svg>`
 }
 
@@ -951,13 +1074,14 @@ function generateClassicLetterheadSVG(data: TabletExportData): string {
   const primaryColor = styles.primaryColor || '#102A56'
   const fontFam = styles.fontFamily === 'serif' ? 'Georgia, serif' : 'Arial, sans-serif'
 
-  const headH = Math.round(h * 0.14)
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const headH = Math.round(baseH * 0.14)
   const patY = headH + 12
   const patH = 26
   const diagY = patY + patH + 4
   const diagH = 20
   const rxY = diagY + diagH + 10
-  const lineCount = 14
+  const lineCount = Math.max(14, Math.round(14 * (h / baseH)))
 
   const patientNameClean = safeTruncate(patient.patientName, 26) || '___________________________'
   const complaintClean = safeTruncate(patient.chiefComplaint, 24) || '—'
@@ -1000,15 +1124,287 @@ function generateClassicLetterheadSVG(data: TabletExportData): string {
   ${strokesSVG}
 
   <!-- Advice & Lab Notice -->
-  <text x="14" y="${h - 44}" font-size="7" fill="#94a3b8" font-family="${fontFam}">Advice: ________________________________</text>
-  <text x="${w * 0.55}" y="${h - 44}" font-size="7" fill="#94a3b8" font-family="${fontFam}">Investigations: ____________________</text>
+  <text x="14" y="${h - 44}" font-size="7.5" font-weight="${patient.advice ? 'bold' : 'normal'}" fill="${patient.advice ? '#0f172a' : '#64748b'}" font-family="${fontFam}">Advice: ${escapeXml(patient.advice ? safeTruncate(patient.advice, 32) : '______________________')}</text>
+  <text x="${w * 0.52}" y="${h - 44}" font-size="7.5" font-weight="${patient.investigations ? 'bold' : 'normal'}" fill="${patient.investigations ? '#0f172a' : '#64748b'}" font-family="${fontFam}">Investigations: ${escapeXml(patient.investigations ? safeTruncate(patient.investigations, 24) : '________________')}</text>
 
   <!-- Classic Signature Block -->
   <line x1="14" y1="${h - 32}" x2="${w - 14}" y2="${h - 32}" stroke="#e2e8f0" stroke-width="0.8" />
-  <text x="14" y="${h - 18}" font-size="7" fill="#64748b" font-family="${fontFam}">Follow-up on: ________________</text>
+  <text x="14" y="${h - 18}" font-size="7.5" font-weight="${patient.followUp ? 'bold' : 'normal'}" fill="${patient.followUp ? '#0f172a' : '#64748b'}" font-family="${fontFam}">Follow-up on: ${escapeXml(patient.followUp ? safeTruncate(patient.followUp, 28) : '________________')}</text>
+  ${renderSvgDoctorSignature(doctor, w - 62, h - 22, 85, 25, fontFam)}
   <line x1="${w - 110}" y1="${h - 20}" x2="${w - 14}" y2="${h - 20}" stroke="#475569" stroke-width="1" />
   <text x="${w - 62}" y="${h - 8}" text-anchor="middle" font-size="7" fill="#64748b" font-family="${fontFam}">Doctor's Signature</text>
   <text x="14" y="${h - 8}" font-size="5.5" fill="#cbd5e1" letter-spacing="0.5" font-family="${fontFam}">PrescriptionMaker.in · Classic Letterhead</text>
+</svg>`
+}
+
+// ── 11. Dental & Clinic Rx SVG Layout ─────────────────────────────────────────
+function generateDentalClinicSVG(data: TabletExportData): string {
+  const { w, h, doctor, patient, paths } = data
+  const clinicClean = safeTruncate(doctor.clinicName, 32) || 'MARQUEZ DENTAL CLINIC'
+  const addressClean = safeTruncate(doctor.clinicAddress, 45) || 'Brgy. San Jose, San Nicolas, Ilocos Norte'
+  const phoneClean = doctor.phone || '09178302001'
+
+  // Clean doctor name without duplicate 'Dra.' or 'Dr.'
+  let rawDoc = (doctor.doctorName || 'Dra. Lois Gabrielle F. Marquez').trim()
+  if (!/^(Dr|Dra)\.?\s+/i.test(rawDoc)) {
+    rawDoc = `Dr. ${rawDoc}`
+  }
+  const qualClean = (doctor.qualification || 'DMD').trim()
+  const doctorTitleClean = qualClean ? `${rawDoc}, ${qualClean}` : rawDoc
+
+  const patientNameClean = safeTruncate(patient.patientName, 26)
+  const patientAgeClean = (patient.age || '').trim()
+  const todayStr = patient.date || new Date().toLocaleDateString('en-IN')
+
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+  const topH = Math.round(baseH * 0.125)
+  const lineCount = Math.max(13, Math.round(13 * (h / baseH)))
+  const fontFam = "Georgia, 'Times New Roman', serif"
+
+  const leftMargin = Math.round(w * 0.05)
+  const rightMargin = Math.round(w * 0.94)
+
+  const writingLines = generateWritingLines(topH + 52, h - 85, lineCount, leftMargin, rightMargin)
+  const strokesSVG = paths.map(p => `<path d="${p.d}" stroke="${p.color}" stroke-width="${p.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('\n')
+
+  const pLabelSize = Math.max(6.8, Math.min(11, Math.round(w * 0.014)))
+  const pValSize = Math.max(7.2, Math.min(12, Math.round(w * 0.015)))
+
+  // Safe right boundary with 14% pure free whitespace on right
+  const safeRight = Math.round(w * 0.86)
+  const maxBlockWidth = Math.round(w * 0.46)
+  const blockX = safeRight - maxBlockWidth
+  const availableWidth = safeRight - blockX
+
+  const targetDocSize = Math.max(5.5, Math.min(12.5, Math.round(w * 0.0155)))
+  const maxDocSizeForLength = Math.floor((availableWidth - 10) / (Math.max(1, doctorTitleClean.length) * 0.65))
+  const docFontSize = Math.max(5.5, Math.min(targetDocSize, maxDocSizeForLength, 12.5))
+
+  const labelFontSize = Math.max(5, Math.min(10, Math.round(docFontSize * 0.82)))
+  const licLabelW = Math.round(11 * labelFontSize * 0.65)
+  const lineStartX = blockX + licLabelW + 6
+  const underlineEndX = safeRight
+
+  const maxValLen = Math.max(12, Math.floor((underlineEndX - lineStartX - 6) / (labelFontSize * 0.62)))
+  const regNoClean = safeTruncate(doctor.registrationNumber || 'PRC-0078921', maxValLen)
+  const specClean = safeTruncate(doctor.specialization || 'PTR-1234567', maxValLen)
+
+  const docNameY = h - Math.max(48, Math.round(baseH * 0.052))
+  const line1Y = docNameY + Math.max(14, Math.round(baseH * 0.016))
+  const line2Y = line1Y + Math.max(14, Math.round(baseH * 0.016))
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:#ffffff;display:block;">
+  <!-- Header: Large ℞ on Left, Clinic Details on Right -->
+  <text x="${Math.round(w * 0.06)}" y="${Math.round(topH * 0.68)}" font-size="${Math.max(38, Math.round(w * 0.12))}" font-family="${fontFam}" fill="#111827">℞</text>
+
+  <!-- Clinic Name -->
+  <text x="${Math.round(w * 0.26)}" y="${Math.round(topH * 0.28)}" font-size="${Math.max(10, Math.round(w * 0.034))}" font-family="${fontFam}" font-weight="bold" fill="#111827" letter-spacing="0.4">${escapeXml(clinicClean.toUpperCase())}</text>
+
+  <!-- Address -->
+  <text x="${Math.round(w * 0.26)}" y="${Math.round(topH * 0.44)}" font-size="${Math.max(6.5, Math.round(w * 0.02))}" font-family="${fontFam}" fill="#374151">${escapeXml(addressClean)}</text>
+
+  <!-- Phone -->
+  <text x="${Math.round(w * 0.26)}" y="${Math.round(topH * 0.58)}" font-size="${Math.max(6.5, Math.round(w * 0.02))}" font-weight="bold" fill="#111827" font-family="Arial, sans-serif">📞 ${escapeXml(phoneClean)}</text>
+
+  <!-- Clinic Hours -->
+  <text x="${Math.round(w * 0.26)}" y="${Math.round(topH * 0.72)}" font-size="${Math.max(5.5, Math.round(w * 0.017))}" fill="#4b5563" font-family="${fontFam}">Clinic Hours: Monday – Saturday | 9:00 AM – 12:00 NN  1:00 PM – 5:00 PM</text>
+  <text x="${Math.round(w * 0.26)}" y="${Math.round(topH * 0.84)}" font-size="${Math.max(5.5, Math.round(w * 0.017))}" fill="#4b5563" font-family="${fontFam}">Sunday                       | By appointment</text>
+
+  <!-- Solid Black Divider Line -->
+  <line x1="${leftMargin}" y1="${topH}" x2="${rightMargin}" y2="${topH}" stroke="#111827" stroke-width="2" />
+
+  <!-- Patient Info Underlines -->
+  <text x="${leftMargin}" y="${topH + 18}" font-size="${pLabelSize}" font-family="${fontFam}" fill="#111827">Patient's Name:</text>
+  <line x1="${Math.round(w * 0.17)}" y1="${topH + 20}" x2="${Math.round(w * 0.58)}" y2="${topH + 20}" stroke="#111827" stroke-width="0.8" />
+  ${patientNameClean ? `<text x="${Math.round(w * 0.18)}" y="${topH + 18}" font-size="${pValSize}" font-family="${fontFam}" font-weight="bold" fill="#111827">${escapeXml(patientNameClean)}</text>` : ''}
+
+  <text x="${Math.round(w * 0.62)}" y="${topH + 18}" font-size="${pLabelSize}" font-family="${fontFam}" fill="#111827">Age:</text>
+  <line x1="${Math.round(w * 0.67)}" y1="${topH + 20}" x2="${Math.round(w * 0.77)}" y2="${topH + 20}" stroke="#111827" stroke-width="0.8" />
+  ${patientAgeClean ? `<text x="${Math.round(w * 0.68)}" y="${topH + 18}" font-size="${pValSize}" font-family="${fontFam}" fill="#111827">${escapeXml(patientAgeClean)}</text>` : ''}
+
+  <text x="${Math.round(w * 0.80)}" y="${topH + 18}" font-size="${pLabelSize}" font-family="${fontFam}" fill="#111827">Gender:</text>
+  <line x1="${Math.round(w * 0.87)}" y1="${topH + 20}" x2="${rightMargin}" y2="${topH + 20}" stroke="#111827" stroke-width="0.8" />
+  ${patient.sex ? `<text x="${Math.round(w * 0.88)}" y="${topH + 18}" font-size="${pValSize}" font-family="${fontFam}" fill="#111827">${escapeXml(patient.sex)}</text>` : ''}
+
+  <text x="${leftMargin}" y="${topH + 36}" font-size="${pLabelSize}" font-family="${fontFam}" fill="#111827">Address:</text>
+  <line x1="${Math.round(w * 0.13)}" y1="${topH + 38}" x2="${Math.round(w * 0.58)}" y2="${topH + 38}" stroke="#111827" stroke-width="0.8" />
+  ${patient.address ? `<text x="${Math.round(w * 0.14)}" y="${topH + 36}" font-size="${pValSize}" font-family="${fontFam}" fill="#111827">${escapeXml(safeTruncate(patient.address, 36))}</text>` : ''}
+
+  <text x="${Math.round(w * 0.62)}" y="${topH + 36}" font-size="${pLabelSize}" font-family="${fontFam}" fill="#111827">Date:</text>
+  <line x1="${Math.round(w * 0.67)}" y1="${topH + 38}" x2="${rightMargin}" y2="${topH + 38}" stroke="#111827" stroke-width="0.8" />
+  <text x="${Math.round(w * 0.68)}" y="${topH + 36}" font-size="${pValSize}" font-family="${fontFam}" fill="#111827">${escapeXml(todayStr)}</text>
+
+  <!-- Writing guide lines -->
+  ${writingLines}
+
+  <!-- Tablet handwriting strokes -->
+  ${strokesSVG}
+
+  <!-- Footer Doctor Credentials & Signature -->
+  ${doctor.signature && doctor.signature.trim() ? `<image href="${escapeXml(doctor.signature)}" x="${blockX + 20}" y="${docNameY - 36}" width="130" height="32" preserveAspectRatio="xMidYMid meet" />` : ''}
+  <text x="${blockX}" y="${docNameY}" font-size="${docFontSize}" font-family="${fontFam}" font-weight="bold" fill="#111827">${escapeXml(doctorTitleClean)}</text>
+
+  <text x="${blockX}" y="${line1Y}" font-size="${labelFontSize}" font-family="${fontFam}" fill="#111827">License No.</text>
+  <line x1="${lineStartX}" y1="${line1Y + 2}" x2="${underlineEndX}" y2="${line1Y + 2}" stroke="#111827" stroke-width="0.8" />
+  ${regNoClean ? `<text x="${lineStartX + 4}" y="${line1Y}" font-size="${labelFontSize}" font-family="${fontFam}" fill="#111827">${escapeXml(regNoClean)}</text>` : ''}
+
+  <text x="${blockX}" y="${line2Y}" font-size="${labelFontSize}" font-family="${fontFam}" fill="#111827">PTR No.</text>
+  <line x1="${lineStartX}" y1="${line2Y + 2}" x2="${underlineEndX}" y2="${line2Y + 2}" stroke="#111827" stroke-width="0.8" />
+  ${specClean ? `<text x="${lineStartX + 4}" y="${line2Y}" font-size="${labelFontSize}" font-family="${fontFam}" fill="#111827">${escapeXml(specClean)}</text>` : ''}
+</svg>`
+}
+
+// ── 12. Modern Teal Ribbon SVG Layout ─────────────────────────────────────────
+function generateModernTealRibbonSVG(data: TabletExportData): string {
+  const { w, h, doctor, patient, paths } = data
+  const tealColor = '#00C4CC'
+  const navyColor = '#0f2330'
+
+  const rawDocName = (doctor.doctorName || '').replace(/^Dr\.?\s*/i, '').trim()
+  const doctorClean = safeTruncate(rawDocName || 'Doctor Name', 24)
+  const qualClean = (doctor.qualification || 'QUALIFICATION').toUpperCase()
+  const otherDetails = safeTruncate(doctor.specialization || doctor.clinicName || 'Add other details', 32)
+  const patientNameClean = safeTruncate(patient.patientName, 26)
+  const diagnosisClean = safeTruncate(patient.diagnosis, 48)
+  const todayStr = patient.date || new Date().toLocaleDateString('en-IN')
+  const addressRaw = doctor.clinicAddress || '24 Dummy Street Area'
+  const isLongAddress = addressRaw.trim().length > 22
+  const addressClean = safeTruncate(addressRaw, isLongAddress ? 50 : 22)
+  const phoneClean = safeTruncate(doctor.phone || '+12-345 678 9012', 20)
+
+  // Standard A4 reference height for top header proportions
+  const baseH = Math.min(h, Math.round(w * (1123 / 794)))
+
+  // Top-Right "V" Ribbon (Matches Image 1 authentic template design)
+  const rH = Math.round(baseH * 0.158)
+  const cTopL = Math.round(w * 0.49)
+  const cTopR = Math.round(w * 0.655)
+  const cApex = Math.round(w * 0.825)
+  const cBaseL = Math.round(w * 0.66)
+
+  // Midpoint of Cyan's right edge where Navy meets Cyan in the fold
+  const nInnerX = Math.round((cTopR + cApex) / 2)
+  const nInnerY = Math.round(rH * 0.50)
+
+  // Navy arm
+  const nTopL = Math.round(w * 0.81)
+  const nTopR = Math.round(w * 0.98)
+
+  // Bottom-Left Folded 3D Corner Chevron (Matches Image 1 authentic template design)
+  const peakX = Math.round(w * 0.105)
+  const peakY = h - Math.round(baseH * 0.103)
+  const cPeakR = Math.round(w * 0.24)
+  const cBotR = Math.round(w * 0.35)
+  const cBotL = Math.round(w * 0.215)
+  const nMidX = Math.round(w * 0.174)
+  const nMidY = h - Math.round(baseH * 0.043)
+  const nBotX = Math.round(w * 0.148)
+
+  // Caduceus Emblem (Centered above the chevron, proportional and graceful)
+  const cadX = Math.round(w * 0.17)
+  const cadY = h - Math.round(baseH * 0.20)
+  const cadScale = Math.max(0.72, Math.min(1.15, w / 480))
+
+  // Signature Block Coordinates (Elevated above footer to eliminate ANY overlap!)
+  const sigY = h - Math.round(baseH * 0.145)
+  const sigX1 = Math.round(w * 0.62)
+  const sigX2 = Math.round(w * 0.88)
+  const sigCenter = Math.round((sigX1 + sigX2) / 2)
+
+  // Footer Contact Coordinates (Positioned cleanly on bottom margin)
+  const footerY = h - Math.round(baseH * 0.045)
+  const addrX = Math.round(w * 0.38)
+  const phoneX = Math.round(w * 0.70)
+
+  const fontFam = 'Arial, Helvetica, sans-serif'
+  const strokesSVG = paths.map(p => `<path d="${p.d}" stroke="${p.color}" stroke-width="${p.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('\n')
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:#ffffff;display:block;">
+  <!-- Top-Right Geometric Ribbon: clean diagonal V shape matching Image 1 -->
+  <!-- Navy right arm (folds behind Cyan ribbon) -->
+  <path d="M ${nTopL} 0 L ${nTopR} 0 L ${cApex} ${rH} L ${nInnerX} ${nInnerY} Z" fill="${navyColor}" />
+  <!-- Cyan left arm (folds in front with flat base) -->
+  <path d="M ${cTopL} 0 L ${cTopR} 0 L ${cApex} ${rH} L ${cBaseL} ${rH} Z" fill="${tealColor}" />
+
+  <!-- Top-Left Doctor Info (Typography matching Image 1) -->
+  <text x="${Math.round(w * 0.055)}" y="${Math.round(baseH * 0.088)}" font-size="${Math.max(14, Math.round(w * 0.044))}" font-weight="800" fill="#0e3860" font-family="${fontFam}">
+    Dr. <tspan font-weight="400" fill="#1e3a5f">${escapeXml(doctorClean)}</tspan>
+  </text>
+  <text x="${Math.round(w * 0.055)}" y="${Math.round(baseH * 0.122)}" font-size="${Math.max(6.5, Math.round(w * 0.02))}" font-weight="bold" fill="#64748b" letter-spacing="2.2" font-family="${fontFam}">${escapeXml(qualClean)}</text>
+  <line x1="${Math.round(w * 0.055)}" y1="${Math.round(baseH * 0.130)}" x2="${Math.round(w * 0.055) + Math.min(110, Math.round(w * 0.22))}" y2="${Math.round(baseH * 0.130)}" stroke="#cbd5e1" stroke-width="1.2" />
+  <text x="${Math.round(w * 0.055)}" y="${Math.round(baseH * 0.160)}" font-size="${Math.max(6.5, Math.round(w * 0.02))}" font-style="italic" fill="#64748b" font-family="${fontFam}">${escapeXml(otherDetails)}</text>
+
+  <!-- 3-Row Underlined Patient Strip (Clean, neat lines matching Image 1) -->
+  <!-- Row 1: Patient Name & Date -->
+  <text x="${Math.round(w * 0.055)}" y="${Math.round(baseH * 0.210)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#475569" font-family="${fontFam}">Patient Name:</text>
+  <line x1="${Math.round(w * 0.22)}" y1="${Math.round(baseH * 0.213)}" x2="${Math.round(w * 0.63)}" y2="${Math.round(baseH * 0.213)}" stroke="#cbd5e1" stroke-width="1" />
+  ${patientNameClean ? `<text x="${Math.round(w * 0.24)}" y="${Math.round(baseH * 0.208)}" font-size="${Math.max(7.5, Math.round(w * 0.022))}" font-weight="bold" fill="#0f172a" font-family="${fontFam}">${escapeXml(patientNameClean)}</text>` : ''}
+
+  <text x="${Math.round(w * 0.66)}" y="${Math.round(baseH * 0.210)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#475569" font-family="${fontFam}">Date:</text>
+  <line x1="${Math.round(w * 0.74)}" y1="${Math.round(baseH * 0.213)}" x2="${Math.round(w * 0.94)}" y2="${Math.round(baseH * 0.213)}" stroke="#cbd5e1" stroke-width="1" />
+  <text x="${Math.round(w * 0.76)}" y="${Math.round(baseH * 0.208)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#334155" font-family="${fontFam}">${escapeXml(todayStr)}</text>
+
+  <!-- Row 2: Age, Gender, Weight -->
+  <text x="${Math.round(w * 0.055)}" y="${Math.round(baseH * 0.245)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#475569" font-family="${fontFam}">Age:</text>
+  <line x1="${Math.round(w * 0.12)}" y1="${Math.round(baseH * 0.248)}" x2="${Math.round(w * 0.30)}" y2="${Math.round(baseH * 0.248)}" stroke="#cbd5e1" stroke-width="1" />
+  ${patient.age ? `<text x="${Math.round(w * 0.14)}" y="${Math.round(baseH * 0.243)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#0f172a" font-family="${fontFam}">${escapeXml(patient.age)}</text>` : ''}
+
+  <text x="${Math.round(w * 0.33)}" y="${Math.round(baseH * 0.245)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#475569" font-family="${fontFam}">Gender:</text>
+  <line x1="${Math.round(w * 0.43)}" y1="${Math.round(baseH * 0.248)}" x2="${Math.round(w * 0.58)}" y2="${Math.round(baseH * 0.248)}" stroke="#cbd5e1" stroke-width="1" />
+  ${patient.sex ? `<text x="${Math.round(w * 0.45)}" y="${Math.round(baseH * 0.243)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#0f172a" font-family="${fontFam}">${escapeXml(patient.sex)}</text>` : ''}
+
+  <text x="${Math.round(w * 0.62)}" y="${Math.round(baseH * 0.245)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#475569" font-family="${fontFam}">Weight:</text>
+  <line x1="${Math.round(w * 0.73)}" y1="${Math.round(baseH * 0.248)}" x2="${Math.round(w * 0.94)}" y2="${Math.round(baseH * 0.248)}" stroke="#cbd5e1" stroke-width="1" />
+  ${patient.weight ? `<text x="${Math.round(w * 0.75)}" y="${Math.round(baseH * 0.243)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#0f172a" font-family="${fontFam}">${escapeXml(patient.weight)} kg</text>` : ''}
+
+  <!-- Row 3: Diagnosis -->
+  <text x="${Math.round(w * 0.055)}" y="${Math.round(baseH * 0.280)}" font-size="${Math.max(7, Math.round(w * 0.021))}" fill="#475569" font-family="${fontFam}">Diagnosis:</text>
+  <line x1="${Math.round(w * 0.20)}" y1="${Math.round(baseH * 0.283)}" x2="${Math.round(w * 0.94)}" y2="${Math.round(baseH * 0.283)}" stroke="#cbd5e1" stroke-width="1" />
+  ${diagnosisClean ? `<text x="${Math.round(w * 0.22)}" y="${Math.round(baseH * 0.278)}" font-size="${Math.max(7.2, Math.round(w * 0.022))}" font-weight="bold" fill="#0f172a" font-family="${fontFam}">${escapeXml(diagnosisClean)}</text>` : ''}
+
+  <!-- Tablet handwriting strokes (Clean canvas, no ruled lines) -->
+  ${strokesSVG}
+
+  <!-- Bottom-Left Folded 3D Corner Chevron (Exact geometry matching Image 1) -->
+  <!-- Dark Navy Left Slope -->
+  <path d="M 0 ${h} L ${peakX} ${peakY} L ${nMidX} ${nMidY} L ${nBotX} ${h} Z" fill="${navyColor}" />
+  <!-- Vibrant Cyan Right Slope -->
+  <path d="M ${peakX} ${peakY} L ${cPeakR} ${peakY} L ${cBotR} ${h} L ${cBotL} ${h} Z" fill="${tealColor}" />
+
+  <!-- Authentic Medical Caduceus Emblem (Floating above the chevron) -->
+  <!-- Top Sphere / Knob -->
+  <circle cx="${cadX}" cy="${cadY - 26 * cadScale}" r="${4.8 * cadScale}" fill="${tealColor}" />
+  <circle cx="${cadX}" cy="${cadY - 20 * cadScale}" r="${2.2 * cadScale}" fill="${tealColor}" />
+
+  <!-- Central Staff -->
+  <line x1="${cadX}" y1="${cadY - 20 * cadScale}" x2="${cadX}" y2="${cadY + 34 * cadScale}" stroke="${tealColor}" stroke-width="${2.4 * cadScale}" stroke-linecap="round" />
+  <circle cx="${cadX}" cy="${cadY + 34 * cadScale}" r="${2.2 * cadScale}" fill="${tealColor}" />
+
+  <!-- Symmetrical Graceful Wings (Eagle/Medical Wings matching Image 1) -->
+  <!-- Left Wing -->
+  <path d="M ${cadX - 2 * cadScale} ${cadY - 12 * cadScale} C ${cadX - 16 * cadScale} ${cadY - 24 * cadScale}, ${cadX - 32 * cadScale} ${cadY - 24 * cadScale}, ${cadX - 44 * cadScale} ${cadY - 14 * cadScale} C ${cadX - 35 * cadScale} ${cadY - 6 * cadScale}, ${cadX - 29 * cadScale} ${cadY - 5 * cadScale}, ${cadX - 31 * cadScale} ${cadY + 1 * cadScale} C ${cadX - 23 * cadScale} ${cadY + 2 * cadScale}, ${cadX - 19 * cadScale} ${cadY + 4 * cadScale}, ${cadX - 20 * cadScale} ${cadY + 8 * cadScale} C ${cadX - 12 * cadScale} ${cadY + 8 * cadScale}, ${cadX - 4 * cadScale} ${cadY + 4 * cadScale}, ${cadX - 2 * cadScale} ${cadY - 2 * cadScale} Z" fill="${tealColor}" />
+  <!-- Right Wing -->
+  <path d="M ${cadX + 2 * cadScale} ${cadY - 12 * cadScale} C ${cadX + 16 * cadScale} ${cadY - 24 * cadScale}, ${cadX + 32 * cadScale} ${cadY - 24 * cadScale}, ${cadX + 44 * cadScale} ${cadY - 14 * cadScale} C ${cadX + 35 * cadScale} ${cadY - 6 * cadScale}, ${cadX + 29 * cadScale} ${cadY - 5 * cadScale}, ${cadX + 31 * cadScale} ${cadY + 1 * cadScale} C ${cadX + 23 * cadScale} ${cadY + 2 * cadScale}, ${cadX - 19 * cadScale} ${cadY + 4 * cadScale}, ${cadX + 20 * cadScale} ${cadY + 8 * cadScale} C ${cadX + 12 * cadScale} ${cadY + 8 * cadScale}, ${cadX + 4 * cadScale} ${cadY + 4 * cadScale}, ${cadX + 2 * cadScale} ${cadY - 2 * cadScale} Z" fill="${tealColor}" />
+
+  <!-- Twin Symmetrical Coiled Serpents (Figure-8 Waves) -->
+  <path d="M ${cadX - 4 * cadScale} ${cadY - 6 * cadScale} C ${cadX - 14 * cadScale} ${cadY - 2 * cadScale}, ${cadX - 13 * cadScale} ${cadY + 3 * cadScale}, ${cadX} ${cadY + 7 * cadScale} C ${cadX + 14 * cadScale} ${cadY + 11 * cadScale}, ${cadX + 14 * cadScale} ${cadY + 17 * cadScale}, ${cadX} ${cadY + 21 * cadScale} C ${cadX - 10 * cadScale} ${cadY + 24 * cadScale}, ${cadX - 8 * cadScale} ${cadY + 28 * cadScale}, ${cadX - 2 * cadScale} ${cadY + 30 * cadScale}" fill="none" stroke="${tealColor}" stroke-width="${2 * cadScale}" stroke-linecap="round" />
+  <path d="M ${cadX + 4 * cadScale} ${cadY - 6 * cadScale} C ${cadX + 14 * cadScale} ${cadY - 2 * cadScale}, ${cadX + 13 * cadScale} ${cadY + 3 * cadScale}, ${cadX} ${cadY + 7 * cadScale} C ${cadX - 14 * cadScale} ${cadY + 11 * cadScale}, ${cadX - 14 * cadScale} ${cadY + 17 * cadScale}, ${cadX} ${cadY + 21 * cadScale} C ${cadX + 10 * cadScale} ${cadY + 24 * cadScale}, ${cadX + 8 * cadScale} ${cadY + 28 * cadScale}, ${cadX + 2 * cadScale} ${cadY + 30 * cadScale}" fill="none" stroke="${tealColor}" stroke-width="${2 * cadScale}" stroke-linecap="round" />
+  <circle cx="${cadX - 4 * cadScale}" cy="${cadY - 6 * cadScale}" r="${2 * cadScale}" fill="${tealColor}" />
+  <circle cx="${cadX + 4 * cadScale}" cy="${cadY - 6 * cadScale}" r="${2 * cadScale}" fill="${tealColor}" />
+
+  <!-- Bottom-Right Signature Block (Elevated to completely avoid footer overlap!) -->
+  ${renderSvgDoctorSignature(doctor, sigCenter, sigY, 90, 24, fontFam)}
+  <line x1="${sigX1}" y1="${sigY}" x2="${sigX2}" y2="${sigY}" stroke="#cbd5e1" stroke-width="1.2" />
+  <text x="${sigCenter}" y="${sigY + 16}" text-anchor="middle" font-size="${Math.max(7.2, Math.round(w * 0.022))}" fill="#0f2330" font-family="${fontFam}">Signature</text>
+
+  <!-- Footer Address & Phone (Matching Image 1, prevents any overlap) -->
+  ${isLongAddress ? `
+  <text x="${addrX}" y="${footerY - 7}" font-size="${Math.max(6.5, Math.round(w * 0.02))}" fill="#475569" font-family="${fontFam}">📍 ${escapeXml(addressClean)}</text>
+  <text x="${addrX}" y="${footerY + 8}" font-size="${Math.max(6.5, Math.round(w * 0.02))}" fill="#475569" font-family="${fontFam}">📞 ${escapeXml(phoneClean)}</text>
+  ` : `
+  <text x="${addrX}" y="${footerY}" font-size="${Math.max(6.5, Math.round(w * 0.02))}" fill="#475569" font-family="${fontFam}">📍 ${escapeXml(addressClean)}</text>
+  <text x="${Math.round(w * 0.94)}" y="${footerY}" text-anchor="end" font-size="${Math.max(6.5, Math.round(w * 0.02))}" fill="#475569" font-family="${fontFam}">📞 ${escapeXml(phoneClean)}</text>
+  `}
 </svg>`
 }
 
@@ -1021,10 +1417,12 @@ export function generateTabletPrescriptionSVG(data: TabletExportData): string {
   const template = inputTpl || MOBILE_TEMPLATES[0]
 
   switch (template.id) {
+    case 'dental-clinic':
+      return generateDentalClinicSVG(data)
+    case 'modern-teal-ribbon':
+      return generateModernTealRibbonSVG(data)
     case 'two-column-sidebar':
       return generateTwoColumnSidebarSVG(data)
-    case 'hospital-opd':
-      return generateHospitalOPDSVG(data)
     case 'soap-clinical':
       return generateSOAPSVG(data)
     case 'minimal-print-ruled':
@@ -1129,10 +1527,14 @@ export function generateTabletPrescriptionHTML(data: TabletExportData): string {
   const patientNameClean = safeTruncate(patient.patientName || '___________________________', 24)
   let fullSvg = generateTabletPrescriptionSVG(data)
 
-  // Ensure SVG fills the 794x1123 A4 page container cleanly without cut-off or distortion
+  const aspectMultiplier = data.h / (data.w * (1123 / 794))
+  const pageH = Math.round(1123 * Math.max(1, aspectMultiplier))
+  const pageHeightMm = Math.round(297 * Math.max(1, aspectMultiplier))
+
+  // Ensure SVG fills the page container cleanly without cut-off or distortion
   fullSvg = fullSvg
     .replace(/width="[^"]*"/, 'width="794"')
-    .replace(/height="[^"]*"/, 'height="1123"')
+    .replace(/height="[^"]*"/, `height="${pageH}"`)
 
   return `<!DOCTYPE html>
 <html>
@@ -1141,7 +1543,7 @@ export function generateTabletPrescriptionHTML(data: TabletExportData): string {
   <title>Prescription - ${escapeXml(patientNameClean)}</title>
   <style>
     @page {
-      size: A4 portrait;
+      size: ${aspectMultiplier > 1.05 ? `210mm ${pageHeightMm}mm` : 'A4 portrait'};
       margin: 0;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -1161,7 +1563,7 @@ export function generateTabletPrescriptionHTML(data: TabletExportData): string {
     }
     .page-container {
       width: 794px;
-      height: 1123px;
+      height: ${pageH}px;
       background: #ffffff;
       margin: 0 auto;
       position: relative;
@@ -1174,11 +1576,11 @@ export function generateTabletPrescriptionHTML(data: TabletExportData): string {
         margin: 0 !important;
         padding: 0 !important;
         width: 210mm !important;
-        height: 297mm !important;
+        height: ${pageHeightMm}mm !important;
       }
       .page-container {
         width: 210mm !important;
-        height: 297mm !important;
+        height: ${pageHeightMm}mm !important;
         margin: 0 !important;
         padding: 0 !important;
         box-shadow: none !important;
@@ -1258,8 +1660,15 @@ export async function downloadTabletPrescriptionPdf(
 
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
     try {
+      const aspectMultiplier = data.h / (data.w * (1123 / 794))
+      const targetCanvasW = 1588
+      const targetCanvasH = Math.round(2245 * Math.max(1, aspectMultiplier))
+      const targetOptW = 794
+      const targetOptH = Math.round(1123 * Math.max(1, aspectMultiplier))
+      const targetPdfH_mm = Math.round(297 * Math.max(1, aspectMultiplier))
+
       const svgMarkup = generateTabletPrescriptionSVG(data)
-      const canvas = await svgToCanvas(svgMarkup, 1588, 2245)
+      const canvas = await svgToCanvas(svgMarkup, targetCanvasW, targetCanvasH)
       const html2pdf = await loadHtml2Pdf()
       if (!html2pdf) throw new Error('html2pdf library could not be loaded')
 
@@ -1271,14 +1680,14 @@ export async function downloadTabletPrescriptionPdf(
           scale: 2,
           useCORS: true,
           logging: false,
-          width: 794,
-          height: 1122,
+          width: targetOptW,
+          height: targetOptH,
         },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        jsPDF: { unit: 'mm', format: aspectMultiplier > 1.05 ? [210, targetPdfH_mm] : 'a4', orientation: 'portrait' },
       }
 
-      // Directly pass the high-res 1588x2245 canvas to html2pdf!
-      // Produces an exact 1-page pristine, ultra-sharp vector PDF with 0% stretch!
+      // Directly pass the high-res canvas to html2pdf!
+      // Produces an exact pristine, ultra-sharp vector PDF with 0% stretch!
       await html2pdf().set(opt).from(canvas).save()
       return
     } catch (err) {

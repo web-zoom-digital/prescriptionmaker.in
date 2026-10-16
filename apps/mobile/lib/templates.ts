@@ -44,18 +44,6 @@ export const MOBILE_TEMPLATES: Template[] = [
     emoji: '🏥',
     image: require('../assets/templates/two-column-sidebar.jpg'),
   },
-  // 3. Hospital OPD Form
-  {
-    id: 'hospital-opd',
-    name: 'Hospital OPD Form',
-    description: 'Institutional format with MRN, Ward, Bed, HOD signature. For government/private hospitals.',
-    category: 'hospital',
-    layout: 'modern',
-    styles: { primaryColor: '#0B1B3D', accentColor: '#155EEF', bgColor: '#ffffff', fontFamily: 'sans-serif' },
-    isPremium: true,
-    emoji: '🏛️',
-    image: require('../assets/templates/hospital-opd.jpg'),
-  },
   // 4. SOAP Clinical Notes
   {
     id: 'soap-clinical',
@@ -140,13 +128,243 @@ export const MOBILE_TEMPLATES: Template[] = [
     emoji: '⚕️',
     image: require('../assets/templates/compartmentalized-grid.jpg'),
   },
+  // 11. Dental & Clinic Rx
+  {
+    id: 'dental-clinic',
+    name: 'Dental & Clinic Rx',
+    description: 'Classic clinic letterhead with prominent ℞ emblem, clinic hours, phone, underlined patient fields, and License/PTR credentials.',
+    category: 'dental',
+    layout: 'classic',
+    styles: { primaryColor: '#18181b', accentColor: '#3f3f46', bgColor: '#ffffff', fontFamily: 'serif' },
+    isPremium: false,
+    emoji: '🦷',
+    image: require('../assets/templates/dental-clinic.jpg'),
+  },
+  // 12. Modern Teal Ribbon
+  {
+    id: 'modern-teal-ribbon',
+    name: 'Modern Teal Ribbon',
+    description: 'Contemporary geometric teal chevron header & footer, Caduceus emblem, tracked qualification accent, and 3-row patient bar.',
+    category: 'general',
+    layout: 'modern',
+    styles: { primaryColor: '#00b4d8', accentColor: '#0f2330', bgColor: '#ffffff', fontFamily: 'sans-serif' },
+    isPremium: true,
+    emoji: '💠',
+    image: require('../assets/templates/modern-teal-ribbon.jpg'),
+  },
 ]
 
 export const TEMPLATE_CATEGORIES = [
   { id: 'all', name: 'All', emoji: '🏥' },
   { id: 'clinic', name: 'Clinic', emoji: '🩺' },
+  { id: 'dental', name: 'Dental', emoji: '🦷' },
   { id: 'hospital', name: 'Hospital', emoji: '🏛️' },
   { id: 'specialty', name: 'Specialty', emoji: '⚕️' },
   { id: 'general', name: 'General', emoji: '👨‍⚕️' },
   { id: 'pediatric', name: 'Pediatric', emoji: '👶' },
 ]
+
+export type TemplateFieldConfig = {
+  hasChiefComplaint: boolean
+  chiefComplaintLabel?: string
+  hasDiagnosis: boolean
+  diagnosisLabel?: string
+  hasAddress: boolean
+  hasAllergies: boolean
+  hasWeightInPatient: boolean
+  hasOpdRef: boolean
+  opdRefLabel?: string
+  hasVitals: boolean
+  vitalsList?: ('bp' | 'pulse' | 'temp' | 'spo2' | 'weight' | 'height')[]
+  hasAdvice?: boolean
+  hasInvestigations?: boolean
+  hasFollowUp?: boolean
+  hasLogo?: boolean
+}
+
+/**
+ * Returns exactly which fields belong to each template layout.
+ * Ensures the doctor is only presented with fields that actually appear
+ * on the selected prescription template, eliminating unnecessary inputs.
+ */
+export function getTemplateFieldConfig(templateId?: string): TemplateFieldConfig {
+  switch (templateId) {
+    case 'classic-letterhead':
+      return {
+        hasChiefComplaint: true,
+        chiefComplaintLabel: 'Chief Complaint',
+        hasDiagnosis: true,
+        diagnosisLabel: 'Diagnosis',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: false,
+        hasVitals: false, // Zero vitals on Classic Letterhead
+        hasAdvice: true,
+        hasInvestigations: true,
+        hasFollowUp: true,
+      }
+
+    case 'two-column-sidebar':
+      return {
+        hasChiefComplaint: false,
+        hasDiagnosis: true,
+        diagnosisLabel: 'Diagnosis',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: true,
+        opdRefLabel: 'OPD Ref / Slip No.',
+        hasVitals: true,
+        vitalsList: ['bp', 'pulse', 'temp', 'spo2', 'weight', 'height'],
+        hasFollowUp: true,
+        hasLogo: true,
+      }
+
+    case 'vitals-first':
+      return {
+        hasChiefComplaint: false,
+        hasDiagnosis: true,
+        diagnosisLabel: 'Diagnosis',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: false,
+        hasVitals: true,
+        vitalsList: ['bp', 'pulse', 'temp', 'spo2', 'weight'],
+        hasInvestigations: true,
+        hasFollowUp: true,
+      }
+
+    case 'soap-clinical':
+      return {
+        hasChiefComplaint: true,
+        chiefComplaintLabel: 'S — Subjective (Symptoms & History)',
+        hasDiagnosis: true,
+        diagnosisLabel: 'A — Assessment (Clinical Diagnosis)',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: false,
+        hasVitals: true,
+        vitalsList: ['bp', 'pulse', 'temp', 'spo2', 'weight'],
+        hasFollowUp: true,
+      }
+
+
+    case 'multi-section-boxed':
+      return {
+        hasChiefComplaint: true,
+        chiefComplaintLabel: 'Chief Complaint',
+        hasDiagnosis: true,
+        diagnosisLabel: 'Diagnosis',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: true,
+        opdRefLabel: 'Patient Ref / Slip No.',
+        hasVitals: false,
+        hasAdvice: true,
+        hasInvestigations: true,
+        hasFollowUp: true,
+      }
+
+    case 'bilingual-indian':
+      return {
+        hasChiefComplaint: false,
+        hasDiagnosis: true,
+        diagnosisLabel: 'रोग निदान / Diagnosis',
+        hasAddress: true,
+        hasAllergies: true,
+        hasWeightInPatient: false,
+        hasOpdRef: false,
+        hasVitals: false,
+        hasAdvice: true,
+        hasInvestigations: true,
+        hasFollowUp: true,
+      }
+
+    case 'dental-clinic':
+      return {
+        hasChiefComplaint: false,
+        hasDiagnosis: false,
+        hasAddress: true,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: false,
+        hasVitals: false,
+      }
+
+    case 'modern-teal-ribbon':
+      return {
+        hasChiefComplaint: false,
+        hasDiagnosis: true,
+        diagnosisLabel: 'Diagnosis',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: true,
+        hasOpdRef: false,
+        hasVitals: false,
+      }
+
+    case 'minimal-print-ruled':
+      return {
+        hasChiefComplaint: false,
+        hasDiagnosis: true,
+        diagnosisLabel: 'Diagnosis',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: false,
+        hasVitals: false,
+      }
+
+    case 'detailed-drug-chart':
+      return {
+        hasChiefComplaint: false,
+        hasDiagnosis: true,
+        diagnosisLabel: 'Diagnosis',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: false,
+        hasVitals: false,
+        hasAdvice: true,
+        hasInvestigations: true,
+        hasFollowUp: true,
+      }
+
+    case 'compartmentalized-grid':
+      return {
+        hasChiefComplaint: true,
+        chiefComplaintLabel: 'Chief Complaint',
+        hasDiagnosis: true,
+        diagnosisLabel: 'Diagnosis',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: false,
+        hasVitals: false,
+        hasAdvice: true,
+        hasFollowUp: true,
+      }
+
+    default:
+      return {
+        hasChiefComplaint: true,
+        chiefComplaintLabel: 'Chief Complaint',
+        hasDiagnosis: true,
+        diagnosisLabel: 'Diagnosis',
+        hasAddress: false,
+        hasAllergies: false,
+        hasWeightInPatient: false,
+        hasOpdRef: false,
+        hasVitals: false,
+        hasAdvice: true,
+        hasInvestigations: true,
+        hasFollowUp: true,
+      }
+  }
+}
+
+

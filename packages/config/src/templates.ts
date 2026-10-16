@@ -71,40 +71,6 @@ export const TEMPLATES: Omit<Template, 'id' | 'usageCount' | 'createdAt' | 'upda
     seoDescription: 'Split layout with doctor sidebar and Rx panel for cardiologists.',
   },
 
-  // 3. Hospital OPD Form — Institutional hospital format
-  {
-    name: 'Hospital OPD Form',
-    slug: 'hospital-opd',
-    description: 'Full institutional hospital format with Patient MRN, Ward, Bed Number, Insurance, Attending Physician, HOD Signature. Used by government and private hospital doctors.',
-    category: 'hospital',
-    layout: 'modern',
-    preview: '/templates/previews/hospital-opd.jpg',
-    thumbnail: '/templates/thumbnails/hospital-opd.jpg',
-    styles: {
-      primaryColor: '#155e75',
-      accentColor: '#0ea5e9',
-      bgColor: '#f0f9ff',
-      fontFamily: 'Inter, sans-serif',
-      headerStyle: 'hospital-banner',
-      medicineTableStyle: 'hospital-grid',
-      signatureStyle: 'dual',
-      footerStyle: 'institutional',
-    },
-    sections: [
-      { id: 'header', name: 'Hospital Banner', visible: true, order: 1 },
-      { id: 'registration', name: 'MRN / Ward / Bed / Date', visible: true, order: 2 },
-      { id: 'patient', name: 'Patient Full Details', visible: true, order: 3 },
-      { id: 'diagnosis', name: 'Diagnosis / ICD Code', visible: true, order: 4 },
-      { id: 'medicines', name: 'Hospital Medicine Table', visible: true, order: 5 },
-      { id: 'investigations', name: 'Investigations Ordered', visible: true, order: 6 },
-      { id: 'dual-signature', name: 'HOD + Doctor Signatures', visible: true, order: 7 },
-    ],
-    printSettings: { pageSize: 'A4', orientation: 'portrait', margins: { top: 0, right: 10, bottom: 10, left: 10 } },
-    isPublished: true, isFeatured: true, isPremium: true,
-    tags: ['hospital', 'opd', 'mrn', 'hod', 'institutional'],
-    seoTitle: 'Hospital OPD Prescription Form Template',
-    seoDescription: 'Institutional hospital OPD format with MRN, ward, HOD and doctor signatures.',
-  },
 
   // 4. SOAP Clinical Notes — Western/academic clinical documentation
   {

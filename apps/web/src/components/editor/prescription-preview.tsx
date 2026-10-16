@@ -355,160 +355,6 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
     )
   }
 
-  // ─── 3. HOSPITAL OPD FORM ──────────────────────────────────────────────────
-  // Full institutional format: MRN, Ward, Bed, HOD signature
-  if (slug === 'hospital-opd') {
-    return (
-      <div style={{ width: '210mm', minHeight: '297mm', background: bg, fontFamily: ff, fontSize: '9px', boxSizing: 'border-box' }}>
-        {/* Hospital banner */}
-        <div style={{ background: pc, color: '#fff', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontFamily: 'Georgia, serif', fontWeight: 900 }}>℞</div>
-            <div>
-              <div style={{ fontSize: '16px', fontWeight: 800 }}>{doctor.clinicName || 'City Hospital'}</div>
-              {doctor.address && <div style={{ fontSize: '8px', opacity: 0.8 }}>{doctor.address}</div>}
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, opacity: 0.9 }}>OPD / PRESCRIPTION</div>
-            <div style={{ fontSize: '8.5px', opacity: 0.7, marginTop: '2px' }}>Date: {today}</div>
-          </div>
-        </div>
-
-        <div style={{ padding: '10px 14px' }}>
-          {/* MRN / Ward / Bed row */}
-          <div style={{ display: 'flex', border: `1px solid ${pc}40`, borderRadius: '4px', overflow: 'hidden', marginBottom: '8px' }}>
-            {[
-              { label: 'MRN No.', value: patient.mrn },
-              { label: 'Ward', value: patient.ward },
-              { label: 'Bed No.', value: patient.bedNo },
-              { label: 'IP/OP No.', value: patient.ipOpNo },
-            ].map((f, i) => (
-              <div key={i} style={{ flex: 1, padding: '5px 8px', borderRight: i < 3 ? `1px solid ${pc}30` : 'none', background: i % 2 === 0 ? '#fff' : `${pc}05` }}>
-                <div style={{ fontSize: '7px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.3px' }}>{f.label}</div>
-                <div style={{ fontSize: '9px', fontWeight: 600, marginTop: '2px' }}>{f.value || '\u00A0'}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Attending Physician */}
-          <div style={{ background: `${ac}20`, border: `1px solid ${ac}40`, borderRadius: '4px', padding: '5px 10px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-            <span>
-              <strong style={{ color: pc }}>ATTENDING PHYSICIAN:</strong>
-              <span style={{ marginLeft: '8px', fontWeight: 700 }}>{doctor.name ? `Dr. ${doctor.name}` : 'Dr. ______________'}</span>
-              {doctor.qualifications && <span style={{ color: '#64748b', marginLeft: '6px' }}>{doctor.qualifications}</span>}
-            </span>
-            <span>
-              <strong style={{ color: pc }}>SPECIALTY:</strong>
-              <span style={{ marginLeft: '6px' }}>{doctor.specialization || '________________'}</span>
-            </span>
-          </div>
-
-          {/* Patient info table */}
-          <table style={{ width: '100%', borderCollapse: 'collapse', border: `1px solid ${pc}40`, marginBottom: '8px', fontSize: '9px' }}>
-            <tbody>
-              <tr style={{ backgroundColor: `${pc}15` }}>
-                <td colSpan={4} style={{ padding: '4px 8px', fontWeight: 700, color: pc, textTransform: 'uppercase', fontSize: '8px', letterSpacing: '0.5px' }}>Patient Information</td>
-              </tr>
-              <tr style={{ borderBottom: `1px solid ${pc}25` }}>
-                <td colSpan={4} style={{ padding: '5px 8px' }}>
-                  <span style={{ color: '#64748b' }}>Patient Name: </span>
-                  <strong style={{ fontSize: '11px' }}>{patient.name || '___________________________'}</strong>
-                </td>
-              </tr>
-              <tr style={{ borderBottom: `1px solid ${pc}25` }}>
-                <td style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25`, width: '25%' }}><span style={{ color: '#64748b' }}>MRN: </span><strong>{patient.mrn || '\u00A0'}</strong></td>
-                <td style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25`, width: '25%' }}><span style={{ color: '#64748b' }}>Age: </span><strong>{patient.age || '____'}</strong></td>
-                <td style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25`, width: '25%' }}><span style={{ color: '#64748b' }}>Sex: </span><strong>{patient.gender || '____'}</strong></td>
-                <td style={{ padding: '5px 8px', width: '25%' }}><span style={{ color: '#64748b' }}>Ward: </span><strong>{patient.ward || '\u00A0'}</strong></td>
-              </tr>
-              <tr style={{ borderBottom: `1px solid ${pc}25` }}>
-                <td colSpan={2} style={{ padding: '5px 8px', borderRight: `1px solid ${pc}25` }}><span style={{ color: '#64748b' }}>Insurance No: </span><strong>{patient.insuranceNo || '\u00A0'}</strong></td>
-                <td colSpan={2} style={{ padding: '5px 8px' }}><span style={{ color: '#64748b' }}>Care Provider: </span><strong>{patient.careProvider || '\u00A0'}</strong></td>
-              </tr>
-              <tr>
-                <td colSpan={4} style={{ padding: '5px 8px' }}>
-                  <span style={{ color: '#64748b' }}>Diagnosis: </span>
-                  <strong>{diagnosis || '___________________________'}</strong>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          {/* Rx + Medicine table */}
-          <div style={{ fontSize: '14px', fontFamily: 'Georgia, serif', fontWeight: 900, color: pc, marginBottom: '4px' }}>℞</div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', border: `1px solid ${pc}40`, fontSize: '8.5px', marginBottom: '8px' }}>
-            <thead>
-              <tr style={{ background: pc, color: '#fff' }}>
-                <th style={{ padding: '5px 6px', textAlign: 'left', width: '32%' }}>Medication / Strength</th>
-                <th style={{ padding: '5px 6px', textAlign: 'center', width: '20%' }}>Dosage / Frequency</th>
-                <th style={{ padding: '5px 6px', textAlign: 'center', width: '13%' }}>Route</th>
-                <th style={{ padding: '5px 6px', textAlign: 'center', width: '13%' }}>Quantity</th>
-                <th style={{ padding: '5px 6px', textAlign: 'left', width: '22%' }}>Duration / Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filledMeds.length > 0 ? filledMeds.map((med, idx) => (
-                <tr key={idx} style={{ borderBottom: `1px solid ${pc}20`, backgroundColor: idx % 2 === 0 ? '#fff' : `${pc}05` }}>
-                  <td style={{ padding: '5px 6px' }}><strong>{med.name}</strong>{med.strength ? <span style={{ color: '#64748b' }}> / {med.strength}</span> : ''}</td>
-                  <td style={{ padding: '5px 6px', textAlign: 'center' }}>{med.frequency ? t(med.frequency, lang) : '—'}</td>
-                  <td style={{ padding: '5px 6px', textAlign: 'center' }}>Oral</td>
-                  <td style={{ padding: '5px 6px', textAlign: 'center' }}>&nbsp;</td>
-                  <td style={{ padding: '5px 6px' }}>{med.duration || '—'}</td>
-                </tr>
-              )) : Array.from({ length: 5 }, (_, idx) => (
-                <tr key={idx} style={{ borderBottom: `1px solid ${pc}15` }}>
-                  <td style={{ padding: '6px' }}>&nbsp;</td>
-                  <td style={{ padding: '6px' }}>&nbsp;</td>
-                  <td style={{ padding: '6px' }}>&nbsp;</td>
-                  <td style={{ padding: '6px' }}>&nbsp;</td>
-                  <td style={{ padding: '6px' }}>&nbsp;</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Investigations */}
-          <div style={{ border: `1px solid ${pc}30`, borderRadius: '4px', padding: '6px 10px', marginBottom: '8px' }}>
-            <div style={{ fontSize: '8px', fontWeight: 700, color: pc, textTransform: 'uppercase', marginBottom: '4px' }}>Investigations Ordered</div>
-            <div style={{ color: '#374151', minHeight: '20px' }}>{labTests || '\u00a0'}</div>
-          </div>
-
-          {/* Advice */}
-          {advice && (
-            <div style={{ border: `1px solid ${pc}30`, borderRadius: '4px', padding: '6px 10px', marginBottom: '8px' }}>
-              <div style={{ fontSize: '8px', fontWeight: 700, color: pc, textTransform: 'uppercase', marginBottom: '4px' }}>Instructions / Advice</div>
-              <div style={{ color: '#374151' }}>{t(advice, lang)}</div>
-            </div>
-          )}
-
-          {followUpDate && (
-            <div style={{ fontSize: '9px', color: '#64748b', marginBottom: '8px' }}>
-              Review Date: <strong>{followUpDate}</strong>
-            </div>
-          )}
-
-          {/* Dual signatures */}
-          <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-            <div style={{ flex: 1, border: `1px solid ${pc}30`, borderRadius: '4px', padding: '8px 10px' }}>
-              <div style={{ fontSize: '8px', color: '#64748b', fontWeight: 700, marginBottom: '20px' }}>HOD SIGNATURE</div>
-              <div style={{ borderTop: '1px solid #94a3b8' }}></div>
-              <div style={{ fontSize: '7.5px', color: '#94a3b8', marginTop: '3px' }}>Head of Department</div>
-            </div>
-            <div style={{ flex: 1, border: `1px solid ${pc}30`, borderRadius: '4px', padding: '8px 10px' }}>
-              <div style={{ fontSize: '8px', color: '#64748b', fontWeight: 700, marginBottom: '4px' }}>DOCTOR SIGNATURE</div>
-              {doctor.signatureUrl
-                ? <img src={doctor.signatureUrl} alt="Sig" style={{ width: '70px', height: '28px', objectFit: 'contain' }} />
-                : <div style={{ height: '24px' }} />}
-              <div style={{ borderTop: '1px solid #94a3b8' }}></div>
-              <div style={{ fontSize: '7.5px', color: '#1e293b', fontWeight: 600, marginTop: '3px' }}>Dr. {doctor.name || '____________'}</div>
-              {doctor.registrationNumber && <div style={{ fontSize: '7px', color: '#94a3b8' }}>Reg: {doctor.registrationNumber}</div>}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   // ─── 4. SOAP CLINICAL NOTES ────────────────────────────────────────────────
   // S/O/A/P format used by western-trained/academic doctors
@@ -1393,38 +1239,38 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
     const EyeSVG = ({ size = 80, opacity = 1 }: { size?: number; opacity?: number }) => (
       <svg width={size} height={size * 0.55} viewBox="0 0 120 66" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity }}>
         {/* Eyelashes top */}
-        <path d="M20 28 Q30 8 60 6 Q90 8 100 28" stroke="#1a1a1a" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+        <path d="M20 28 Q30 8 60 6 Q90 8 100 28" stroke="#1a1a1a" strokeWidth="3.5" fill="none" strokeLinecap="round" />
         {/* Upper eyelid fill */}
-        <path d="M12 32 Q30 4 60 3 Q90 4 108 32 Q90 56 60 58 Q30 56 12 32Z" fill="white" stroke="#888" strokeWidth="0.5"/>
+        <path d="M12 32 Q30 4 60 3 Q90 4 108 32 Q90 56 60 58 Q30 56 12 32Z" fill="white" stroke="#888" strokeWidth="0.5" />
         {/* Iris */}
-        <circle cx="60" cy="32" r="18" fill="#1e90ff"/>
+        <circle cx="60" cy="32" r="18" fill="#1e90ff" />
         <circle cx="60" cy="32" r="18" fill="url(#irisGrad)" />
         {/* Pupil */}
-        <circle cx="60" cy="32" r="9" fill="#111"/>
+        <circle cx="60" cy="32" r="9" fill="#111" />
         {/* Iris detail rings */}
-        <circle cx="60" cy="32" r="14" stroke="#0066cc" strokeWidth="0.8" fill="none" opacity="0.6"/>
-        <circle cx="60" cy="32" r="17" stroke="#1a7adb" strokeWidth="0.5" fill="none" opacity="0.4"/>
+        <circle cx="60" cy="32" r="14" stroke="#0066cc" strokeWidth="0.8" fill="none" opacity="0.6" />
+        <circle cx="60" cy="32" r="17" stroke="#1a7adb" strokeWidth="0.5" fill="none" opacity="0.4" />
         {/* Highlight */}
-        <ellipse cx="53" cy="26" rx="4" ry="3" fill="white" opacity="0.7"/>
-        <circle cx="67" cy="28" r="1.5" fill="white" opacity="0.5"/>
+        <ellipse cx="53" cy="26" rx="4" ry="3" fill="white" opacity="0.7" />
+        <circle cx="67" cy="28" r="1.5" fill="white" opacity="0.5" />
         {/* Lower eyelid */}
-        <path d="M12 32 Q30 58 60 60 Q90 58 108 32" stroke="#aaa" strokeWidth="1" fill="none"/>
+        <path d="M12 32 Q30 58 60 60 Q90 58 108 32" stroke="#aaa" strokeWidth="1" fill="none" />
         {/* Eyelashes — lower few */}
-        <line x1="28" y1="52" x2="22" y2="58" stroke="#555" strokeWidth="1.5" strokeLinecap="round"/>
-        <line x1="42" y1="58" x2="38" y2="64" stroke="#555" strokeWidth="1.5" strokeLinecap="round"/>
-        <line x1="78" y1="58" x2="82" y2="64" stroke="#555" strokeWidth="1.5" strokeLinecap="round"/>
-        <line x1="92" y1="52" x2="98" y2="58" stroke="#555" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="28" y1="52" x2="22" y2="58" stroke="#555" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="42" y1="58" x2="38" y2="64" stroke="#555" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="78" y1="58" x2="82" y2="64" stroke="#555" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="92" y1="52" x2="98" y2="58" stroke="#555" strokeWidth="1.5" strokeLinecap="round" />
         {/* Eyelashes — upper few */}
-        <line x1="30" y1="14" x2="26" y2="6" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
-        <line x1="45" y1="8" x2="43" y2="0" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
-        <line x1="60" y1="6" x2="60" y2="0" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
-        <line x1="75" y1="8" x2="77" y2="0" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
-        <line x1="90" y1="14" x2="94" y2="6" stroke="#222" strokeWidth="1.8" strokeLinecap="round"/>
+        <line x1="30" y1="14" x2="26" y2="6" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="45" y1="8" x2="43" y2="0" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="60" y1="6" x2="60" y2="0" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="75" y1="8" x2="77" y2="0" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="90" y1="14" x2="94" y2="6" stroke="#222" strokeWidth="1.8" strokeLinecap="round" />
         <defs>
           <radialGradient id="irisGrad" cx="45%" cy="40%" r="55%">
-            <stop offset="0%" stopColor="#4eb8ff"/>
-            <stop offset="60%" stopColor="#1e80ff"/>
-            <stop offset="100%" stopColor="#0050cc"/>
+            <stop offset="0%" stopColor="#4eb8ff" />
+            <stop offset="60%" stopColor="#1e80ff" />
+            <stop offset="100%" stopColor="#0050cc" />
           </radialGradient>
         </defs>
       </svg>
@@ -1434,9 +1280,9 @@ export function PrescriptionPreview({ template, data }: PrescriptionPreviewProps
     const ChevronLogo = () => (
       <svg width="32" height="38" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
         {/* 3 stacked chevron/diamond shapes */}
-        <path d="M16 0 L28 9 L16 14 L4 9 Z" fill="#0e7490" opacity="0.9"/>
-        <path d="M16 13 L28 22 L16 27 L4 22 Z" fill="#0891b2" opacity="0.9"/>
-        <path d="M16 26 L28 35 L16 38 L4 35 Z" fill="#06b6d4" opacity="0.9"/>
+        <path d="M16 0 L28 9 L16 14 L4 9 Z" fill="#0e7490" opacity="0.9" />
+        <path d="M16 13 L28 22 L16 27 L4 22 Z" fill="#0891b2" opacity="0.9" />
+        <path d="M16 26 L28 35 L16 38 L4 35 Z" fill="#06b6d4" opacity="0.9" />
       </svg>
     )
 
