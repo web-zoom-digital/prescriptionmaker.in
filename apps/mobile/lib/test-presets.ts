@@ -18,6 +18,7 @@ export type TestPreset = {
     address: string
     phone: string
     email: string
+    signature?: string
   }
   patient: {
     name: string
@@ -28,6 +29,12 @@ export type TestPreset = {
     date?: string
     chiefComplaint: string
     diagnosis: string
+    bp?: string
+    pulse?: string
+    temp?: string
+    spo2?: string
+    respiratoryRate?: string
+    examination?: string
   }
   symptoms: string
   medicines: Array<{
@@ -44,6 +51,9 @@ export type TestPreset = {
   followUp: string
   language?: 'en' | 'hi'
 }
+
+export const SAMPLE_DOCTOR_SIGNATURE =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="70" viewBox="0 0 220 70"><path d="M15 48 C 30 18, 42 62, 58 26 C 72 12, 78 52, 94 30 C 108 20, 114 56, 128 26 C 144 14, 162 42, 186 28 C 196 24, 206 34, 212 26" fill="none" stroke="%231a365d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 54 C 74 50, 142 52, 206 46" fill="none" stroke="%231a365d" stroke-width="1.8" stroke-linecap="round"/></svg>'
 
 export const TEST_PRESETS: TestPreset[] = [
   // 1. Classic Letterhead — General Medicine
@@ -64,6 +74,7 @@ export const TEST_PRESETS: TestPreset[] = [
       address: 'B-12, Green Park Main, South Ext., New Delhi - 110016',
       phone: '+91 98110 23456',
       email: 'dr.rahul@apolloclinic.com',
+      signature: SAMPLE_DOCTOR_SIGNATURE,
     },
     patient: {
       name: 'Aarav Verma',
@@ -202,6 +213,7 @@ export const TEST_PRESETS: TestPreset[] = [
       address: '730, Eastern Metropolitan Bypass, Kolkata - 700107',
       phone: '+91 98300 54321',
       email: 'dr.ananya@fortishealthcare.com',
+      signature: SAMPLE_DOCTOR_SIGNATURE,
     },
     patient: {
       name: 'Mohan Lal Agarwal',
@@ -211,6 +223,12 @@ export const TEST_PRESETS: TestPreset[] = [
       phone: '+91 98311 88776',
       chiefComplaint: 'S: Burning soles at night, increased thirst, fatigue. O: FBS 188 mg/dL, PPBS 284 mg/dL, HbA1c 8.8%',
       diagnosis: 'Uncontrolled Type 2 Diabetes Mellitus with Early Peripheral Neuropathy',
+      bp: '138/84',
+      pulse: '76',
+      temp: '98.4',
+      spo2: '98',
+      respiratoryRate: '16',
+      examination: 'Bilateral mild pedal edema (+), diminished monofilament sensation on both feet',
     },
     symptoms: 'Polyuria, polydipsia, bilateral burning feet paresthesia, postprandial lethargy',
     medicines: [
@@ -275,6 +293,12 @@ export const TEST_PRESETS: TestPreset[] = [
       phone: '+91 98201 11223',
       chiefComplaint: 'Routine 3-month post-stenting review. Vitals: BP 124/78, Pulse 64 bpm, SpO2 99%, BMI 25.4',
       diagnosis: 'Post-Percutaneous Coronary Intervention (DES in LAD), Stable Ischemic Heart Disease',
+      bp: '124/78',
+      pulse: '64',
+      temp: '98.6',
+      spo2: '99',
+      respiratoryRate: '16',
+      examination: 'Chest: Bilateral clear, CVS: S1 S2 normal, no murmur, Peripheral pulses well felt',
     },
     symptoms: 'No active angina chest pain, mild post-meal fullness, good functional exercise tolerance',
     medicines: [

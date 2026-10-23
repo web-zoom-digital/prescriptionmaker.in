@@ -1,11 +1,23 @@
 {
   "manifest_version": 3,
-  "name": "PrescriptionMaker.in",
+  "name": "PrescriptionMaker.in - Digital Rx & EMR Companion",
   "version": "1.0.0",
-  "description": "Seamlessly draft digital prescriptions and capture data directly from any web-based EMR.",
+  "description": "Seamlessly draft digital prescriptions, capture patient data directly from any web-based EMR, and print or share Rx on WhatsApp.",
+  "icons": {
+    "16": "icon-16.png",
+    "32": "icon-32.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
   "action": {
     "default_popup": "index.html",
-    "default_title": "Open PrescriptionMaker"
+    "default_title": "PrescriptionMaker - Quick Rx & EMR Capture",
+    "default_icon": {
+      "16": "icon-16.png",
+      "32": "icon-32.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
   },
   "content_scripts": [
     {
@@ -20,10 +32,22 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "contextMenus"
   ],
   "host_permissions": [
+    "http://localhost:3000/*",
     "http://localhost:3005/*",
-    "https://prescriptionmaker.in/*"
-  ]
+    "https://prescriptionmaker.in/*",
+    "https://*.prescriptionmaker.in/*"
+  ],
+  "commands": {
+    "toggle-rx-widget": {
+      "suggested_key": {
+        "default": "Alt+P",
+        "mac": "Alt+P"
+      },
+      "description": "Toggle PrescriptionMaker Floating Widget"
+    }
+  }
 }

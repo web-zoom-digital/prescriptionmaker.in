@@ -845,7 +845,7 @@ function OverlaySOAP({
   const diagnosisClean = safeTruncate(patient.diagnosis, 36) || 'Acute Pharyngitis'
   const examClean = safeTruncate(patient.examination || patient.symptoms, 50) || 'Examination findings...'
   const dateStr = patient.date || new Date().toLocaleDateString('en-IN')
-  const patientAgeSex = [patient.age ? `Age ${patient.age}` : '', patient.sex].filter(Boolean).join(' / ') || 'Age 34 / Male'
+  const patientAgeSex = [patient.age ? `Age ${patient.age}` : '', patient.sex].filter(Boolean).join(' / ')
 
   // Proportional font sizing
   const fDoc = Math.max(12, Math.round(w * 0.034))
@@ -930,7 +930,7 @@ function OverlaySOAP({
       {/* Patient + Date Bar (Lavender Card) */}
       <Rect x={10} y={patCardY} width={contentW} height={patCardH} fill="#eef2ff" stroke="#c7d2fe" strokeWidth={0.8} rx={4} />
       <SvgText x={18} y={patCardY + patCardH * 0.65} fontSize={fText} fill="#0f172a" fontWeight="600">
-        {`Patient: ${patientNameClean}   ${patientAgeSex}`}
+        {`Patient: ${patientNameClean}${patientAgeSex ? `   ${patientAgeSex}` : ''}`}
       </SvgText>
       <SvgText x={w - 18} y={patCardY + patCardH * 0.65} textAnchor="end" fontSize={fText} fill="#0f172a" fontWeight="600">
         {`Date: ${dateStr}`}
@@ -1251,7 +1251,7 @@ function OverlayVitalsFirst({
       {/* Prominent 6-card VITALS Box */}
       <Rect x={10} y={vitalsBoxY} width={w - 20} height={vitalsH} fill="#ffffff" stroke={primaryColor} strokeWidth={1.5} rx={4} />
       <Rect x={10} y={vitalsBoxY} width={w - 20} height={16} fill={primaryColor} rx={3} />
-      <SvgText x={16} y={vitalsBoxY + 11} fontSize={f7} fontWeight="bold" fill="#ffffff" letterSpacing={0.5}>❤️  RECORDED VITALS & CARDIAC PARAMETERS</SvgText>
+      <SvgText x={16} y={vitalsBoxY + 11} fontSize={f7} fontWeight="bold" fill="#ffffff" letterSpacing={0.5}>❤️ VITALS</SvgText>
 
       {/* Row 1 of Vitals: BP, HR, SpO2 */}
       <Rect x={10} y={vitalsBoxY + 16} width={cardW} height={cardH} fill={accentColor + '10'} stroke={primaryColor + '20'} strokeWidth={0.5} />

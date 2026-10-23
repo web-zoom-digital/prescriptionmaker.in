@@ -310,12 +310,12 @@ function generateSOAPSVG(data: TabletExportData): string {
   const qualSpec = [doctor.qualification, doctor.specialization].filter(Boolean).join(' · ') || 'MBBS, MD · General Medicine'
   const clinicClean = safeTruncate(doctor.clinicName, 32) || 'Name of your clinic'
 
-  const patientNameClean = safeTruncate(patient.patientName, 26) || '___________________________'
+  const patientNameClean = safeTruncate(patient.patientName, 26) || 'Patient Name'
   const complaintClean = safeTruncate(patient.chiefComplaint, 45) || 'Acute Pharyngitis'
   const diagnosisClean = safeTruncate(patient.diagnosis, 40) || 'Acute Pharyngitis'
   const examClean = safeTruncate(patient.examination || patient.symptoms, 60) || 'Examination findings...'
   const dateStr = patient.date || new Date().toLocaleDateString('en-IN')
-  const patientAgeSex = [patient.age ? `Age ${patient.age}` : '', patient.sex].filter(Boolean).join(' / ') || 'Age 34 / Male'
+  const patientAgeSex = [patient.age ? `Age ${patient.age}` : '', patient.sex].filter(Boolean).join(' / ')
 
   // Proportional font sizing
   const fDoc = Math.max(12, Math.round(w * 0.034))
@@ -405,7 +405,7 @@ function generateSOAPSVG(data: TabletExportData): string {
   <!-- Patient + Date Bar (Lavender Card) -->
   <rect x="10" y="${patCardY}" width="${contentW}" height="${patCardH}" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.8" rx="4" />
   <text x="18" y="${patCardY + patCardH * 0.65}" font-size="${fText}" font-family="${fontFam}">
-    <tspan fill="#64748b">Patient: </tspan><tspan font-weight="bold" fill="#0f172a">${escapeXml(patientNameClean)}</tspan><tspan fill="#64748b">   ${escapeXml(patientAgeSex)}</tspan>
+    <tspan fill="#64748b">Patient: </tspan><tspan font-weight="bold" fill="#0f172a">${escapeXml(patientNameClean)}</tspan>${patientAgeSex ? `<tspan fill="#64748b">   ${escapeXml(patientAgeSex)}</tspan>` : ''}
   </text>
   <text x="${w - 18}" y="${patCardY + patCardH * 0.65}" text-anchor="end" font-size="${fText}" font-family="${fontFam}">
     <tspan fill="#64748b">Date: </tspan><tspan font-weight="bold" fill="#0f172a">${escapeXml(dateStr)}</tspan>
@@ -480,42 +480,42 @@ function generateMinimalSVG(data: TabletExportData): string {
   const patientNameClean = safeTruncate(patient.patientName, 26) || '___________________________'
   const complaintClean = safeTruncate(patient.chiefComplaint, 24) || '—'
   const diagnosisClean = safeTruncate(patient.diagnosis, 28) || 'Clinical Assessment'
-  const clinicClean = safeTruncate(doctor.clinicName, 32) || 'CLINICAL PRACTICE'
-  const doctorClean = safeTruncate(doctor.doctorName ? `Dr. ${doctor.doctorName}` : 'Dr. Attending Physician', 28)
+  const clinicClean = safeTruncate(doctor.clinicName, 32) || 'Name of your clinic'
+  const doctorClean = safeTruncate(doctor.doctorName ? `Dr. ${doctor.doctorName}` : 'Dr. Doctor Name', 28)
 
   const writingLines = generateWritingLines(rxY + 28, h - 45, lineCount, 12, w - 12)
   const strokesSVG = paths.map(p => `<path d="${p.d}" stroke="${p.color}" stroke-width="${p.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`).join('\n')
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:#ffffff;display:block;">
   <!-- Dark Solid Rule -->
-  <line x1="12" y1="${headH}" x2="${w - 12}" y2="${headH}" stroke="#1a202c" stroke-width="2" />
-  <text x="12" y="24" font-size="14" font-weight="bold" fill="#1a202c" letter-spacing="0.5" font-family="${fontFam}">${escapeXml(clinicClean.toUpperCase())}</text>
-  <text x="12" y="38" font-size="9" font-weight="bold" fill="#2d3748" font-family="${fontFam}">${escapeXml(doctorClean)} <tspan font-style="italic" font-weight="normal" fill="#718096">· ${escapeXml(doctor.qualification || 'Physician & Surgeon')}</tspan></text>
-  <text x="${w - 12}" y="38" text-anchor="end" font-size="7.5" fill="#a0aec0" font-family="${fontFam}">Reg. No. ${escapeXml(doctor.registrationNumber || 'DOC-REG-8812')}</text>
+  <line x1="12" y1="${headH}" x2="${w - 12}" y2="${headH}" stroke="#111827" stroke-width="2" />
+  <text x="12" y="24" font-size="14" font-weight="bold" fill="#111827" letter-spacing="-0.2" font-family="${fontFam}">${escapeXml(clinicClean)}</text>
+  <text x="12" y="38" font-size="9" font-weight="bold" fill="#111827" font-family="${fontFam}">${escapeXml(doctorClean)} <tspan font-style="italic" font-weight="normal" fill="#374151">· ${escapeXml(doctor.qualification || 'MBBS, MD, General Medicine')}</tspan></text>
+  <text x="${w - 12}" y="38" text-anchor="end" font-size="7.5" fill="#6b7280" font-family="${fontFam}">Reg. No. ${escapeXml(doctor.registrationNumber || 'DOC-REG-8812')}</text>
 
   <!-- Patient + Date -->
-  <text x="12" y="${patY + 14}" font-size="8" fill="#a0aec0" font-family="${fontFam}">Patient: </text>
-  <text x="56" y="${patY + 14}" font-size="10.5" font-weight="bold" fill="#2d3748" font-family="${fontFam}">${escapeXml(patientNameClean)}</text>
-  <line x1="56" y1="${patY + 17}" x2="${Math.min(w * 0.6, 56 + 140)}" y2="${patY + 17}" stroke="#a0aec0" stroke-width="0.8" stroke-dasharray="2,2" />
-  <text x="${w * 0.62}" y="${patY + 14}" font-size="8" fill="#718096" font-family="${fontFam}">${escapeXml(patient.age ? `Age ${patient.age}` : 'Age —')}${escapeXml(patient.sex ? ` / ${patient.sex}` : '')}</text>
-  <text x="${w - 12}" y="${patY + 14}" text-anchor="end" font-size="8" fill="#718096" font-family="${fontFam}">${escapeXml(patient.date || new Date().toLocaleDateString('en-IN'))}</text>
+  <text x="12" y="${patY + 14}" font-size="8" font-style="italic" fill="#6b7280" font-family="${fontFam}">Patient: </text>
+  <text x="56" y="${patY + 14}" font-size="10.5" font-weight="bold" fill="#111827" font-family="${fontFam}">${escapeXml(patientNameClean)}</text>
+  <line x1="56" y1="${patY + 17}" x2="${Math.min(w * 0.6, 56 + 140)}" y2="${patY + 17}" stroke="#9ca3af" stroke-width="0.8" stroke-dasharray="2,2" />
+  <text x="${w * 0.62}" y="${patY + 14}" font-size="8" fill="#6b7280" font-family="${fontFam}">${escapeXml(patient.age ? `Age ${patient.age}` : 'Age —')}${escapeXml(patient.sex ? ` / ${patient.sex}` : '')}</text>
+  <text x="${w - 12}" y="${patY + 14}" text-anchor="end" font-size="8" fill="#6b7280" font-family="${fontFam}">${escapeXml(patient.date || new Date().toLocaleDateString('en-IN'))}</text>
 
   <!-- Diagnosis -->
-  <text x="12" y="${diagY + 14}" font-size="7.5" font-style="italic" fill="#a0aec0" font-family="${fontFam}">Diagnosis: </text>
-  <text x="64" y="${diagY + 14}" font-size="8.5" fill="#2d3748" font-family="${fontFam}">${escapeXml(diagnosisClean)}</text>
-  <line x1="12" y1="${diagY + diagH}" x2="${w - 12}" y2="${diagY + diagH}" stroke="#e2e8f0" stroke-width="0.8" />
+  <text x="12" y="${diagY + 14}" font-size="7.5" font-style="italic" fill="#6b7280" font-family="${fontFam}">Diagnosis: </text>
+  <text x="64" y="${diagY + 14}" font-size="8.5" font-weight="bold" fill="#111827" font-family="${fontFam}">${escapeXml(diagnosisClean)}</text>
+  <line x1="12" y1="${diagY + diagH}" x2="${w - 12}" y2="${diagY + diagH}" stroke="#e5e7eb" stroke-width="0.8" />
 
   <!-- Big Italic ℞ -->
-  <text x="12" y="${rxY + 20}" font-size="34" font-family="${fontFam}" font-style="italic" fill="#1a202c">℞</text>
+  <text x="12" y="${rxY + 20}" font-size="34" font-family="${fontFam}" font-style="italic" font-weight="bold" fill="#111827">℞</text>
 
   ${writingLines}
   ${strokesSVG}
 
   <!-- Footer -->
   ${renderSvgDoctorSignature(doctor, w - 52, h - 28, 80, 22, fontFam)}
-  <line x1="${w - 95}" y1="${h - 26}" x2="${w - 12}" y2="${h - 26}" stroke="#cbd5e1" stroke-width="0.8" />
-  <text x="${w - 52}" y="${h - 14}" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="Arial,sans-serif">Signature</text>
-  <text x="12" y="${h - 14}" font-size="6.5" fill="#cbd5e1" letter-spacing="1" font-family="Arial,sans-serif">MINIMAL PRINT RULED</text>
+  <line x1="${w - 95}" y1="${h - 26}" x2="${w - 12}" y2="${h - 26}" stroke="#6b7280" stroke-width="0.8" />
+  <text x="${w - 52}" y="${h - 14}" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="${fontFam}">Signature</text>
+  <text x="${w / 2}" y="${h - 10}" text-anchor="middle" font-size="6.5" fill="#cbd5e1" letter-spacing="3" font-family="${fontFam}">P R E S C R I P T I O N M A K E R . I N</text>
 </svg>`
 }
 
@@ -604,13 +604,16 @@ function generateBilingualSVG(data: TabletExportData): string {
   <text x="14" y="${h - 40}" font-size="7" font-weight="${patient.investigations ? 'bold' : 'normal'}" fill="${patient.investigations ? '#0f172a' : '#64748b'}" font-family="${fontFam}">जाँच / Investigations: ${escapeXml(patient.investigations ? safeTruncate(patient.investigations, 24) : '___________________')}</text>
   <text x="${w * 0.52}" y="${h - 40}" font-size="7" font-weight="${patient.advice ? 'bold' : 'normal'}" fill="${patient.advice ? '#0f172a' : '#64748b'}" font-family="${fontFam}">सलाह / Advice: ${escapeXml(patient.advice ? safeTruncate(patient.advice, 28) : '________________________')}</text>
 
-  <!-- Footer -->
-  <line x1="10" y1="${h - 30}" x2="${w - 10}" y2="${h - 30}" stroke="#cbd5e1" stroke-width="0.8" />
-  <text x="14" y="${h - 18}" font-size="7" font-weight="${patient.followUp ? 'bold' : 'normal'}" fill="${patient.followUp ? '#0f172a' : '#64748b'}" font-family="${fontFam}">Next Visit / अगली मुलाकात: ${escapeXml(patient.followUp ? patient.followUp : '____________')}</text>
-  ${renderSvgDoctorSignature(doctor, w - 67, h - 20, 85, 22, fontFam)}
-  <line x1="${w - 120}" y1="${h - 18}" x2="${w - 14}" y2="${h - 18}" stroke="#94a3b8" stroke-width="0.8" />
-  <text x="${w - 67}" y="${h - 8}" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="${fontFam}">डॉक्टर के हस्ताक्षर / Signature</text>
-  <text x="14" y="${h - 8}" font-size="6" fill="#94a3b8" font-family="${fontFam}">PrescriptionMaker.in · द्विभाषी पर्ची</text>
+  <!-- Footer & Left-Aligned Signature -->
+  ${renderSvgDoctorSignature(doctor, 55, h - 32, 80, 20, fontFam)}
+  <line x1="14" y1="${h - 30}" x2="114" y2="${h - 30}" stroke="#94a3b8" stroke-width="0.8" />
+  <text x="14" y="${h - 20}" font-size="7" font-weight="bold" fill="#334155" font-family="${fontFam}">Doctor's Signature</text>
+  <text x="14" y="${h - 12}" font-size="6.5" fill="#64748b" font-family="${fontFam}">${escapeXml(doctorClean)}</text>
+  <text x="${w - 14}" y="${h - 20}" text-anchor="end" font-size="6.5" font-weight="${patient.followUp ? 'bold' : 'normal'}" fill="${patient.followUp ? '#0f172a' : '#64748b'}" font-family="${fontFam}">Next Visit / अगली मुलाकात: ${escapeXml(patient.followUp ? patient.followUp : '____________')}</text>
+
+  <!-- Bottom Solid Purple Ribbon -->
+  <rect x="10" y="${h - 10}" width="${w - 20}" height="8" fill="${primaryColor}" rx="2.5" />
+  <text x="${w / 2}" y="${h - 4}" text-anchor="middle" font-size="5.5" font-weight="bold" fill="#ffffff" font-family="${fontFam}">prescriptionmaker.in</text>
 </svg>`
 }
 
@@ -665,7 +668,7 @@ function generateVitalsFirstSVG(data: TabletExportData): string {
   <!-- Prominent 6-card VITALS Box -->
   <rect x="10" y="${vitalsBoxY}" width="${w - 20}" height="${vitalsH}" fill="#ffffff" stroke="${primaryColor}" stroke-width="1.5" rx="4" />
   <rect x="10" y="${vitalsBoxY}" width="${w - 20}" height="16" fill="${primaryColor}" rx="3" />
-  <text x="16" y="${vitalsBoxY + 11}" font-size="7" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">❤️  RECORDED VITALS &amp; CARDIAC PARAMETERS</text>
+  <text x="16" y="${vitalsBoxY + 11}" font-size="8" font-weight="bold" fill="#ffffff" letter-spacing="0.5" font-family="${fontFam}">❤️ VITALS</text>
 
   <!-- Row 1 of Vitals: BP, HR, SpO2 -->
   <rect x="10" y="${vitalsBoxY + 16}" width="${cardW}" height="${cardH}" fill="${accentColor}10" stroke="${primaryColor}20" stroke-width="0.5" />
@@ -1754,9 +1757,13 @@ export async function downloadPrescriptionPdf({
       // Extract .page element or fallback to body content
       const targetPage = doc.querySelector('.page')
       const contentNode = document.createElement('div')
-      contentNode.className = 'page'
+      contentNode.className = targetPage ? targetPage.className : 'page'
       contentNode.style.width = '794px'
       contentNode.style.backgroundColor = '#ffffff'
+      if (targetPage && targetPage.getAttribute('style')) {
+        contentNode.setAttribute('style', targetPage.getAttribute('style')!)
+        contentNode.style.width = '794px'
+      }
       contentNode.innerHTML = targetPage ? targetPage.innerHTML : (doc.body ? doc.body.innerHTML : html)
       wrapper.appendChild(contentNode)
       document.body.appendChild(wrapper)

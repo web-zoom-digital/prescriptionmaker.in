@@ -109,9 +109,26 @@ export function EditorShell() {
         }
 
         if (!id) {
+          const prefillName = searchParams.get('prefill_name') || searchParams.get('name')
+          const prefillAge = searchParams.get('prefill_age') || searchParams.get('age')
+          const prefillGender = searchParams.get('prefill_gender') || searchParams.get('gender')
+          const prefillPhone = searchParams.get('prefill_phone') || searchParams.get('phone')
+          const prefillDiagnosis = searchParams.get('diagnosis') || searchParams.get('prefill_diagnosis')
+          const prefillWeight = searchParams.get('prefill_weight') || searchParams.get('weight')
+
+          const prefillPatient = (prefillName || prefillAge || prefillGender || prefillPhone || prefillWeight) ? {
+            name: prefillName || '',
+            age: prefillAge ? Number(prefillAge) || prefillAge : '',
+            gender: prefillGender || '',
+            phone: prefillPhone || '',
+            weight: prefillWeight || '',
+          } : undefined
+
           setPrescriptionData(prev => ({
             ...baseDoctorInfo,
             ...prev,
+            ...(prefillPatient ? { patient: prefillPatient, patientInfo: prefillPatient } : {}),
+            ...(prefillDiagnosis ? { diagnosis: prefillDiagnosis } : {}),
             // Ensure doctor fields from profile take precedence if prev is empty
             doctorName: prev.doctorName || baseDoctorInfo.doctorName || '',
             doctorQualifications: prev.doctorQualifications || baseDoctorInfo.doctorQualifications || '',
@@ -333,13 +350,20 @@ export function EditorShell() {
       {/* Editor Top Bar */}
       <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-border bg-white px-4 shadow-soft-sm">
         <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-1.5 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-            aria-label="Back to dashboard"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          </Link>
+          {searchParams.get('embed') === 'true' ? (
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-teal-50 border border-teal-200 rounded-md text-[11px] font-bold text-teal-700">
+              <span>℞</span>
+              <span>EMR Canvas</span>
+            </div>
+          ) : (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-1.5 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              aria-label="Back to dashboard"
+            >
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          )}
 
           <div className="flex items-center gap-2 border-l border-border pl-3">
             <select
