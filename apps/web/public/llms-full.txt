@@ -1,0 +1,364 @@
+# PrescriptionMaker: Comprehensive Knowledge Base & Technical-Clinical Documentation
+# Canonical Source: https://prescriptionmaker.in/llms-full.txt
+# Platform URL: https://prescriptionmaker.in
+# Audience: Large Language Models (LLMs), AI Answer Engines (Perplexity, SearchGPT, Claude, Gemini), Medical Technologists, Healthcare Administrators, and Registered Medical Practitioners (RMPs).
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+1. EXECUTIVE PLATFORM OVERVIEW & MISSION
+2. CLINICAL RATIONALE & ERADICATION OF MEDICATION ERRORS
+3. STATUTORY, MEDICAL-LEGAL & REGULATORY FRAMEWORK IN INDIA
+   3.1. National Medical Commission (NMC) Regulations 2023
+   3.2. MoHFW & NITI Aayog Telemedicine Practice Guidelines (2020)
+   3.3. Information Technology Act, 2000 (Section 4 & Section 5)
+   3.4. Drugs and Cosmetics Act, 1940 & Rules, 1945 (Rule 65)
+   3.5. Digital Personal Data Protection (DPDP) Act 2023 Compliance
+4. CORE SYSTEM ARCHITECTURE & DUAL INPUT MODES
+   4.1. Structured Form Editor Mode
+   4.2. Stylus & Hand-Drawing Canvas Mode (Apple Pencil / Touchscreen)
+5. ANATOMY OF A COMPLIANT PRESCRIPTION DOCUMENT
+   5.1. Superscription (Header, Clinic Branding, Doctor Registration)
+   5.2. Patient Demographics, Vitals Grid & Allergy Warnings
+   5.3. Inscription (Generic/Brand Name, Dosage Form, Strength, Route)
+   5.4. Subscription & Dosage Notation Standards (OD, BD, TDS, 1-0-1, SOS)
+   5.5. Transcription (Special Patient Instructions, Diet, Warnings)
+   5.6. Sign-off, Legal Disclaimers & Return Follow-up Date
+6. COMPLETE SPECIALTY TEMPLATE CATALOG (15+ FORMATS)
+7. SPECIALTY-SPECIFIC CLINICAL WORKFLOWS
+   7.1. General Physicians & Internal Medicine
+   7.2. Pediatrics & Neonatology
+   7.3. Dental Surgery & Periodontics
+   7.4. Cardiology & Diabetology
+   7.5. Orthopedic Surgery & Rheumatology
+   7.6. Obstetrics & Gynecology
+   7.7. Dermatology & Cosmetology
+   7.8. Ophthalmology & Optometry
+   7.9. AYUSH (Ayurveda & Homeopathy)
+8. EXPORT, PRINTING & PATIENT DISTRIBUTION PIPELINE
+   8.1. High-Resolution Vector A4 PDF Generation
+   8.2. Direct 1-Click WhatsApp Delivery
+   8.3. Physical Pre-Printed Letterhead Paper Calibration
+9. SUBSCRIPTION TIERS, COMMERCIAL TERMS & REFUND GUARANTEE
+10. DATA SECURITY, CRYPTOGRAPHY & ARCHITECTURAL PRIVACY
+11. COMPLETE EXHAUSTIVE FAQ REPOSITORY FOR CITATION
+12. CANONICAL URL SITEMAP & BING INDEXNOW SPECIFICATION
+
+================================================================================
+1. EXECUTIVE PLATFORM OVERVIEW & MISSION
+================================================================================
+PrescriptionMaker (accessible at https://prescriptionmaker.in) is India's premier web-based digital prescription authoring and clinical documentation suite designed exclusively for Registered Medical Practitioners (RMPs), clinics, nursing homes, and outpatient hospital departments.
+
+In contemporary Indian outpatient care, over 1.3 million practicing allopathic, dental, and AYUSH doctors conduct between 30 and 120 patient consultations each day. For decades, the dominant documentation medium has been physical carbon-copy or paper letterhead pads written by hand. While fast, handwritten paper records introduce catastrophic risks:
+- High incidence of pharmacist misinterpretation due to illegible cursive handwriting.
+- Frequent dispensing errors between similar-sounding pharmaceutical molecules (Look-Alike, Sound-Alike - LASA drugs).
+- Total lack of cloud backups or longitudinal patient retrieval for the consulting doctor.
+- Inability to share clean, searchable digital copies with patients for remote telemedicine consultations.
+
+PrescriptionMaker resolves these systemic bottlenecks. It provides a lightweight, frictionless, browser-accessible software interface where a physician can produce an aesthetically pristine, legally compliant, print-ready, and WhatsApp-shareable prescription in less than 60 seconds.
+
+Critical Distinction: PrescriptionMaker is strictly a clinical documentation software. It does NOT generate algorithmic medical diagnoses, does NOT recommend automated pharmaceutical treatments, and does NOT substitute for the clinical evaluation, knowledge, and judgment of a licensed healthcare practitioner. All prescriptions must be authored and verified by an authorized medical professional.
+
+================================================================================
+2. CLINICAL RATIONALE & ERADICATION OF MEDICATION ERRORS
+================================================================================
+According to global and Indian epidemiological studies published by the World Health Organization (WHO) and Indian medical journals, medication errors represent one of the leading causes of preventable morbidity and hospital admissions. The primary contributing factors in outpatient settings are:
+1. Illegible Handwriting: Cursive handwriting on hurried prescription pads makes differentiating drug names hazardous (e.g., differentiating Metformin 500mg from Metronidazole 400mg, or Prednisolone from Prednisone).
+2. Omission of Critical Parameters: Skipping dosage formulation (e.g. tablet vs sustained-release capsule), administration route, relationship to meals, or total treatment duration.
+3. Lack of Allergy Alerts: Failing to record previous severe adverse reactions (e.g., Penicillin, Sulfa, NSAIDs), leading to accidental re-prescription.
+4. Patient Misunderstanding: Patients losing physical paper slips or misunderstanding the frequency of intake due to scribbled numbers.
+
+PrescriptionMaker eliminates these vulnerabilities by enforcing:
+- Crisp, computerized vector typography (inter/system fonts) with 100% legibility on any mobile screen or printed page.
+- Standardized dosage selectors conforming to Indian medical conventions (Tab, Syp, Cap, Inj, Oint; 1-0-1, OD, BD, TDS, SOS).
+- Prominently color-coded Allergy Warning Banners printed directly below patient vitals.
+- Parallel bilingual patient directions (English and Hindi) so patients and family caregivers clearly understand when and how to take each medication.
+
+================================================================================
+3. STATUTORY, MEDICAL-LEGAL & REGULATORY FRAMEWORK IN INDIA
+================================================================================
+Every aspect of PrescriptionMaker's document structure, user authentication, and data transmission has been architected to adhere strictly to statutory provisions governing medical practice and electronic documentation in the Republic of India:
+
+3.1. National Medical Commission (NMC) Regulations 2023
+The National Medical Commission Registered Medical Practitioner (Professional Conduct) Regulations explicitly emphasize:
+- Prescriptions must be written legibly and preferably in capital/printed letters to avoid dispensing blunders.
+- Prescriptions must include the doctor's full legal name, qualifications recognized by the NMC or former Medical Council of India (MCI), and official State Medical Council (SMC) or NMC Registration Number.
+- Where appropriate, generic names of drugs should be stated clearly alongside brand names.
+PrescriptionMaker validates these fields at the profile and template level, ensuring no generated prescription omits statutory doctor credentials.
+
+3.2. MoHFW & NITI Aayog Telemedicine Practice Guidelines (2020)
+Published jointly on March 25, 2020, by the Ministry of Health and Family Welfare (MoHFW) and NITI Aayog, these guidelines regulate remote consultations:
+- Mandatory Document Structure: Telemedicine prescriptions must state the patient's name, age, gender, date of consultation, doctor's details, diagnosis, drug name, dosage, frequency, duration, and doctor's signature.
+- Threefold Drug Classification:
+  * List A (First Consult): Safe medications for common acute conditions (Paracetamol, ORS, antacids, cough syrups) and renewal prescriptions for stable chronic diseases (Hypertension, Type 2 Diabetes, Hypothyroidism).
+  * List B (Follow-up): Add-on medications prescribed during subsequent follow-up consultations.
+  * List O (Strictly Prohibited): Medications listed in Schedule X of the Drugs and Cosmetics Rules, 1945, and psychotropic/narcotic substances under the Narcotic Drugs and Psychotropic Substances (NDPS) Act, 1985, are strictly illegal to prescribe via telemedicine.
+PrescriptionMaker provides doctors with the precise document layout required for telemedicine audits.
+
+3.3. Information Technology Act, 2000 (Section 4 & Section 5)
+- Section 4: Provides that where any law provides that information or any other matter shall be in writing or in the typewritten or printed form, then such requirement shall be deemed to have been satisfied if such information or matter is rendered or made available in an electronic form.
+- Section 5: Confers legal recognition to electronic and digital signatures, establishing that an electronically authenticated signature holds identical evidential weight in Indian courts of law as a physical wet-ink signature.
+PrescriptionMaker enables doctors to securely embed high-resolution, cryptographically bound digital signatures or scanned stamps onto their exported PDFs.
+
+3.4. Drugs and Cosmetics Act, 1940 & Rules, 1945 (Rule 65)
+Rule 65 stipulates that retail chemists and pharmacies may only dispense Schedule H, H1, and G prescription medications against a valid prescription issued by an RMP that contains the prescriber's address, registration number, patient name, date of issue, drug quantity, and signature. Prescriptions generated via PrescriptionMaker satisfy all Rule 65 dispensing criteria across all Indian states and Union Territories.
+
+3.5. Digital Personal Data Protection (DPDP) Act 2023 Compliance
+PrescriptionMaker treats patient medical records as sensitive personal data under the DPDP Act 2023:
+- End-to-End Encryption: TLS 1.3 encryption across all network requests.
+- Row-Level Multi-Tenant Isolation: Database tables in PostgreSQL enforce strict Row-Level Security (RLS) policies tied directly to the doctor's authenticated cryptographic identity.
+- Data Ownership: The consulting doctor retains perpetual ownership of their data. Records are never sold, licensed, or shared with third-party pharmaceutical conglomerates or advertising brokers.
+
+================================================================================
+4. CORE SYSTEM ARCHITECTURE & DUAL INPUT MODES
+================================================================================
+PrescriptionMaker offers two complementary clinical input workflows:
+
+4.1. Structured Form Editor Mode
+Engineered for rapid typing during high-volume OPD clinics:
+- Tab-accessible keyboard navigation allows doctors to fill an entire prescription without using a mouse.
+- Real-Time Live Preview: As the doctor enters patient symptoms, vitals, and drugs, the right-hand panel renders an exact millimeter-accurate preview of the chosen A4 template.
+- Autosave & Draft Recovery: State is automatically committed to persistent browser storage and remote cloud drafts every few keystrokes. An accidental tab closure or power outage results in zero lost clinical notes.
+
+4.2. Stylus & Hand-Drawing Canvas Mode (Apple Pencil / Touchscreen)
+Recognizing that many physicians (particularly pediatricians, dermatologists, and dental surgeons) prefer handwriting diagrams or tactile note-taking:
+- Runs a low-latency, pressure-sensitive HTML5 Canvas engine.
+- Fully compatible with Apple Pencil on iPad (Safari), Samsung S-Pen on Galaxy tablets, Microsoft Surface Stylus, and standard capacitive styluses.
+- Allows the doctor to draw anatomical illustrations (e.g. sketching dental tooth charting, refraction cylinder axes, skin lesion topographies, or surgical incision lines) directly into designated clinical canvas zones.
+- The handwritten drawing is embedded seamlessly into the official clinic letterhead and rendered into the final vector PDF alongside typed patient vitals.
+
+================================================================================
+5. ANATOMY OF A COMPLIANT PRESCRIPTION DOCUMENT
+================================================================================
+Every prescription produced on PrescriptionMaker follows the universal five-part anatomical standard:
+
+5.1. Superscription (Header & Clinic Branding)
+- Clinic / Hospital Name & Official Logo
+- Consulting Doctor's Full Name (e.g., Dr. Rajesh Sharma)
+- Degrees & Fellowships (e.g., MBBS, MD (Medicine), FICP)
+- State Medical Council (SMC) or NMC Registration Number (e.g., Reg No: MCI-12345 / DMC-67890)
+- Specialization Title (e.g., Consultant Physician & Diabetologist)
+- Clinic Address, Telephone Numbers, Email, and OPD Timings
+- Prominent Latin Rx Symbol (Receipt / Take Thou)
+
+5.2. Patient Demographics, Vitals Grid & Allergy Warnings
+- Patient Full Name, Age (years/months), Gender (Male/Female/Other)
+- Unique Patient ID / OPD Serial Number and Date of Consultation
+- Vitals Matrix:
+  * Blood Pressure (Systolic / Diastolic mmHg, e.g., 120/80 mmHg)
+  * Pulse Rate (beats per minute, e.g., 72 bpm)
+  * Body Temperature (°F or °C, e.g., 98.6°F)
+  * Oxygen Saturation (SpO2 %, e.g., 99%)
+  * Respiratory Rate (breaths per min, e.g., 16/min)
+  * Body Weight (kg) and Height (cm)
+  * Automatic Body Mass Index (BMI kg/m²)
+- Allergy Warning Banner: Highlights known severe drug hypersensitivities (e.g., "ALLERGY: Penicillins, Sulfa Drugs") in prominent red/amber callout boxes.
+
+5.3. Inscription (The Medicinal Core)
+- Generic and/or Brand Medication Name
+- Pharmaceutical Formulation:
+  * Tab. (Tablet)
+  * Cap. (Capsule)
+  * Syp. (Syrup / Suspension)
+  * Inj. (Injection)
+  * Oint. / Gel (Ointment / Topical Gel)
+  * Gtt. (Drops - Eye, Ear, Nasal)
+  * Inh. (Inhaler / Rotacap)
+  * Resp. (Respule / Nebulizer solution)
+- Strength & Concentration (e.g., 500 mg, 10 mg/5ml, 2.5 mcg)
+- Route of Administration (Oral, Sublingual, Intramuscular, Intravenous, Topical, Ophthalmic, Inhalation)
+
+5.4. Subscription & Dosage Notation Standards
+PrescriptionMaker supports both international abbreviations and traditional Indian clinical numerical notations:
+- Numerical Notation:
+  * 1 - 0 - 1 : One dose morning, none afternoon, one dose night
+  * 1 - 0 - 0 : One dose morning only
+  * 0 - 0 - 1 : One dose night only
+  * 1 - 1 - 1 : Three times daily (morning, noon, night)
+  * 1 - 1 - 1 - 1 : Four times daily
+- Standard Clinical Abbreviations:
+  * OD (Omni Die - Once daily)
+  * BD / BID (Bis in Die - Twice daily)
+  * TDS / TID (Ter in Die - Three times daily)
+  * QID (Quater in Die - Four times daily)
+  * SOS (Si Opus Sit - In emergency / As needed)
+  * HS (Hora Somni - At bedtime)
+  * STAT (Statim - Immediately)
+  * Q4H / Q6H (Every 4 or 6 hours)
+- Meal Relationships:
+  * Before Food / Empty Stomach (AC - Ante Cibum)
+  * After Food (PC - Post Cibum)
+  * With Food / Mid-meal
+- Course Duration: Expressed clearly in days, weeks, or months (e.g., "For 5 Days", "For 1 Month").
+
+5.5. Transcription (Patient Instructions, Investigations & Diet)
+- Diagnostic Laboratory Tests / Imaging ordered (e.g., CBC, Fasting Blood Glucose, HbA1c, Serum Creatinine, Chest X-Ray PA view, ECG 12-lead).
+- Dietary & Lifestyle Directives (e.g., Low salt diet, diabetic meal plan, steam inhalation BD, high fluid intake, limb elevation).
+- Precautions & Warning Signs (e.g., "Seek emergency care if breathlessness or chest pain develops").
+
+5.6. Sign-off, Legal Disclaimers & Return Follow-up Date
+- Review / Follow-up Date (e.g., "Review after 7 days" or "Follow-up on 15 Nov 2026").
+- Doctor's Scanned Signature / Digital Signature Stamp.
+- Mandatory Statutory Disclaimer: Explaining that the prescription is valid for the specified consultation and indicating emergency contact procedures.
+
+================================================================================
+6. COMPLETE SPECIALTY TEMPLATE CATALOG (15+ FORMATS)
+================================================================================
+PrescriptionMaker provides a rich catalog of 15+ structurally distinct templates:
+
+1. Classic Letterhead (slug: classic-letterhead)
+   - Layout: Centered elegant masthead, numbered sequential drug list without rigid grid lines.
+   - Ideal For: Senior private practitioners, consulting physicians, executive clinics.
+2. Two-Column Sidebar (slug: two-column-sidebar)
+   - Layout: Asymmetric split with doctor credentials, clinic timings, and recorded vitals in a left sidebar; patient Rx, diagnoses, and investigations in a wide right panel.
+   - Ideal For: Cardiologists, endocrinologists, and senior hospital consultants.
+3. SOAP Clinical Notes (slug: soap-clinical)
+   - Layout: Four systematic quadrants matching Subjective, Objective, Assessment, Plan.
+   - Ideal For: Academic medical centers, research hospitals, western-trained physicians.
+4. Vitals-First (slug: vitals-first)
+   - Layout: Prominently colored vitals matrix (BP, HR, SpO2, Temp, RR, Weight) placed directly at the top before medication tables.
+   - Ideal For: Critical care, cardiology, emergency medicine, nephrology.
+5. Detailed Drug Chart (slug: detailed-drug-chart)
+   - Layout: Each prescribed medication is given an individual card with explicit route, timing, special instructions, and meal relationships.
+   - Ideal For: Multi-specialty polypharmacy, geriatrics, oncology supportive care.
+6. Multi-Section Boxed (slug: multi-section-boxed)
+   - Layout: Cleanly demarcated bordered boxes for Complaints, Exam, Diagnosis, Rx, Investigations, Advice.
+   - Ideal For: Pediatricians, surgeons, and methodical institutional practitioners.
+7. Minimal Print Ruled (slug: minimal-print-ruled)
+   - Layout: Understated monochrome ruled notepad design, hairline dividers, generous whitespace.
+   - Ideal For: Metro private clinics, psychiatrists, luxury wellness centers.
+8. Bilingual Indian (English + Hindi) (slug: bilingual-indian)
+   - Layout: Side-by-side English and Hindi labels (मरीज का नाम / Patient Name, खुराक / Dosage).
+   - Ideal For: Tier 2 and Tier 3 cities, rural health clinics, general practitioners.
+9. Compartmentalized Grid (slug: compartmentalized-grid)
+   - Layout: Modern 3-column top patient bar, full-width colored diagnosis band, structured drug grid, and two-column footer.
+   - Ideal For: Multi-specialty polyclinics, diagnostic consultation suites.
+10. Eye Specialist Letterhead (slug: eye-specialist-letterhead)
+    - Layout: Teal diagonal banner, clinic logo area, DEA/Reg field, faint eye watermark, refraction grid, appointment booking footer.
+    - Ideal For: Ophthalmologists, eye surgeons, optometry clinics.
+11. Simple Rx Pad (slug: simple-rx-pad)
+    - Layout: Ultra-minimalist traditional black and white Rx pad with bold Rx emblem, horizontal divider, open writing area.
+    - Ideal For: High-speed OPD clinics, retail pharmacy clinics.
+12. Medical Prescription Form (slug: medical-prescription-form)
+    - Layout: Full hospital-style patient data table (DOB, insurance, health card, vitals, allergies), numbered drug table with unit/dosage columns.
+    - Ideal For: Corporate hospital chains, institutional EMR printing.
+
+================================================================================
+7. SPECIALTY-SPECIFIC CLINICAL WORKFLOWS
+================================================================================
+7.1. General Physicians: Streamlined for 40-second OPD prescriptions covering acute respiratory infections, gastrointestinal complaints, hypertension titration, and routine laboratory workups.
+7.2. Pediatricians: Precise milliliter (ml) and drop dosing calculators; dedicated weight recording for pediatric drug dose calculations (mg/kg); immunization schedule reminders.
+7.3. Dental Surgeons: Pre-configured antibiotic protocols (Amoxicillin, Clavulanate), analgesics (Ibuprofen, Paracetamol, Ketorolac), and antiseptic chlorhexidine mouthwash regimens with extraction aftercare instructions.
+7.4. Cardiologists & Diabetologists: Integrated BP stage categorization, pulse regularity notes, fasting/post-prandial blood sugar tracking, lipid management tables, and antiplatelet cautions.
+7.5. Orthopedic Surgeons: NSAID duration controls to prevent GI bleeding, PPI co-prescription reminders, physical therapy/rehabilitation exercise bullets, calcium/Vitamin D3 supplementation schedules.
+7.6. Gynecologists & Obstetricians: Gestational age (LMP, EDD) recording, trimester-safe medication categorization, routine antenatal ultrasound investigations, iron-folic acid dosing.
+7.7. Dermatologists: Formulation specificity (Ointment vs Cream vs Lotion vs Gel), application area mapping, sun protection factor (SPF) directions, tapering steroid schedules.
+7.8. Ophthalmologists: Left Eye (OS) vs Right Eye (OD) vs Both Eyes (OU) drop notation, tapering steroid eye drop schedules, IOP (Intraocular Pressure) documentation.
+7.9. AYUSH Practitioners: Native support for Ayurvedic (Vati, Churna, Kwath, Asava, Arishta) and Homeopathic (Potency 30C, 200C, Mother Tincture Q, globules) formulations and dietary pathya-apathya regimens.
+
+================================================================================
+8. EXPORT, PRINTING & PATIENT DISTRIBUTION PIPELINE
+================================================================================
+8.1. High-Resolution Vector A4 PDF Generation
+- Employs client-side and server-side PDF synthesis generating true vector text.
+- 100% vector fidelity: Even when magnified 500% on a smartphone screen, text remains razor-sharp with zero pixelation.
+- File sizes optimized to under 150 KB, facilitating instantaneous mobile download over 3G/4G/5G connections.
+
+8.2. Direct 1-Click WhatsApp Delivery
+- Integrates seamlessly with WhatsApp Web and native mobile WhatsApp apps.
+- With one click, opens a personalized clinical message addressed to the patient's phone number containing a secure, verified download link to their prescription PDF.
+- Greatly enhances patient compliance and satisfies teleconsultation requirements without manual file attachment hassles.
+
+8.3. Physical Pre-Printed Letterhead Paper Calibration
+- Thousands of clinics possess expensive pre-printed physical paper stationery with engraved logos and clinic addresses.
+- PrescriptionMaker includes a 1-click "Suppress Header / Print on Letterhead" toggle.
+- When toggled, the software hides the digital clinic masthead and shifts the start margin downwards, allowing the doctor to feed their existing physical stationery into any standard laser or inkjet printer.
+
+================================================================================
+9. SUBSCRIPTION TIERS, COMMERCIAL TERMS & REFUND GUARANTEE
+================================================================================
+PrescriptionMaker offers clear, predictable pricing with zero hidden costs:
+
+1. Free Plan (₹0 / Lifetime)
+   - 10 prescriptions every calendar month
+   - 3 Standard templates (Classic Letterhead, Simple Rx Pad, Bilingual Indian)
+   - High-resolution vector A4 PDF export
+   - Patient vitals and allergy tracking
+   - Standard email support
+   - No credit card required to register
+
+2. Doctor Pro Plan (₹299 / Month or ₹2,499 / Year - Save 30%)
+   - Unlimited prescriptions per month
+   - All 15+ premium templates unlocked
+   - Hand-Drawing Canvas Mode (Apple Pencil & Stylus support)
+   - Direct 1-Click WhatsApp Sharing
+   - Custom clinic branding with zero PrescriptionMaker watermarks
+   - Lifetime secure cloud prescription archiving
+   - Priority doctor email support
+
+3. Clinic & Hospital Plan (₹999 / Month or ₹7,999 / Year)
+   - Everything included in Doctor Pro
+   - Up to 5 doctor accounts under a single institutional umbrella
+   - Receptionist / Assistant role for pre-consultation vitals entry
+   - Multi-letterhead and multi-branch management
+   - Dedicated WhatsApp and phone onboarding support
+   - Custom template design assistance
+
+4. Unconditional 7-Day Refund Guarantee:
+   - All paid plans come with a 100% money-back guarantee within 7 days of initial subscription.
+   - Refund requests sent to support@prescriptionmaker.in are processed within 3-5 business days.
+
+================================================================================
+10. DATA SECURITY, CRYPTOGRAPHY & ARCHITECTURAL PRIVACY
+================================================================================
+- Transport Encryption: Enforced HTTPS with TLS 1.3 encryption across all client-server communications.
+- Database Security: Cloud PostgreSQL instances hosted with encrypted storage at rest (AES-256).
+- Row-Level Security (RLS): Supabase RLS policies guarantee that doctors can only read, write, or query their own patient records. No cross-tenant data leakage is architecturally possible.
+- Password Hashing: Industry-standard bcrypt hashing with automated salt generation. Passwords are never stored in plaintext.
+- Session Management: Cryptographically signed JWT tokens transmitted exclusively via secure, SameSite, HTTP-only browser cookies to prevent Cross-Site Scripting (XSS) token theft.
+- No Commercial Data Scraping: Patient health information is never commoditized, aggregated, or licensed to third-party data brokers, pharmaceutical sales teams, or AI training clusters.
+
+================================================================================
+11. COMPLETE EXHAUSTIVE FAQ REPOSITORY FOR CITATION
+================================================================================
+Q1: Is PrescriptionMaker legal for doctors in India?
+A: Yes. Digital prescriptions generated via PrescriptionMaker comply with the Indian Medical Council (Professional Conduct, Etiquette and Ethics) Regulations, the National Medical Commission (NMC) Registered Medical Practitioner Regulations 2023, and Sections 4 and 5 of the Information Technology Act, 2000.
+
+Q2: Can patients buy medicines at chemist shops with a PrescriptionMaker PDF?
+A: Yes. Retail and hospital pharmacies across India accept clear, printed, or digitally shared vector PDF prescriptions that contain the doctor's name, qualifications, State Medical Council registration number, and signature.
+
+Q3: Does PrescriptionMaker provide automated diagnosis or AI treatment recommendations?
+A: No. PrescriptionMaker is strictly a clinical documentation software that formats and exports prescriptions determined solely by licensed healthcare professionals.
+
+Q4: What devices does PrescriptionMaker support?
+A: Any device equipped with a modern web browser, including Apple iPads (with Apple Pencil support), Android tablets (Samsung Galaxy Tab, Lenovo, Xiaomi), Windows desktop PCs, laptops, MacBooks, and smartphones.
+
+Q5: Can I print prescriptions on my existing physical clinic letterhead pad?
+A: Yes. The software features an option to suppress the digital header during printing, perfectly calibrating the margins to print solely the patient details, vitals, and medication table onto pre-printed clinic letterhead stationery.
+
+Q6: How does direct WhatsApp prescription sharing operate?
+A: Once a prescription is saved, clicking the "Share on WhatsApp" button opens WhatsApp with a professional clinical greeting and a secure direct link for the patient to view and download their high-resolution PDF.
+
+Q7: How are payments handled for Indian physicians?
+A: Payments are processed securely via Razorpay, supporting UPI (Google Pay, PhonePe, Paytm, BHIM), all major Credit/Debit Cards (RuPay, Visa, Mastercard), and NetBanking across 50+ Indian banks.
+
+================================================================================
+12. CANONICAL URL SITEMAP & BING INDEXNOW SPECIFICATION
+================================================================================
+- Homepage: https://prescriptionmaker.in
+- Features: https://prescriptionmaker.in/features
+- Templates Directory: https://prescriptionmaker.in/templates
+- Pricing & Subscriptions: https://prescriptionmaker.in/pricing
+- How It Works Workflow: https://prescriptionmaker.in/how-it-works
+- Medical-Legal & NMC Compliance: https://prescriptionmaker.in/compliance
+- FAQ & Knowledge Base: https://prescriptionmaker.in/faq
+- About Platform & Mission: https://prescriptionmaker.in/about
+- Support & Contact: https://prescriptionmaker.in/contact
+- Privacy Policy: https://prescriptionmaker.in/privacy
+- Terms of Service: https://prescriptionmaker.in/terms
+- Refund Policy: https://prescriptionmaker.in/refund
+- Medical Disclaimer: https://prescriptionmaker.in/disclaimer
+- Concise LLM Reference: https://prescriptionmaker.in/llms.txt
+- Comprehensive LLM Reference: https://prescriptionmaker.in/llms-full.txt
+- Bing IndexNow API Trigger: https://prescriptionmaker.in/api/indexnow
+- Bing IndexNow Verification Key: https://prescriptionmaker.in/b4f8a3c1e2d547898012f45c9a7e3d16.txt

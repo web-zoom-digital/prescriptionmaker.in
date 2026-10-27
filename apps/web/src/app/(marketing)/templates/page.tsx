@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import { SiteHeader } from '@/components/layout/site-header'
-import { SiteFooter } from '@/components/layout/site-footer'
 import { TemplatesGrid } from '@/components/templates/templates-grid'
 import { TEMPLATES, TEMPLATE_CATEGORIES } from '@prescriptionmaker/config/templates'
 
@@ -20,9 +18,7 @@ export const metadata: Metadata = {
 
 export default function TemplatesPage() {
   return (
-    <>
-      <SiteHeader />
-      <main id="main-content">
+    <div className="pt-28 pb-20">
         {/* Breadcrumb Schema */}
         <script
           type="application/ld+json"
@@ -65,8 +61,6 @@ export default function TemplatesPage() {
             <TemplatesGrid templates={TEMPLATES} categories={TEMPLATE_CATEGORIES} />
           </div>
         </section>
-      </main>
-      <SiteFooter />
-    </>
+    </div>
   )
 }

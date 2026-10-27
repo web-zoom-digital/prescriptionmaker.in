@@ -3,10 +3,11 @@ import { FileText, Mail } from 'lucide-react'
 
 const FOOTER_LINKS = {
   product: [
-    { label: 'Features', href: '/#features' },
+    { label: 'Features', href: '/features' },
     { label: 'Templates', href: '/templates' },
-    { label: 'Pricing', href: '/#pricing' },
-    { label: 'How It Works', href: '/#how-it-works' },
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'How It Works', href: '/how-it-works' },
+    { label: 'NMC Compliance', href: '/compliance' },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy' },
@@ -17,6 +18,7 @@ const FOOTER_LINKS = {
   support: [
     { label: 'Contact Us', href: '/contact' },
     { label: 'FAQ', href: '/faq' },
+    { label: 'About Us', href: '/about' },
     { label: 'Dashboard', href: '/dashboard' },
   ],
 }

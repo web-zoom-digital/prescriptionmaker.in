@@ -35,11 +35,13 @@ export const metadata: Metadata = {
   keywords: [
     'prescription maker',
     'digital prescription',
-    'online prescription maker',
+    'online prescription maker for doctors',
+    'digital prescription generator India',
+    'doctor prescription pad format PDF',
     'prescription template India',
-    'doctor prescription software',
+    'doctor prescription software free',
     'prescription PDF download',
-    'free prescription maker',
+    'free prescription maker online',
     'e-prescription India',
     'medical prescription maker',
     'prescription maker for doctors',
@@ -47,12 +49,15 @@ export const metadata: Metadata = {
     'OPD prescription software',
     'clinic prescription software',
     'prescription WhatsApp share',
-    'prescription maker online free',
+    'NMC prescription guidelines 2023',
+    'telemedicine prescription format India',
     'MBBS doctor prescription',
-    'general physician prescription',
+    'general physician prescription pad',
+    'pediatric prescription template',
+    'dental prescription format',
     'digital prescription India',
-    'prescription generator',
-    'doctor pad online',
+    'prescription generator online',
+    'doctor pad online printing',
   ],
 
   authors: [{ name: 'PrescriptionMaker', url: 'https://prescriptionmaker.in' }],
@@ -63,12 +68,17 @@ export const metadata: Metadata = {
 
   category: 'Healthcare Software',
 
-  // Geo-targeting for India
+  // Comprehensive Geo-targeting for India & South Asia (GEO)
   other: {
-    'geo.region': 'IN',
-    'geo.placename': 'India',
-    'ICBM': '20.5937, 78.9629',
+    'geo.region': 'IN-DL',
+    'geo.placename': 'New Delhi, India',
+    'geo.position': '28.6139;77.2090',
+    'ICBM': '28.6139, 77.2090',
     'DC.Language': 'en-IN',
+    'DC.title': 'PrescriptionMaker — Free Digital Prescription Software for Indian Doctors',
+    'DC.coverage': 'India',
+    'DC.subject': 'Digital Prescriptions, Medical Software, Doctor OPD Documentation, NMC Compliance',
+    'indexnow-key': 'b4f8a3c1e2d547898012f45c9a7e3d16',
   },
 
   robots: {
@@ -178,6 +188,39 @@ export default function RootLayout({
                 'https://twitter.com/prescriptionmaker',
                 'https://linkedin.com/company/prescriptionmaker',
               ],
+            }),
+          }}
+        />
+
+        {/* MedicalBusiness Schema for GEO targeting */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'MedicalBusiness',
+              name: 'PrescriptionMaker India',
+              url: 'https://prescriptionmaker.in',
+              logo: 'https://prescriptionmaker.in/logo.png',
+              description:
+                'Provider of digital prescription maker and clinical OPD documentation software for registered medical practitioners and clinics across India.',
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: 'New Delhi',
+                addressRegion: 'Delhi',
+                addressCountry: 'IN',
+              },
+              geo: {
+                '@type': 'GeoCoordinates',
+                latitude: 28.6139,
+                longitude: 77.209,
+              },
+              areaServed: {
+                '@type': 'Country',
+                name: 'India',
+              },
+              currenciesAccepted: 'INR',
+              paymentAccepted: 'UPI, Credit Card, Debit Card, NetBanking',
             }),
           }}
         />

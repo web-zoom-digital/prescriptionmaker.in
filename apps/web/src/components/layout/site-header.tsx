@@ -9,21 +9,22 @@ import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
   { label: 'Home', href: '/', icon: Home },
-  { label: 'Features', href: '/#features', icon: Stethoscope },
+  { label: 'Features', href: '/features', icon: Stethoscope },
   {
     label: 'Templates',
     href: '/templates',
     icon: LayoutTemplate,
     children: [
       { label: 'All Templates', href: '/templates' },
-      { label: 'Classic Medical', href: '/templates/classic-medical' },
-      { label: 'Minimal Clinical', href: '/templates/minimal-clinical' },
-      { label: 'Modern Clinic', href: '/templates/modern-clinic' },
-      { label: 'Pediatric', href: '/templates/pediatric' },
+      { label: 'Classic Letterhead', href: '/templates/classic-letterhead' },
+      { label: 'Two-Column Sidebar', href: '/templates/two-column-sidebar' },
+      { label: 'Bilingual Indian (EN+HI)', href: '/templates/bilingual-indian' },
+      { label: 'Vitals-First Layout', href: '/templates/vitals-first' },
+      { label: 'Eye Specialist', href: '/templates/eye-specialist-letterhead' },
     ],
   },
-  { label: 'How It Works', href: '/#how-it-works', icon: HelpCircle },
-  { label: 'Pricing', href: '/#pricing', icon: IndianRupee },
+  { label: 'How It Works', href: '/how-it-works', icon: HelpCircle },
+  { label: 'Pricing', href: '/pricing', icon: IndianRupee },
 ]
 
 // Animated hamburger icon

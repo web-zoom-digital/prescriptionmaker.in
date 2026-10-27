@@ -11,14 +11,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/templates`, priority: 0.9, changeFrequency: 'weekly' as const },
     { url: `${BASE_URL}/pricing`, priority: 0.8, changeFrequency: 'monthly' as const },
     { url: `${BASE_URL}/how-it-works`, priority: 0.8, changeFrequency: 'monthly' as const },
-    { url: `${BASE_URL}/blog`, priority: 0.7, changeFrequency: 'daily' as const },
-    { url: `${BASE_URL}/faq`, priority: 0.7, changeFrequency: 'monthly' as const },
-    { url: `${BASE_URL}/about`, priority: 0.6, changeFrequency: 'monthly' as const },
+    { url: `${BASE_URL}/compliance`, priority: 0.8, changeFrequency: 'monthly' as const },
+    { url: `${BASE_URL}/faq`, priority: 0.8, changeFrequency: 'monthly' as const },
+    { url: `${BASE_URL}/about`, priority: 0.7, changeFrequency: 'monthly' as const },
     { url: `${BASE_URL}/contact`, priority: 0.6, changeFrequency: 'yearly' as const },
-    { url: `${BASE_URL}/privacy`, priority: 0.3, changeFrequency: 'yearly' as const },
-    { url: `${BASE_URL}/terms`, priority: 0.3, changeFrequency: 'yearly' as const },
+    { url: `${BASE_URL}/privacy`, priority: 0.4, changeFrequency: 'yearly' as const },
+    { url: `${BASE_URL}/terms`, priority: 0.4, changeFrequency: 'yearly' as const },
+    { url: `${BASE_URL}/refund`, priority: 0.4, changeFrequency: 'yearly' as const },
     { url: `${BASE_URL}/refund-policy`, priority: 0.3, changeFrequency: 'yearly' as const },
-    { url: `${BASE_URL}/disclaimer`, priority: 0.3, changeFrequency: 'yearly' as const },
+    { url: `${BASE_URL}/disclaimer`, priority: 0.4, changeFrequency: 'yearly' as const },
   ]
 
   const templatePages = TEMPLATES.filter((t) => t.isPublished).map((template) => ({
