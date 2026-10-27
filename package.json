@@ -38,7 +38,7 @@
       "canvas"
     ],
     "overrides": {
-      "jsdom>canvas": "-"
+      "canvas": "-"
     }
   }
 }
