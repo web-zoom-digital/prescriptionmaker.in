@@ -11,6 +11,8 @@ const FOOTER_LINKS = {
   ],
   resources: [
     { label: 'Prescription Format (PDF)', href: '/prescription-format' },
+    { label: 'Dosage Calculator (mg/kg)', href: '/dosage-calculator' },
+    { label: 'Telemedicine Rx (WhatsApp)', href: '/telemedicine-prescription' },
     { label: 'Rx Abbreviations (1-0-1)', href: '/abbreviations' },
     { label: 'NMC 2023 Compliance', href: '/compliance' },
     { label: 'FAQ & Guidance', href: '/faq' },

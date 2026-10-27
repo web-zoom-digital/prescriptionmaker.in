@@ -18,6 +18,8 @@ function getAllSiteUrls(): string[] {
     `${baseUrl}/faq`,
     `${baseUrl}/about`,
     `${baseUrl}/prescription-format`,
+    `${baseUrl}/dosage-calculator`,
+    `${baseUrl}/telemedicine-prescription`,
     `${baseUrl}/abbreviations`,
     `${baseUrl}/specialties`,
     `${baseUrl}/contact`,

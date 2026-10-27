@@ -10,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/features`, priority: 0.9, changeFrequency: 'monthly' as const },
     { url: `${BASE_URL}/templates`, priority: 0.9, changeFrequency: 'weekly' as const },
     { url: `${BASE_URL}/prescription-format`, priority: 0.9, changeFrequency: 'monthly' as const },
+    { url: `${BASE_URL}/dosage-calculator`, priority: 0.9, changeFrequency: 'monthly' as const },
+    { url: `${BASE_URL}/telemedicine-prescription`, priority: 0.9, changeFrequency: 'monthly' as const },
     { url: `${BASE_URL}/specialties`, priority: 0.8, changeFrequency: 'monthly' as const },
     { url: `${BASE_URL}/abbreviations`, priority: 0.8, changeFrequency: 'monthly' as const },
     { url: `${BASE_URL}/pricing`, priority: 0.8, changeFrequency: 'monthly' as const },

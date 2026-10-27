@@ -40,6 +40,8 @@ export default function robots(): MetadataRoute.Robots {
           '/prescription-format',
           '/abbreviations',
           '/specialties',
+          '/dosage-calculator',
+          '/telemedicine-prescription',
           '/contact',
           '/privacy',
           '/terms',

@@ -349,6 +349,8 @@ A: Payments are processed securely via Razorpay, supporting UPI (Google Pay, Pho
 - Features: https://prescriptionmaker.in/features
 - Templates Directory: https://prescriptionmaker.in/templates
 - Doctor Prescription Pad Format (PDF): https://prescriptionmaker.in/prescription-format
+- Pediatric & Adult Dosage Calculator (mg/kg): https://prescriptionmaker.in/dosage-calculator
+- Telemedicine Prescription (WhatsApp PDF): https://prescriptionmaker.in/telemedicine-prescription
 - Medical Prescription Abbreviations (1-0-1, OD, BD, SOS): https://prescriptionmaker.in/abbreviations
 - Specialties Directory: https://prescriptionmaker.in/specialties
 - Pricing & Subscriptions: https://prescriptionmaker.in/pricing
