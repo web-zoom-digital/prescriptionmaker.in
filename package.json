@@ -36,6 +36,9 @@
   "pnpm": {
     "ignoredBuiltDependencies": [
       "canvas"
-    ]
+    ],
+    "overrides": {
+      "jsdom>canvas": "-"
+    }
   }
 }

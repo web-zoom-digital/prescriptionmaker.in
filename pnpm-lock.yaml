@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  jsdom>canvas: '-'
+
 importers:
 
   .:
@@ -392,7 +395,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^2.1.3
-        version: 2.1.9(@types/node@20.19.43)(@vitest/ui@2.1.9)(jsdom@20.0.3(canvas@2.11.2))(lightningcss@1.33.0)(terser@5.51.2)
+        version: 2.1.9(@types/node@20.19.43)(@vitest/ui@2.1.9)(jsdom@20.0.3)(lightningcss@1.33.0)(terser@5.51.2)
 
   packages/config:
     devDependencies:
@@ -5464,7 +5467,7 @@ packages:
     resolution: {integrity: sha512-SYhBvTh89tTfCD/CRdSOm13mOBa42iTaTyfyEWBdKcGdPxPtLFBXuHR8XHb33YNYaP+lLbmSvBTsnoesCNJEsQ==}
     engines: {node: '>=14'}
     peerDependencies:
-      canvas: ^2.5.0
+      canvas: '*'
     peerDependenciesMeta:
       canvas:
         optional: true
@@ -11221,7 +11224,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.17
       tinyrainbow: 1.2.0
-      vitest: 2.1.9(@types/node@20.19.43)(@vitest/ui@2.1.9)(jsdom@20.0.3(canvas@2.11.2))(lightningcss@1.33.0)(terser@5.51.2)
+      vitest: 2.1.9(@types/node@20.19.43)(@vitest/ui@2.1.9)(jsdom@20.0.3)(lightningcss@1.33.0)(terser@5.51.2)
 
   '@vitest/utils@2.1.9':
     dependencies:
@@ -15741,7 +15744,7 @@ snapshots:
       terser: 5.51.2
       yaml: 2.9.1
 
-  vitest@2.1.9(@types/node@20.19.43)(@vitest/ui@2.1.9)(jsdom@20.0.3(canvas@2.11.2))(lightningcss@1.33.0)(terser@5.51.2):
+  vitest@2.1.9(@types/node@20.19.43)(@vitest/ui@2.1.9)(jsdom@20.0.3)(lightningcss@1.33.0)(terser@5.51.2):
     dependencies:
       '@vitest/expect': 2.1.9
       '@vitest/mocker': 2.1.9(vite@5.4.21(@types/node@20.19.43)(lightningcss@1.33.0)(terser@5.51.2))

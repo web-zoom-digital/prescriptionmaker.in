@@ -5,3 +5,6 @@ packages:
 
 ignoredBuiltDependencies:
   - canvas
+
+overrides:
+  jsdom>canvas: "-"
