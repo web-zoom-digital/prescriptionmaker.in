@@ -14,13 +14,17 @@ function getAllSiteUrls(): string[] {
     `${baseUrl}/templates`,
     `${baseUrl}/pricing`,
     `${baseUrl}/how-it-works`,
-    `${baseUrl}/faq`,
     `${baseUrl}/compliance`,
+    `${baseUrl}/faq`,
     `${baseUrl}/about`,
+    `${baseUrl}/prescription-format`,
+    `${baseUrl}/abbreviations`,
+    `${baseUrl}/specialties`,
     `${baseUrl}/contact`,
     `${baseUrl}/privacy`,
     `${baseUrl}/terms`,
     `${baseUrl}/refund`,
+    `${baseUrl}/refund-policy`,
     `${baseUrl}/disclaimer`,
   ]
 
@@ -31,7 +35,7 @@ function getAllSiteUrls(): string[] {
   return [...staticPages, ...templatePages]
 }
 
-async function submitToIndexNow(urls: string[]) {
+async function submitToIndexNowEndpoints(urls: string[]) {
   const payload = {
     host: HOST,
     key: INDEXNOW_KEY,
@@ -39,38 +43,51 @@ async function submitToIndexNow(urls: string[]) {
     urlList: urls,
   }
 
-  // Submit to IndexNow master API (propagates to Bing, Yandex, etc.)
-  const response = await fetch('https://api.indexnow.org/indexnow', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-    body: JSON.stringify(payload),
-  })
+  const endpoints = [
+    'https://api.indexnow.org/indexnow',
+    'https://www.bing.com/indexnow',
+  ]
 
-  return {
-    status: response.status,
-    ok: response.ok,
-    statusText: response.statusText,
-  }
+  const results = await Promise.allSettled(
+    endpoints.map(async (endpoint) => {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify(payload),
+      })
+      return {
+        endpoint,
+        status: res.status,
+        ok: res.ok || res.status === 200 || res.status === 202,
+      }
+    })
+  )
+
+  return results.map((r, i) =>
+    r.status === 'fulfilled'
+      ? r.value
+      : { endpoint: endpoints[i], status: 500, ok: false, error: String(r.reason) }
+  )
 }
 
 /**
  * GET /api/indexnow
- * Submits all public URLs to Bing IndexNow API.
+ * Submits all public URLs to both IndexNow and Bing IndexNow endpoints.
  */
 export async function GET(req: NextRequest) {
   try {
     const urls = getAllSiteUrls()
-    const result = await submitToIndexNow(urls)
+    const results = await submitToIndexNowEndpoints(urls)
 
     return NextResponse.json({
-      success: result.ok || result.status === 200 || result.status === 202,
-      message: 'URLs submitted to Bing IndexNow successfully',
-      indexNowStatus: result.status,
+      success: results.some((r) => r.ok),
+      message: 'URLs submitted to Bing & IndexNow APIs successfully',
       host: HOST,
       keyLocation: KEY_LOCATION,
       submittedCount: urls.length,
+      endpoints: results,
       urls,
     })
   } catch (error) {
@@ -113,15 +130,15 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const result = await submitToIndexNow(validUrls)
+    const results = await submitToIndexNowEndpoints(validUrls)
 
     return NextResponse.json({
-      success: result.ok || result.status === 200 || result.status === 202,
-      message: `${validUrls.length} URL(s) submitted to Bing IndexNow`,
-      indexNowStatus: result.status,
+      success: results.some((r) => r.ok),
+      message: `${validUrls.length} URL(s) submitted to Bing & IndexNow`,
       host: HOST,
       keyLocation: KEY_LOCATION,
       submittedCount: validUrls.length,
+      endpoints: results,
       urls: validUrls,
     })
   } catch (error) {

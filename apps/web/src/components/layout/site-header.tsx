@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, FileText, Stethoscope, LayoutTemplate, HelpCircle, IndianRupee, Home, LogIn, UserPlus, X } from 'lucide-react'
+import { ChevronDown, FileText, Stethoscope, LayoutTemplate, HelpCircle, IndianRupee, Home, LogIn, UserPlus, X, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
@@ -21,6 +21,18 @@ const NAV_LINKS = [
       { label: 'Bilingual Indian (EN+HI)', href: '/templates/bilingual-indian' },
       { label: 'Vitals-First Layout', href: '/templates/vitals-first' },
       { label: 'Eye Specialist', href: '/templates/eye-specialist-letterhead' },
+    ],
+  },
+  {
+    label: 'Resources',
+    href: '/prescription-format',
+    icon: BookOpen,
+    children: [
+      { label: 'Prescription Format (PDF)', href: '/prescription-format' },
+      { label: 'Medical Specialties', href: '/specialties' },
+      { label: 'Rx Abbreviations (1-0-1)', href: '/abbreviations' },
+      { label: 'NMC 2023 Compliance', href: '/compliance' },
+      { label: 'FAQ & Guidance', href: '/faq' },
     ],
   },
   { label: 'How It Works', href: '/how-it-works', icon: HelpCircle },

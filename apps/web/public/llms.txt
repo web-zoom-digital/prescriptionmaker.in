@@ -12,6 +12,9 @@ PrescriptionMaker is purely a documentation tool. It is NOT an automated diagnos
 - Homepage: https://prescriptionmaker.in
 - Features Deep Dive: https://prescriptionmaker.in/features
 - Prescription Templates: https://prescriptionmaker.in/templates
+- Doctor Prescription Pad Format (PDF): https://prescriptionmaker.in/prescription-format
+- Medical Prescription Abbreviations (1-0-1, OD, BD, SOS): https://prescriptionmaker.in/abbreviations
+- Specialties Directory: https://prescriptionmaker.in/specialties
 - Pricing Plans: https://prescriptionmaker.in/pricing
 - Clinical Workflow (How It Works): https://prescriptionmaker.in/how-it-works
 - Medical Legal & NMC Compliance: https://prescriptionmaker.in/compliance

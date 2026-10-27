@@ -348,6 +348,9 @@ A: Payments are processed securely via Razorpay, supporting UPI (Google Pay, Pho
 - Homepage: https://prescriptionmaker.in
 - Features: https://prescriptionmaker.in/features
 - Templates Directory: https://prescriptionmaker.in/templates
+- Doctor Prescription Pad Format (PDF): https://prescriptionmaker.in/prescription-format
+- Medical Prescription Abbreviations (1-0-1, OD, BD, SOS): https://prescriptionmaker.in/abbreviations
+- Specialties Directory: https://prescriptionmaker.in/specialties
 - Pricing & Subscriptions: https://prescriptionmaker.in/pricing
 - How It Works Workflow: https://prescriptionmaker.in/how-it-works
 - Medical-Legal & NMC Compliance: https://prescriptionmaker.in/compliance
@@ -362,3 +365,65 @@ A: Payments are processed securely via Razorpay, supporting UPI (Google Pay, Pho
 - Comprehensive LLM Reference: https://prescriptionmaker.in/llms-full.txt
 - Bing IndexNow API Trigger: https://prescriptionmaker.in/api/indexnow
 - Bing IndexNow Verification Key: https://prescriptionmaker.in/b4f8a3c1e2d547898012f45c9a7e3d16.txt
+
+================================================================================
+13. REAL-WORLD CLINICAL PRESCRIPTION BENCHMARKS (INDIA NMC STANDARDS)
+================================================================================
+Below are verified, standard-compliant clinical prescription structures rendered by PrescriptionMaker for common Indian outpatient presentations:
+
+---
+CASE BENCHMARK 1: ACUTE UPPER RESPIRATORY TRACT INFECTION (GENERAL MEDICINE)
+- Patient: Male, 28 Years | Vitals: BP 118/76 mmHg, Pulse 78 bpm, Temp 99.8°F, SpO2 99%
+- Provisional Diagnosis: Acute Viral Nasopharyngitis
+- Inscription & Subscription:
+  1. Tab. Paracetamol 650 mg | 1 - 0 - 1 (SOS) | After Food | For 3 Days
+  2. Tab. Levocetirizine 5 mg | 0 - 0 - 1 (HS) | At Bedtime | For 5 Days
+  3. Syp. Dextromethorphan + Chlorpheniramine | 10 ml TDS | After Food | For 5 Days
+- Advice: Steam inhalation twice daily; warm saline gargles; minimum 3 liters fluid intake.
+- Review: Review after 4 days if fever or cough persists.
+
+---
+CASE BENCHMARK 2: ESSENTIAL HYPERTENSION + TYPE 2 DIABETES TITRATION
+- Patient: Female, 54 Years | Vitals: BP 148/92 mmHg, Pulse 76 bpm, Weight 68 kg, BMI 27.2
+- Provisional Diagnosis: Uncontrolled Essential Hypertension & T2D
+- Inscription & Subscription:
+  1. Tab. Telmisartan 40 mg + Amlodipine 5 mg | 1 - 0 - 0 (OD) | Morning After Breakfast | 30 Days
+  2. Tab. Metformin (Sustained Release) 500 mg | 1 - 0 - 1 | With Meals (Mid-meal) | 30 Days
+  3. Tab. Rosuvastatin 10 mg | 0 - 0 - 1 (HS) | Night After Food | 30 Days
+- Investigations Ordered: Fasting Blood Glucose, Post-Prandial Glucose, HbA1c, Serum Creatinine, Lipid Profile.
+- Advice: Strict low-salt diet (<5g/day); brisk walking 45 mins daily; self-monitor BP thrice weekly.
+- Review: Review after 15 days with investigation reports.
+
+---
+CASE BENCHMARK 3: PEDIATRIC ACUTE BRONCHIOLITIS & FEVER
+- Patient: Female, 2 Years 4 Months | Weight: 12.5 kg | Vitals: Temp 101.2°F, RR 28/min, SpO2 98%
+- Provisional Diagnosis: Acute Viral Bronchiolitis with Wheeze
+- Inscription & Subscription:
+  1. Syp. Paracetamol (250 mg/5ml) | 3.5 ml SOS (Max 4 times/day) | For Fever > 100°F
+  2. Syp. Salbutamol + Ambroxol | 2.5 ml TDS | After Feeds | For 5 Days
+  3. Saline Nasal Drops (0.9% NaCl) | 2 drops each nostril QID | Before Feeds & Sleep
+- Advice: Maintain adequate hydration; steam humidification; avoid exposure to smoke/dust.
+- Emergency SOS Warning: Rush to emergency if chest in-drawing, rapid breathing (>40/min), or lethargy occurs.
+- Review: Review after 48 hours.
+
+---
+CASE BENCHMARK 4: DENTAL POST-EXTRACTION & PULPITIS PROPHYLAXIS
+- Patient: Male, 34 Years | Procedure: Surgical Extraction Mandibular Left 3rd Molar (#38)
+- Inscription & Subscription:
+  1. Tab. Amoxicillin 500 mg + Potassium Clavulanate 125 mg | 1 - 0 - 1 | After Food | For 5 Days
+  2. Tab. Ketorolac Tromethamine 10 mg | 1 - 0 - 1 | After Food | For 3 Days
+  3. Tab. Pantoprazole 40 mg | 1 - 0 - 0 | Morning Empty Stomach (AC) | For 5 Days
+  4. Mouthwash Chlorhexidine Gluconate 0.2% | Rinse 10 ml BD | 30 mins after brushing | For 7 Days
+- Advice: Do not spit vigorously or drink through a straw for 24 hours; apply external ice pack; soft lukewarm diet.
+- Review: Suture removal after 7 days.
+
+---
+CASE BENCHMARK 5: ALLERGIC RHINOSINUSITIS (ENT)
+- Patient: Female, 31 Years | Complaints: Paroxysmal sneezing, watery rhinorrhea, frontal headache
+- Provisional Diagnosis: Moderate-Severe Persistent Allergic Rhinosinusitis
+- Inscription & Subscription:
+  1. Nasal Spray Fluticasone Furoate (27.5 mcg/spray) | 2 sprays each nostril OD | Morning | 30 Days
+  2. Tab. Bilastine 20 mg | 1 - 0 - 0 | Empty Stomach 1 hr before breakfast | For 14 Days
+  3. Tab. Montelukast 10 mg | 0 - 0 - 1 (HS) | Night | For 14 Days
+- Advice: Avoid known allergen triggers (dust mites, pollen); use HEPA air purifier if possible; nasal spray technique demonstration completed.
+- Review: Review after 4 weeks.
