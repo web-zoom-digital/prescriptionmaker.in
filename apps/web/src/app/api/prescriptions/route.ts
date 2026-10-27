@@ -6,8 +6,8 @@ import { verifyJWT } from '@/lib/auth/jwt'
 // IMPORTANT: Since this bypasses RLS, we MUST enforce authorization logic
 // (e.g., matching user_id) manually in these API routes.
 const supabase = createClient(
-  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-  process.env['SUPABASE_SERVICE_ROLE_KEY']!
+  process.env['NEXT_PUBLIC_SUPABASE_URL'] || 'https://placeholder.supabase.co',
+  process.env['SUPABASE_SERVICE_ROLE_KEY'] || 'placeholder-service-key'
 )
 
 // GET /api/prescriptions — List user's prescriptions

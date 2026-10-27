@@ -11,8 +11,8 @@ export async function GET(request: NextRequest) {
 
   if (token_hash && type) {
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key'
     )
 
     const { data, error } = await supabase.auth.verifyOtp({
@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
       // User is verified and logged in.
       // We must update the `users` table status to 'active'
       const supabaseAdmin = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
+        process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+        process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key'
       )
 
       const { data: profile } = await supabaseAdmin

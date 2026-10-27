@@ -5,13 +5,13 @@ import { signJWT } from '@/lib/auth/jwt'
 import { rateLimit } from '@/lib/auth/rate-limit'
 
 const supabase = createClient(
-  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-  process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!
+  process.env['NEXT_PUBLIC_SUPABASE_URL'] || 'https://placeholder.supabase.co',
+  process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || 'placeholder-anon-key'
 )
 
 const supabaseAdmin = createClient(
-  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-  process.env['SUPABASE_SERVICE_ROLE_KEY']!
+  process.env['NEXT_PUBLIC_SUPABASE_URL'] || 'https://placeholder.supabase.co',
+  process.env['SUPABASE_SERVICE_ROLE_KEY'] || 'placeholder-service-key'
 )
 
 export async function POST(request: NextRequest) {
