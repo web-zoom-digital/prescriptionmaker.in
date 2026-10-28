@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Download, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
 interface DownloadPdfButtonProps {
@@ -22,11 +23,19 @@ export function DownloadPdfButton({
   const handleDownload = async () => {
     setStatus('loading')
     try {
-      const res = await fetch(`/api/prescriptions/${prescriptionId}/pdf`)
+      const res = await fetch(`/api/prescriptions/${prescriptionId}/pdf`, {
+        credentials: 'include',
+      })
 
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to generate PDF')
+        let errorMsg = 'Failed to generate PDF'
+        try {
+          const err = await res.json()
+          errorMsg = err.error || err.details || errorMsg
+        } catch {
+          // Response was not JSON
+        }
+        throw new Error(errorMsg)
       }
 
       // Trigger browser download
@@ -43,10 +52,12 @@ export function DownloadPdfButton({
       URL.revokeObjectURL(url)
 
       setStatus('success')
+      toast.success('Prescription PDF downloaded successfully')
       setTimeout(() => setStatus('idle'), 3000)
     } catch (err: any) {
       console.error('PDF download failed:', err)
       setStatus('error')
+      toast.error(err?.message || 'Failed to download prescription PDF')
       setTimeout(() => setStatus('idle'), 3000)
     }
   }
