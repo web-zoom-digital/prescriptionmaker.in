@@ -43,7 +43,10 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   } else if (info.menuItemId === 'pm-toggle-widget') {
     chrome.tabs.sendMessage(tab.id, { action: 'toggle_widget' })
   } else if (info.menuItemId === 'pm-open-studio') {
-    chrome.tabs.create({ url: 'https://prescriptionmaker.in/editor' })
+    chrome.storage.local.get(['pm_base_url'], (res) => {
+      const base = (typeof res?.pm_base_url === 'string' && res.pm_base_url) ? res.pm_base_url.replace(/\/$/, '') : 'https://prescriptionmaker.in'
+      chrome.tabs.create({ url: `${base}/editor` })
+    })
   }
 })
 

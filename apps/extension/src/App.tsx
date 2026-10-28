@@ -321,6 +321,7 @@ function App() {
         >
           <option value="https://prescriptionmaker.in">Production</option>
           <option value="http://localhost:3000">Localhost (3000)</option>
+          <option value="http://localhost:3003">Localhost (3003)</option>
         </select>
       </footer>
     </div>

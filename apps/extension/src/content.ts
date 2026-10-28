@@ -165,7 +165,12 @@ function normalizeGender(raw: string): string {
 
 // ── 2. FLOATING PRESCRIPTION CANVAS WIDGET ────────────────────────────────
 function buildEditorUrl(patientData: ExtractedPatientData): string {
-  const url = new URL('/editor', currentBaseUrl)
+  let url: URL
+  try {
+    url = new URL('/editor', currentBaseUrl || 'https://prescriptionmaker.in')
+  } catch {
+    url = new URL('https://prescriptionmaker.in/editor')
+  }
   url.searchParams.set('embed', 'true')
   url.searchParams.set('source', 'extension')
 
