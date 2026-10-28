@@ -60,32 +60,98 @@ export async function POST(request: NextRequest) {
   const { name, email, password } = parsed.data
 
   // Create user with Supabase Auth (Anon client triggers the confirmation email)
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { name },
-    }
-  })
+  let authData: { user: any; session: any } | null = null
+  try {
+    const res = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name },
+      },
+    })
 
-  if (authError) {
-    if (authError.message.includes('already registered')) {
+    if (res.error) {
+      console.error('[Signup API Auth Error]:', res.error)
+      const errorMsg = (res.error.message || '').toLowerCase()
+
+      if (errorMsg.includes('already registered')) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'EMAIL_TAKEN',
+              message: 'An account with this email already exists.',
+            },
+          },
+          { status: 409 }
+        )
+      }
+
+      if (
+        errorMsg.includes('fetch failed') ||
+        res.error.name === 'AuthRetryableFetchError' ||
+        res.error.status === 0
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'DATABASE_UNREACHABLE',
+              message:
+                'Authentication database is currently unreachable or paused. Please restore your Supabase project in the Supabase dashboard (https://supabase.com/dashboard).',
+            },
+          },
+          { status: 503 }
+        )
+      }
+
       return NextResponse.json(
         {
           success: false,
           error: {
-            code: 'EMAIL_TAKEN',
-            message: 'An account with this email already exists.',
+            code: 'SIGNUP_FAILED',
+            message: res.error.message || 'Account creation failed. Please try again.',
           },
         },
-        { status: 409 }
+        { status: 500 }
+      )
+    }
+
+    authData = res.data
+  } catch (err: any) {
+    console.error('[Signup API Unexpected Error]:', err)
+    const errStr = (err?.message || String(err)).toLowerCase()
+    if (errStr.includes('fetch failed') || errStr.includes('enotfound')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'DATABASE_UNREACHABLE',
+            message:
+              'Authentication database is currently unreachable or paused. Please restore your Supabase project in the Supabase dashboard (https://supabase.com/dashboard).',
+          },
+        },
+        { status: 503 }
       )
     }
 
     return NextResponse.json(
       {
         success: false,
-        error: { code: 'SIGNUP_FAILED', message: 'Account creation failed. Please try again.' },
+        error: {
+          code: 'SIGNUP_FAILED',
+          message: err?.message || 'Account creation failed. Please try again.',
+        },
+      },
+      { status: 500 }
+    )
+  }
+
+  if (!authData?.user) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: { code: 'SIGNUP_FAILED', message: 'User registration failed. Please try again.' },
       },
       { status: 500 }
     )
@@ -95,7 +161,7 @@ export async function POST(request: NextRequest) {
   const { data: profile, error: profileError } = await supabaseAdmin
     .from('users')
     .insert({
-      id: authData.user!.id,
+      id: authData.user.id,
       email,
       name,
       role: 'doctor',
@@ -106,12 +172,20 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (profileError || !profile) {
+    console.error('[Signup API Profile Creation Error]:', profileError)
     // Cleanup: delete auth user if profile creation fails
-    await supabaseAdmin.auth.admin.deleteUser(authData.user!.id)
+    try {
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+    } catch (cleanupErr) {
+      console.error('[Signup Cleanup Error]:', cleanupErr)
+    }
     return NextResponse.json(
       {
         success: false,
-        error: { code: 'PROFILE_CREATION_FAILED', message: 'Account setup failed. Please try again.' },
+        error: {
+          code: 'PROFILE_CREATION_FAILED',
+          message: profileError?.message || 'Account setup failed. Please try again.',
+        },
       },
       { status: 500 }
     )

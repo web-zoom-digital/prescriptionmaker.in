@@ -56,18 +56,70 @@ export async function POST(request: NextRequest) {
   const { email, password } = parsed.data
 
   // Authenticate with Supabase
-  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
+  let authData: { user: any; session: any } | null = null
+  try {
+    const res = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-  if (authError || !authData.user) {
+    if (res.error || !res.data?.user) {
+      console.error('[Login API Auth Error]:', res.error)
+      const errStr = (res.error?.message || '').toLowerCase()
+      if (
+        errStr.includes('fetch failed') ||
+        res.error?.name === 'AuthRetryableFetchError' ||
+        res.error?.status === 0
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'DATABASE_UNREACHABLE',
+              message:
+                'Authentication database is currently unreachable or paused. Please check your Supabase dashboard.',
+            },
+          },
+          { status: 503 }
+        )
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INVALID_CREDENTIALS',
+            // Generic message — don't reveal whether email or password is wrong
+            message: 'Invalid email or password.',
+          },
+        },
+        { status: 401 }
+      )
+    }
+
+    authData = res.data
+  } catch (err: any) {
+    console.error('[Login API Unexpected Error]:', err)
+    const errStr = (err?.message || String(err)).toLowerCase()
+    if (errStr.includes('fetch failed') || errStr.includes('enotfound')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'DATABASE_UNREACHABLE',
+            message:
+              'Authentication database is currently unreachable or paused. Please check your Supabase dashboard.',
+          },
+        },
+        { status: 503 }
+      )
+    }
+
     return NextResponse.json(
       {
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          // Generic message — don't reveal whether email or password is wrong
           message: 'Invalid email or password.',
         },
       },
