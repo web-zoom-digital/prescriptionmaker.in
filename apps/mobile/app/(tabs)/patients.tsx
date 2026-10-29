@@ -1,9 +1,10 @@
 import {
-  View, Text, StyleSheet, FlatList, Pressable, ActivityIndicator, Platform, StatusBar, TextInput
+  View, Text, StyleSheet, FlatList, Pressable, ActivityIndicator, Platform, StatusBar, TextInput, RefreshControl
 } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { useCallback, useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { getPrescriptions } from '../../lib/prescriptions'
+import { getSavedPatients } from '../../lib/local-store'
 import { Ionicons } from '@expo/vector-icons'
 import { Colors, Typography, Spacing, Radius, Shadow } from '../../lib/design-system'
 
@@ -68,48 +69,72 @@ export default function PatientsTab() {
   const router = useRouter()
   const [patients, setPatients] = useState<PatientSummary[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [search, setSearch] = useState('')
 
   const loadPatients = async () => {
-    setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      const { data, error } = await supabase
-        .from('prescriptions')
-        .select('patient_info, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
+      const [rxs, localPatients] = await Promise.all([
+        getPrescriptions().catch(() => []),
+        getSavedPatients().catch(() => [])
+      ])
 
       const patientMap = new Map<string, PatientSummary>()
-      for (const rx of data) {
-        const name = rx.patient_info?.name?.trim()
-        const phone = rx.patient_info?.phone?.trim()
+
+      // 1. Group patients from all prescriptions (Supabase + local offline cache)
+      for (const rx of rxs) {
+        let pInfo = rx.patient_info
+        if (typeof pInfo === 'string') {
+          try { pInfo = JSON.parse(pInfo) } catch {}
+        }
+        const name = pInfo?.name?.trim()
+        const phone = pInfo?.phone?.trim()
         if (!name) continue
         const key = phone || name
 
         if (!patientMap.has(key)) {
           patientMap.set(key, { 
-            name, phone: phone || '', 
-            lastDate: new Date(rx.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }), 
+            name, 
+            phone: phone || '', 
+            lastDate: rx.created_at ? new Date(rx.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'Recent', 
             rxCount: 1 
           })
         } else {
           patientMap.get(key)!.rxCount += 1
         }
       }
+
+      // 2. Merge any patients from local store that don't have an Rx yet
+      for (const sp of localPatients) {
+        const name = sp.name?.trim()
+        const phone = sp.phone?.trim()
+        if (!name) continue
+        const key = phone || name
+        if (!patientMap.has(key)) {
+          patientMap.set(key, {
+            name,
+            phone: phone || '',
+            lastDate: sp.lastVisit ? new Date(sp.lastVisit).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'Recent',
+            rxCount: sp.visitCount || 1,
+          })
+        }
+      }
+
       setPatients(Array.from(patientMap.values()))
     } catch (err) {
-      console.error(err)
+      console.error('Error loading patients:', err)
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }
 
   useFocusEffect(useCallback(() => { loadPatients() }, []))
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true)
+    loadPatients()
+  }, [])
 
   const filtered = search.trim()
     ? patients.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.phone.includes(search))
@@ -160,8 +185,17 @@ export default function PatientsTab() {
           <Text style={styles.emptyIcon}>👥</Text>
           <Text style={styles.emptyTitle}>{search ? 'No results found' : 'No Patients Yet'}</Text>
           <Text style={styles.emptyDesc}>
-            {search ? `No patient matching "${search}"` : 'Create a prescription to add patients.'}
+            {search ? `No patient matching "${search}"` : 'Patients appear here automatically when you create prescriptions.'}
           </Text>
+          {!search && (
+            <Pressable
+              style={styles.newRxBtn}
+              onPress={() => router.push('/editor')}
+            >
+              <Ionicons name="add" size={18} color="#fff" />
+              <Text style={styles.newRxBtnText}>+ New Prescription</Text>
+            </Pressable>
+          )}
         </View>
       ) : (
         <FlatList
@@ -178,6 +212,13 @@ export default function PatientsTab() {
           )}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={Colors.primaryBlue}
+            />
+          }
         />
       )}
     </View>
@@ -244,4 +285,20 @@ const styles = StyleSheet.create({
   emptyIcon: { fontSize: 64, marginBottom: 12 },
   emptyTitle: { ...Typography.h3, color: Colors.textPrimary, marginBottom: 6 },
   emptyDesc: { ...Typography.bodySm, color: Colors.textSecondary, textAlign: 'center', lineHeight: 20 },
+  newRxBtn: {
+    marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.primaryBlue,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: Radius.full,
+    ...Shadow.blue,
+  },
+  newRxBtnText: {
+    color: Colors.white,
+    fontWeight: '700',
+    fontSize: 14,
+  },
 })

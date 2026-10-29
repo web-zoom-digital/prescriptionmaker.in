@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Platform } from 'react-native'
+import { savePatient } from './local-store'
 
 export type Prescription = {
   id: string
@@ -125,10 +126,37 @@ export async function getPrescription(id: string): Promise<Prescription | null> 
   }
 }
 
+// Helper to sync patient info to local patient store
+async function autoSavePatient(patientInfo: any) {
+  if (!patientInfo) return
+  const name = typeof patientInfo === 'string' ? '' : patientInfo.name?.trim()
+  if (!name) return
+
+  try {
+    await savePatient({
+      name,
+      phone: patientInfo.phone?.trim() || '',
+      age: patientInfo.age ? String(patientInfo.age) : '',
+      gender: patientInfo.gender || '',
+      weight: patientInfo.weight ? String(patientInfo.weight) : '',
+      bloodGroup: patientInfo.bloodGroup || '',
+      allergies: patientInfo.allergies || '',
+      address: patientInfo.address || '',
+    })
+  } catch (err) {
+    // Non-blocking
+  }
+}
+
 // Create new prescription
 export async function createPrescription(payload: Partial<Prescription>) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
+
+  // Auto-sync patient
+  if (payload.patient_info) {
+    autoSavePatient(payload.patient_info)
+  }
 
   const tempId = Date.now().toString()
   const newRx = {
@@ -168,6 +196,10 @@ export async function createPrescription(payload: Partial<Prescription>) {
 
 // Update existing prescription
 export async function updatePrescription(id: string, payload: Partial<Prescription>) {
+  if (payload.patient_info) {
+    autoSavePatient(payload.patient_info)
+  }
+
   try {
     const { error } = await supabase
       .from('prescriptions')

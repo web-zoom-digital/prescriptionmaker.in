@@ -1,11 +1,12 @@
 import {
   View, Text, StyleSheet, FlatList, Pressable, TextInput,
-  Platform, Alert, ActivityIndicator, Modal
+  Platform, Alert, ActivityIndicator, Modal, RefreshControl
 } from 'react-native'
 import { useState, useEffect, useCallback } from 'react'
 import { router } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { getSavedPatients, deletePatient, type SavedPatient } from '../lib/local-store'
+import { getPrescriptions } from '../lib/prescriptions'
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
@@ -14,16 +15,82 @@ export default function PatientsScreen() {
   const [filtered, setFiltered] = useState<SavedPatient[]>([])
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<SavedPatient | null>(null)
 
   const loadPatients = useCallback(async () => {
-    const data = await getSavedPatients()
-    setPatients(data)
-    setFiltered(data)
-    setLoading(false)
+    try {
+      const [rxs, savedLocal] = await Promise.all([
+        getPrescriptions().catch(() => []),
+        getSavedPatients().catch(() => [])
+      ])
+
+      const map = new Map<string, SavedPatient>()
+
+      // 1. Add local saved patients
+      for (const sp of savedLocal) {
+        const key = sp.phone?.trim() || sp.name?.trim().toLowerCase()
+        if (key) map.set(key, sp)
+      }
+
+      // 2. Extract and merge patients from prescriptions
+      for (const rx of rxs) {
+        let p = rx.patient_info
+        if (typeof p === 'string') {
+          try { p = JSON.parse(p) } catch {}
+        }
+        const name = p?.name?.trim()
+        if (!name) continue
+
+        const phone = p?.phone?.trim() || ''
+        const key = phone || name.toLowerCase()
+
+        if (map.has(key)) {
+          const existing = map.get(key)!
+          existing.visitCount = (existing.visitCount || 1) + 1
+          if (rx.created_at && (!existing.lastVisit || new Date(rx.created_at) > new Date(existing.lastVisit))) {
+            existing.lastVisit = rx.created_at
+          }
+          if (!existing.age && p.age) existing.age = String(p.age)
+          if (!existing.gender && p.gender) existing.gender = p.gender
+          if (!existing.weight && p.weight) existing.weight = String(p.weight)
+          if (!existing.bloodGroup && p.bloodGroup) existing.bloodGroup = p.bloodGroup
+          if (!existing.allergies && p.allergies) existing.allergies = p.allergies
+          if (!existing.address && p.address) existing.address = p.address
+        } else {
+          map.set(key, {
+            id: rx.id || Date.now().toString(),
+            name,
+            phone,
+            age: p.age ? String(p.age) : '',
+            gender: p.gender || '',
+            weight: p.weight ? String(p.weight) : '',
+            bloodGroup: p.bloodGroup || '',
+            allergies: p.allergies || '',
+            address: p.address || '',
+            lastVisit: rx.created_at || new Date().toISOString(),
+            visitCount: 1,
+          })
+        }
+      }
+
+      const list = Array.from(map.values())
+      setPatients(list)
+      setFiltered(list)
+    } catch (err) {
+      console.error('Error loading patients:', err)
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
   }, [])
 
   useEffect(() => { loadPatients() }, [loadPatients])
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true)
+    loadPatients()
+  }, [loadPatients])
 
   useEffect(() => {
     if (!query) { setFiltered(patients); return }
@@ -46,8 +113,12 @@ export default function PatientsScreen() {
   const handleViewHistory = (patient: SavedPatient) => {
     setSelectedPatient(null)
     router.push({
-      pathname: '/patient-history',
-      params: { phone: patient.phone, name: patient.name }
+      pathname: '/patient/[phone]',
+      params: {
+        phone: patient.phone || patient.name,
+        name: patient.name,
+        byname: patient.phone ? '0' : '1'
+      }
     })
   }
 
@@ -66,7 +137,7 @@ export default function PatientsScreen() {
   }
 
   const renderItem = ({ item }: { item: SavedPatient }) => (
-    <Pressable style={styles.card} onPress={() => handleViewHistory(item)}>
+    <Pressable style={styles.card} onPress={() => setSelectedPatient(item)}>
       <View style={styles.cardAvatar}>
         <Text style={styles.cardAvatarText}>{item.name.charAt(0)}</Text>
       </View>
@@ -76,15 +147,16 @@ export default function PatientsScreen() {
           {item.age ? <Text style={styles.metaTag}>{item.age} yrs</Text> : null}
           {item.gender ? <Text style={styles.metaTag}>{item.gender}</Text> : null}
           {item.bloodGroup ? <Text style={[styles.metaTag, { backgroundColor: '#fff1f2', color: '#be123c' }]}>{item.bloodGroup}</Text> : null}
+          {item.phone ? <Text style={styles.metaTag}>📞 {item.phone}</Text> : null}
         </View>
         <Text style={styles.cardVisit}>
-          {item.visitCount} visit{item.visitCount !== 1 ? 's' : ''} · Last: {new Date(item.lastVisit).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+          {item.visitCount} visit{item.visitCount !== 1 ? 's' : ''} · Last: {item.lastVisit ? new Date(item.lastVisit).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'Recent'}
         </Text>
       </View>
-      <View style={styles.cardRight}>
-        <Ionicons name="time-outline" size={14} color="#94a3b8" />
+      <Pressable style={styles.cardRight} onPress={() => handleViewHistory(item)}>
+        <Ionicons name="time-outline" size={16} color="#0f766e" />
         <Text style={styles.historyHint}>History</Text>
-      </View>
+      </Pressable>
     </Pressable>
   )
 
@@ -122,13 +194,29 @@ export default function PatientsScreen() {
           keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={filtered.length === 0 ? styles.emptyContainer : styles.list}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#0f766e"
+            />
+          }
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={styles.emptyIcon}>👥</Text>
               <Text style={styles.emptyTitle}>{query ? 'No patients found' : 'No patients yet'}</Text>
               <Text style={styles.emptyText}>
-                {query ? 'Try a different search term' : 'Patients are saved automatically when you create prescriptions with their phone number.'}
+                {query ? 'Try a different search term' : 'Patients are saved automatically when you create prescriptions.'}
               </Text>
+              {!query && (
+                <Pressable
+                  style={styles.emptyBtn}
+                  onPress={() => router.push('/editor')}
+                >
+                  <Ionicons name="add" size={18} color="#fff" />
+                  <Text style={styles.emptyBtnText}>+ New Prescription</Text>
+                </Pressable>
+              )}
             </View>
           }
         />
@@ -213,6 +301,17 @@ const styles = StyleSheet.create({
   emptyIcon: { fontSize: 48, marginBottom: 12 },
   emptyTitle: { fontSize: 17, fontWeight: '700', color: '#334155', marginBottom: 8 },
   emptyText: { fontSize: 13, color: '#94a3b8', textAlign: 'center', lineHeight: 20 },
+  emptyBtn: {
+    marginTop: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#0f766e',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 99,
+  },
+  emptyBtnText: { color: '#fff', fontSize: 14, fontWeight: '700' },
   card: { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10, flexDirection: 'row', alignItems: 'center', gap: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5, elevation: 1 },
   cardAvatar: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#0f766e', alignItems: 'center', justifyContent: 'center' },
   cardAvatarText: { fontSize: 18, fontWeight: '800', color: '#fff' },

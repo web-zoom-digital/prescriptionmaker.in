@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router'
 import { useEffect, useState, useCallback } from 'react'
-import { supabase } from '../../lib/supabase'
+import { getPrescriptions } from '../../lib/prescriptions'
 import { Ionicons } from '@expo/vector-icons'
 import { Colors, Typography, Spacing, Radius, Shadow } from '../../lib/design-system'
 
@@ -16,20 +16,22 @@ export default function PatientHistory() {
   const loadHistory = async () => {
     setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      const all = await getPrescriptions()
+      const searchName = name?.trim()?.toLowerCase()
+      const searchPhone = phone?.trim()
 
-      const { data, error } = await supabase
-        .from('prescriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+      const filtered = all.filter(rx => {
+        let p = rx.patient_info
+        if (typeof p === 'string') {
+          try { p = JSON.parse(p) } catch {}
+        }
+        const rxName = p?.name?.trim()?.toLowerCase()
+        const rxPhone = p?.phone?.trim()
 
-      if (error) throw error
-
-      const filtered = data.filter(rx => {
-        if (isByName) return rx.patient_info?.name?.trim() === name
-        return rx.patient_info?.phone?.trim() === phone
+        if (isByName) {
+          return Boolean(searchName && rxName === searchName)
+        }
+        return Boolean((searchPhone && rxPhone === searchPhone) || (searchName && rxName === searchName))
       })
 
       setPrescriptions(filtered)

@@ -127,7 +127,7 @@ export default function SettingsScreen() {
     {
       icon: 'people-outline', label: 'Patient Records',
       sublabel: 'View and manage patient history',
-      onPress: () => router.push('/patients'),
+      onPress: () => router.push('/(tabs)/patients'),
     },
   ]
 
