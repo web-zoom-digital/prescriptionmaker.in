@@ -3,6 +3,8 @@
  * Renders premium prescription PDFs matching the template style.
  */
 
+import '@/lib/pdf/patch-pdfkit'
+
 import {
   Document,
   Page,

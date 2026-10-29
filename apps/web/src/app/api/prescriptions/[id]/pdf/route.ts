@@ -1,3 +1,6 @@
+// Apply in-memory patch for pdfkit standard fonts before any rendering
+import '@/lib/pdf/patch-pdfkit'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { createElement } from 'react'

@@ -137,11 +137,6 @@ const nextConfig: NextConfig = {
   // that cannot be bundled for the browser
   serverExternalPackages: ['@react-pdf/renderer', 'pdfkit', 'canvas'],
 
-  // Ensure standard fonts and AFM data files needed by pdfkit are included in serverless bundle
-  outputFileTracingIncludes: {
-    '/api/prescriptions/**/*': ['./node_modules/pdfkit/**/*'],
-  },
-
   // Compress output
   compress: true,
 
