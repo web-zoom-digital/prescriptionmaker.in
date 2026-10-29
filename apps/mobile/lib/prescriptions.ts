@@ -12,6 +12,10 @@ export type Prescription = {
   patient_info: any
   doctor_info: any
   medicines: any[]
+  advice?: string
+  follow_up_date?: string
+  lab_tests?: string
+  template_slug?: string
   created_at: string
   updated_at: string
 }
@@ -168,6 +172,10 @@ export async function createPrescription(payload: Partial<Prescription>) {
     patient_info: payload.patient_info ?? {},
     doctor_info: payload.doctor_info ?? {},
     medicines: payload.medicines ?? [],
+    template_slug: payload.template_slug ?? 'classic-medical',
+    advice: payload.advice ?? '',
+    follow_up_date: payload.follow_up_date ?? '',
+    lab_tests: payload.lab_tests ?? '',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   }
@@ -247,9 +255,24 @@ export async function deletePrescription(id: string) {
 }
 
 // Get all prescriptions for a specific patient
-export async function getPatientPrescriptions(phone: string): Promise<Prescription[]> {
-  if (!phone) return []
+export async function getPatientPrescriptions(phoneOrName: string, fallbackName?: string): Promise<Prescription[]> {
+  if (!phoneOrName && !fallbackName) return []
   
   const all = await getPrescriptions()
-  return all.filter(p => p.patient_info?.phone && p.patient_info.phone === phone)
+  const cleanQ = phoneOrName ? phoneOrName.replace(/\D/g, '').slice(-10) : ''
+  const nameQ = (fallbackName || phoneOrName || '').trim().toLowerCase()
+
+  return all.filter(p => {
+    let info = p.patient_info
+    if (typeof info === 'string') {
+      try { info = JSON.parse(info) } catch {}
+    }
+    if (!info) return false
+    const rxDigits = info.phone ? String(info.phone).replace(/\D/g, '').slice(-10) : ''
+    const rxName = info.name ? String(info.name).trim().toLowerCase() : ''
+
+    if (cleanQ && rxDigits && cleanQ === rxDigits) return true
+    if (nameQ && rxName && (rxName === nameQ || rxName.includes(nameQ) || nameQ.includes(rxName))) return true
+    return false
+  })
 }
