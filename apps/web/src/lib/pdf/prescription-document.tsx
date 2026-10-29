@@ -13,12 +13,19 @@ import {
   Image,
 } from '@react-pdf/renderer'
 
+// Ensure pdfkit standard fonts are statically traced by serverless bundlers (@vercel/nft)
+import 'pdfkit/standard-fonts/Helvetica'
+import 'pdfkit/standard-fonts/HelveticaBold'
+import 'pdfkit/standard-fonts/HelveticaOblique'
+import 'pdfkit/standard-fonts/HelveticaBoldOblique'
+
 Font.register({
   family: 'Helvetica',
   fonts: [
     { src: 'Helvetica' },
     { src: 'Helvetica-Bold', fontWeight: 700 },
     { src: 'Helvetica-Oblique', fontStyle: 'italic' },
+    { src: 'Helvetica-BoldOblique', fontWeight: 700, fontStyle: 'italic' },
   ],
 })
 

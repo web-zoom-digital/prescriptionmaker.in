@@ -17,6 +17,15 @@ import { TEMPLATES } from '@prescriptionmaker/config/templates'
 import { PrescriptionDocument } from '@/lib/pdf/prescription-document'
 import { z } from 'zod'
 
+// Explicit imports to ensure standard-fonts are traced into serverless bundle
+import 'pdfkit/standard-fonts/Helvetica'
+import 'pdfkit/standard-fonts/HelveticaBold'
+import 'pdfkit/standard-fonts/HelveticaOblique'
+import 'pdfkit/standard-fonts/HelveticaBoldOblique'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 // ── Request schema ────────────────────────────────────────────────────────────
 
 const generatePdfSchema = z.object({

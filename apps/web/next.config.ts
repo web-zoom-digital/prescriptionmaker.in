@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import path from 'path'
 
 const nextConfig: NextConfig = {
   // Enable React strict mode for better development warnings
@@ -133,9 +134,21 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
 
-  // Keep @react-pdf/renderer on the server only — it uses Node.js canvas/stream APIs
+  // Root directory for output file tracing in monorepo
+  outputFileTracingRoot: path.join(__dirname, '../../'),
+
+  // Keep @react-pdf/renderer and pdfkit on the server only — they use Node.js canvas/stream APIs
   // that cannot be bundled for the browser
-  serverExternalPackages: ['@react-pdf/renderer', 'canvas'],
+  serverExternalPackages: ['@react-pdf/renderer', 'pdfkit', 'canvas'],
+
+  // Ensure standard fonts and AFM data files needed by pdfkit are included in serverless bundle
+  outputFileTracingIncludes: {
+    '**/*': [
+      './node_modules/pdfkit/**/*',
+      '../../node_modules/.pnpm/pdfkit*/**/*',
+      '../../node_modules/pdfkit/**/*',
+    ],
+  },
 
   // Compress output
   compress: true,

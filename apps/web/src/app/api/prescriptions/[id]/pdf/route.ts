@@ -6,6 +6,15 @@ import { TEMPLATES } from '@prescriptionmaker/config/templates'
 import { PrescriptionDocument } from '@/lib/pdf/prescription-document'
 import { verifyJWT } from '@/lib/auth/jwt'
 
+// Explicit imports to ensure standard-fonts are traced into serverless bundle
+import 'pdfkit/standard-fonts/Helvetica'
+import 'pdfkit/standard-fonts/HelveticaBold'
+import 'pdfkit/standard-fonts/HelveticaOblique'
+import 'pdfkit/standard-fonts/HelveticaBoldOblique'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
   process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key'
@@ -111,7 +120,7 @@ export async function GET(
 
     // 6. Render to PDF buffer
     const pdfBuffer = await renderToBuffer(
-      createElement(PrescriptionDocument, {
+      (createElement(PrescriptionDocument, {
         templateName: template.name,
         templateSlug: template.slug,
         primaryColor: (rx as any).custom_color || template.styles?.primaryColor || '#0f766e',
@@ -129,7 +138,7 @@ export async function GET(
         canvasImage: (rx as any).canvas_data_url || (rx as any).canvas_image || null,
         vitals: (rx as any).vitals || undefined,
         chiefComplaint: (rx as any).chief_complaint || undefined,
-      } as any)
+      }) as any)
     )
 
     // 7. Store PDF in Supabase Storage if bucket exists (non-blocking)
