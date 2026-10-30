@@ -20,6 +20,146 @@ export type Prescription = {
   updated_at: string
 }
 
+export const INITIAL_SAMPLE_PRESCRIPTIONS: Prescription[] = [
+  {
+    id: 'rx-sample-aarav-visit-2',
+    title: 'Rx: Aarav Verma - Follow-up Checkup',
+    status: 'complete',
+    mode: 'form',
+    diagnosis: 'Post-Viral Asthenia & Resolving Pharyngitis (Follow-up Checkup)',
+    doctor_info: {
+      name: 'Dr. Rahul Sharma',
+      qualification: 'MBBS, MD (Medicine)',
+      specialization: 'Senior Consultant Physician',
+      regNo: 'MCI-48291',
+      clinicName: 'Apollo Clinic & Healthcare Centre',
+      address: 'B-12, Green Park Main, South Ext., New Delhi - 110016',
+      phone: '+91 98110 23456',
+      email: 'dr.rahul@apolloclinic.com',
+    },
+    patient_info: {
+      name: 'Aarav Verma',
+      age: '32',
+      gender: 'Male',
+      weight: '68 kg',
+      phone: '+91 98765 43210',
+      bp: '118/76 mmHg',
+      pulse: '74 bpm',
+      temp: '98.4°F (Afebrile)',
+      spo2: '99%',
+      chiefComplaint: 'Follow-up visit. Fever has subsided, throat pain resolved, mild post-viral fatigue remaining.',
+    },
+    medicines: [
+      {
+        id: 'rx-m-2-1',
+        name: 'Becosules Performance Capsule',
+        strength: '1 Cap',
+        form: 'capsule',
+        frequency: '1-0-0 (OD)',
+        duration: '10 days',
+        instructions: 'Take 1 capsule daily after breakfast with milk or water for recovery',
+      },
+      {
+        id: 'rx-m-2-2',
+        name: 'Vitamin C 500mg (Limcee)',
+        strength: '500mg',
+        form: 'chewable',
+        frequency: '0-1-0 (OD)',
+        duration: '7 days',
+        instructions: 'Chew 1 tablet daily post-lunch to boost immunity',
+      },
+      {
+        id: 'rx-m-2-3',
+        name: 'Pantoprazole (Pan-40)',
+        strength: '40mg',
+        form: 'tablet',
+        frequency: '1-0-0 (OD)',
+        duration: '5 days',
+        instructions: 'Take 30 minutes before breakfast on an empty stomach',
+      },
+    ],
+    lab_tests: 'Liver Function Test (LFT) - Reports reviewed: Normal',
+    advice: 'Continue drinking 2.5-3 liters fluids daily. Gradual return to routine physical activity. Balanced diet rich in proteins and greens.',
+    follow_up_date: 'SOS (Only if any symptoms recur)',
+    template_slug: 'classic-letterhead',
+    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'rx-sample-aarav-visit-1',
+    title: 'Rx: Aarav Verma - Viral Fever & Pharyngitis',
+    status: 'complete',
+    mode: 'form',
+    diagnosis: 'Acute Viral Fever with Exudative Pharyngitis',
+    doctor_info: {
+      name: 'Dr. Rahul Sharma',
+      qualification: 'MBBS, MD (Medicine)',
+      specialization: 'Senior Consultant Physician',
+      regNo: 'MCI-48291',
+      clinicName: 'Apollo Clinic & Healthcare Centre',
+      address: 'B-12, Green Park Main, South Ext., New Delhi - 110016',
+      phone: '+91 98110 23456',
+      email: 'dr.rahul@apolloclinic.com',
+    },
+    patient_info: {
+      name: 'Aarav Verma',
+      age: '32',
+      gender: 'Male',
+      weight: '68 kg',
+      phone: '+91 98765 43210',
+      bp: '120/80 mmHg',
+      pulse: '78 bpm',
+      temp: '102°F',
+      spo2: '98%',
+      chiefComplaint: 'High grade fever (102°F), severe throat irritation, body ache and painful swallowing for 3 days.',
+    },
+    medicines: [
+      {
+        id: 'rx-m-1-1',
+        name: 'Paracetamol',
+        strength: '650mg',
+        form: 'tablet',
+        frequency: '1-0-1-1 (QID)',
+        duration: '3 days',
+        instructions: 'Take with water after meals. SOS if temperature exceeds 100°F',
+      },
+      {
+        id: 'rx-m-1-2',
+        name: 'Azithromycin',
+        strength: '500mg',
+        form: 'tablet',
+        frequency: '1-0-0 (OD)',
+        duration: '3 days',
+        instructions: 'Take 1 hour before meal or 2 hours after meal once daily at the same time',
+      },
+      {
+        id: 'rx-m-1-3',
+        name: 'Levocetirizine + Montelukast',
+        strength: '5mg/10mg',
+        form: 'tablet',
+        frequency: '0-0-1 (HS)',
+        duration: '5 days',
+        instructions: 'Take at bedtime for allergic throat congestion and cough',
+      },
+      {
+        id: 'rx-m-1-4',
+        name: 'Ascoril-D Cough Syrup',
+        strength: '10ml',
+        form: 'syrup',
+        frequency: '1-1-1 (TDS)',
+        duration: '5 days',
+        instructions: 'Take 10ml thrice daily after food with warm water',
+      },
+    ],
+    lab_tests: 'Complete Blood Count (CBC), Dengue NS1 Antigen, Throat Swab',
+    advice: 'Drink 3-4 liters warm water daily. Warm salt water gargles 3 times a day. Complete bed rest for 3 days. Avoid cold/spicy foods.',
+    follow_up_date: '3 days (for follow-up evaluation)',
+    template_slug: 'classic-letterhead',
+    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+]
+
 // ── Offline Sync Helpers ───────────────────────────────────────────
 
 const STORAGE_KEY = '@rx_maker_prescriptions'
@@ -44,9 +184,28 @@ async function setLocalCache(data: Prescription[]) {
 async function getLocalCache(): Promise<Prescription[]> {
   try {
     const data = await AsyncStorage.getItem(STORAGE_KEY)
-    return data ? JSON.parse(data) : []
+    if (data) {
+      const parsed: Prescription[] = JSON.parse(data)
+      const hasAarav = parsed.some(p => {
+        let pInfo = p.patient_info
+        if (typeof pInfo === 'string') {
+          try { pInfo = JSON.parse(pInfo) } catch {}
+        }
+        const pName = (pInfo?.name || '').toLowerCase()
+        return pName.includes('aarav')
+      })
+      if (!hasAarav) {
+        const merged = [...INITIAL_SAMPLE_PRESCRIPTIONS, ...parsed]
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
+        return merged
+      }
+      return parsed
+    } else {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_SAMPLE_PRESCRIPTIONS))
+      return INITIAL_SAMPLE_PRESCRIPTIONS
+    }
   } catch (e) {
-    return []
+    return INITIAL_SAMPLE_PRESCRIPTIONS
   }
 }
 

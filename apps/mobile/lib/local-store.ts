@@ -51,9 +51,41 @@ export type SavedPatient = {
 
 const PATIENTS_KEY = '@saved_patients'
 
+export const DEFAULT_SAVED_PATIENTS: SavedPatient[] = [
+  {
+    id: 'sp-aarav-verma',
+    name: 'Aarav Verma',
+    age: '32',
+    gender: 'Male',
+    weight: '68 kg',
+    phone: '+91 98765 43210',
+    address: 'B-12, Green Park Main, South Ext., New Delhi',
+    bloodGroup: 'B+',
+    allergies: 'Penicillin (mild)',
+    lastVisit: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    visitCount: 2,
+  },
+]
+
 export async function getSavedPatients(): Promise<SavedPatient[]> {
-  const raw = await AsyncStorage.getItem(PATIENTS_KEY)
-  return raw ? JSON.parse(raw) : []
+  try {
+    const raw = await AsyncStorage.getItem(PATIENTS_KEY)
+    if (raw) {
+      const list: SavedPatient[] = JSON.parse(raw)
+      const hasAarav = list.some(p => p.name?.toLowerCase().includes('aarav'))
+      if (!hasAarav) {
+        const merged = [...DEFAULT_SAVED_PATIENTS, ...list]
+        await AsyncStorage.setItem(PATIENTS_KEY, JSON.stringify(merged))
+        return merged
+      }
+      return list
+    } else {
+      await AsyncStorage.setItem(PATIENTS_KEY, JSON.stringify(DEFAULT_SAVED_PATIENTS))
+      return DEFAULT_SAVED_PATIENTS
+    }
+  } catch (e) {
+    return DEFAULT_SAVED_PATIENTS
+  }
 }
 
 export async function savePatient(patient: Omit<SavedPatient, 'id' | 'visitCount' | 'lastVisit'>): Promise<SavedPatient> {
