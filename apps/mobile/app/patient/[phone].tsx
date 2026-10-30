@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native'
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router'
 import { useEffect, useState, useCallback } from 'react'
 import { getPrescriptions, createPrescription, INITIAL_SAMPLE_PRESCRIPTIONS, type Prescription } from '../../lib/prescriptions'
@@ -165,160 +165,150 @@ export default function PatientHistory() {
       <View style={styles.card}>
         {/* Card Header: Visit Number, Date, Status */}
         <View style={styles.cardHeader}>
-          <View style={styles.visitBadge}>
-            <Ionicons name="medical" size={13} color={Colors.primaryBlue} />
-            <Text style={styles.visitBadgeText}>Visit #{visitNum} {index === 0 ? '(Latest)' : ''}</Text>
-          </View>
-          <View style={styles.dateBadge}>
-            <Ionicons name="calendar-outline" size={13} color={Colors.textSecondary} />
+          <View style={styles.headerLeft}>
+            <View style={styles.visitPill}>
+              <Text style={styles.visitPillText}>Visit #{visitNum}</Text>
+            </View>
             <Text style={styles.dateText}>{date}</Text>
+            {index === 0 ? (
+              <View style={styles.latestTag}>
+                <Text style={styles.latestTagText}>Latest</Text>
+              </View>
+            ) : null}
           </View>
-          <View style={[styles.statusBadge, isComplete ? styles.statusComplete : styles.statusDraft]}>
-            <Text style={[styles.statusText, isComplete ? styles.textComplete : styles.textDraft]}>
-              {isComplete ? '✓ Complete' : '✎ Draft'}
-            </Text>
+          <View style={styles.headerRight}>
+            <View style={[styles.statusBadge, isComplete ? styles.statusComplete : styles.statusDraft]}>
+              <View style={[styles.statusDot, isComplete ? styles.dotComplete : styles.dotDraft]} />
+              <Text style={[styles.statusText, isComplete ? styles.textComplete : styles.textDraft]}>
+                {isComplete ? 'Complete' : 'Draft'}
+              </Text>
+            </View>
           </View>
         </View>
 
         <View style={styles.cardBody}>
-          {/* Doctor & Clinic */}
-          {(dInfo.name || dInfo.doctor_name || dInfo.clinicName || dInfo.clinic_name) ? (
-            <View style={styles.doctorRow}>
-              <Ionicons name="person-circle-outline" size={16} color={Colors.primaryBlue} />
-              <Text style={styles.doctorName}>
-                {dInfo.name || dInfo.doctor_name || 'Dr. Rahul Sharma'}
-              </Text>
+          {/* Doctor Row */}
+          {(dInfo.name || dInfo.doctor_name) ? (
+            <View style={styles.drRow}>
+              <Ionicons name="medkit-outline" size={14} color={Colors.primaryBlue} />
+              <Text style={styles.drName}>{dInfo.name || dInfo.doctor_name}</Text>
               {(dInfo.clinicName || dInfo.clinic_name) ? (
-                <Text style={styles.clinicName}> • {dInfo.clinicName || dInfo.clinic_name}</Text>
+                <Text style={styles.drClinic}>• {dInfo.clinicName || dInfo.clinic_name}</Text>
               ) : null}
             </View>
           ) : null}
 
-          {/* Clinical Vitals & Chief Complaint */}
-          {(pInfo.chiefComplaint || pInfo.bp || pInfo.temp || pInfo.pulse || pInfo.spo2) ? (
-            <View style={styles.clinicalNotesBox}>
-              {pInfo.chiefComplaint ? (
-                <View style={styles.complaintRow}>
-                  <Text style={styles.complaintLabel}>Complaint: </Text>
-                  <Text style={styles.complaintText}>{pInfo.chiefComplaint}</Text>
-                </View>
-              ) : null}
-              {(pInfo.bp || pInfo.temp || pInfo.pulse || pInfo.spo2) ? (
-                <View style={styles.vitalsChipsRow}>
-                  {pInfo.temp ? (
-                    <View style={styles.vChip}><Text style={styles.vChipText}>🌡️ {pInfo.temp}</Text></View>
-                  ) : null}
-                  {pInfo.bp ? (
-                    <View style={styles.vChip}><Text style={styles.vChipText}>💓 BP: {pInfo.bp}</Text></View>
-                  ) : null}
-                  {pInfo.pulse ? (
-                    <View style={styles.vChip}><Text style={styles.vChipText}>🫀 Pulse: {pInfo.pulse}</Text></View>
-                  ) : null}
-                  {pInfo.spo2 ? (
-                    <View style={styles.vChip}><Text style={styles.vChipText}>💨 SpO2: {pInfo.spo2}</Text></View>
-                  ) : null}
-                </View>
-              ) : null}
-            </View>
-          ) : null}
+          {/* Diagnosis & Complaint Box */}
+          <View style={styles.diagnosisSection}>
+            <Text style={styles.diagnosisLabel}>DIAGNOSIS</Text>
+            <Text style={styles.diagnosisTitle}>{item.diagnosis || 'General Medical Consultation'}</Text>
+            
+            {pInfo.chiefComplaint ? (
+              <Text style={styles.complaintText}>
+                <Text style={{ fontWeight: '600', color: Colors.textPrimary }}>Complaint: </Text>
+                {pInfo.chiefComplaint}
+              </Text>
+            ) : null}
 
-          {/* Diagnosis */}
-          {item.diagnosis ? (
-            <View style={styles.diagnosisBox}>
-              <View style={styles.diagHeader}>
-                <Ionicons name="pulse" size={14} color={Colors.primaryBlue} />
-                <Text style={styles.diagLabel}>DIAGNOSIS</Text>
+            {/* Vitals Inline Chips */}
+            {(pInfo.bp || pInfo.temp || pInfo.pulse || pInfo.spo2) ? (
+              <View style={styles.vitalsRowInline}>
+                {pInfo.temp ? <Text style={styles.vVital}>🌡️ {pInfo.temp}</Text> : null}
+                {pInfo.bp ? <Text style={styles.vVital}>💓 {pInfo.bp}</Text> : null}
+                {pInfo.pulse ? <Text style={styles.vVital}>🫀 {pInfo.pulse}</Text> : null}
+                {pInfo.spo2 ? <Text style={styles.vVital}>💨 {pInfo.spo2}</Text> : null}
               </View>
-              <Text style={styles.diagValue}>{item.diagnosis}</Text>
-            </View>
-          ) : null}
+            ) : null}
+          </View>
 
-          {/* Prescribed Medicines (Full Readable Details for Doctor) */}
+          {/* Prescribed Medicines — Clean Prescription Pad Style */}
           {meds.length > 0 ? (
-            <View style={styles.medsSection}>
-              <View style={styles.medsHeaderRow}>
-                <Ionicons name="bandage-outline" size={15} color={Colors.primaryBlue} />
-                <Text style={styles.medsSectionTitle}>
-                  PRESCRIBED MEDICINES ({meds.length})
-                </Text>
+            <View style={styles.medsContainer}>
+              <View style={styles.medsHeader}>
+                <Text style={styles.medsHeading}>PRESCRIBED MEDICINES</Text>
+                <Text style={styles.medsCountBadge}>{meds.length} items</Text>
               </View>
 
-              <View style={styles.medsContainer}>
+              <View style={styles.medsTable}>
                 {meds.map((m: any, i: number) => (
-                  <View key={i} style={styles.medCard}>
-                    <View style={styles.medHeaderRow}>
-                      <Text style={styles.medNumber}>{i + 1}.</Text>
-                      <Text style={styles.medNameText}>
-                        {m.name} {m.strength ? `— ${m.strength}` : ''}
-                      </Text>
-                      {m.form ? (
-                        <View style={styles.medFormBadge}>
-                          <Text style={styles.medFormText}>{m.form}</Text>
-                        </View>
+                  <View key={i} style={[styles.medRow, i === meds.length - 1 && { borderBottomWidth: 0 }]}>
+                    <View style={styles.medLeft}>
+                      <View style={styles.medTitleLine}>
+                        <Text style={styles.medIndexNum}>{i + 1}.</Text>
+                        <Text style={styles.medNameBold}>{m.name}</Text>
+                        {m.strength ? <Text style={styles.medStrengthTag}>{m.strength}</Text> : null}
+                        {m.form ? (
+                          <View style={styles.formTag}>
+                            <Text style={styles.formTagText}>{m.form}</Text>
+                          </View>
+                        ) : null}
+                      </View>
+                      {m.instructions ? (
+                        <Text style={styles.medInstructionsText}>👉 {m.instructions}</Text>
                       ) : null}
                     </View>
 
-                    <View style={styles.medMetaRow}>
+                    <View style={styles.medRight}>
                       {m.frequency ? (
-                        <View style={styles.dosageBadge}>
-                          <Ionicons name="time-outline" size={12} color={Colors.primaryBlue} />
-                          <Text style={styles.dosageText}>{m.frequency}</Text>
+                        <View style={styles.freqPill}>
+                          <Text style={styles.freqText}>{m.frequency}</Text>
                         </View>
                       ) : null}
                       {m.duration ? (
-                        <View style={[styles.dosageBadge, { backgroundColor: '#e0e7ff' }]}>
-                          <Ionicons name="calendar-outline" size={12} color="#4338ca" />
-                          <Text style={[styles.dosageText, { color: '#4338ca' }]}>{m.duration}</Text>
-                        </View>
+                        <Text style={styles.durationText}>{m.duration}</Text>
                       ) : null}
                     </View>
-
-                    {m.instructions ? (
-                      <Text style={styles.medInstructions}>
-                        • Instructions: {m.instructions}
-                      </Text>
-                    ) : null}
                   </View>
                 ))}
               </View>
             </View>
           ) : null}
 
-          {/* Lab Tests */}
-          {item.lab_tests ? (
-            <View style={styles.extraBox}>
-              <Text style={styles.extraTitle}>🧪 Lab Tests / Investigations:</Text>
-              <Text style={styles.extraContent}>{item.lab_tests}</Text>
-            </View>
-          ) : null}
+          {/* Clinical Advice & Investigations Notes */}
+          {(item.lab_tests || item.advice || item.follow_up_date) ? (
+            <View style={styles.clinicalNotesCard}>
+              {item.lab_tests ? (
+                <View style={styles.noteItem}>
+                  <Text style={styles.noteLabel}>🧪 Tests:</Text>
+                  <Text style={styles.noteValue}>{item.lab_tests}</Text>
+                </View>
+              ) : null}
 
-          {/* Advice */}
-          {item.advice ? (
-            <View style={styles.adviceBox}>
-              <Text style={styles.adviceTitle}>📋 Doctor's Advice & Instructions:</Text>
-              <Text style={styles.adviceContent}>{item.advice}</Text>
-            </View>
-          ) : null}
+              {item.advice ? (
+                <View style={styles.noteItem}>
+                  <Text style={styles.noteLabel}>📋 Advice:</Text>
+                  <Text style={styles.noteValue}>{item.advice}</Text>
+                </View>
+              ) : null}
 
-          {/* Follow Up */}
-          {item.follow_up_date ? (
-            <View style={styles.followUpRow}>
-              <Ionicons name="alarm-outline" size={14} color={Colors.success} />
-              <Text style={styles.followUpText}>
-                Follow-up: <Text style={{ fontWeight: '700' }}>{item.follow_up_date}</Text>
-              </Text>
+              {item.follow_up_date ? (
+                <View style={styles.noteItem}>
+                  <Text style={styles.noteLabel}>📅 Follow-up:</Text>
+                  <Text style={[styles.noteValue, { fontWeight: '700', color: Colors.primaryBlue }]}>
+                    {item.follow_up_date}
+                  </Text>
+                </View>
+              ) : null}
             </View>
           ) : null}
         </View>
 
-        {/* Footer Actions */}
+        {/* Card Footer: Clean Action Buttons */}
         <View style={styles.cardFooter}>
           <TouchableOpacity 
-            style={styles.repeatButton}
+            style={styles.repeatBtn}
             onPress={() => router.push({ pathname: '/editor', params: { clone_id: item.id } })}
           >
-            <Ionicons name="copy-outline" size={16} color={Colors.white} />
-            <Text style={styles.repeatButtonText}>Repeat This Prescription</Text>
+            <Ionicons name="repeat" size={15} color={Colors.white} />
+            <Text style={styles.repeatBtnText}>Repeat Prescription</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.viewDetailsBtn}
+            onPress={() => router.push({ pathname: '/editor', params: { id: item.id } })}
+          >
+            <Ionicons name="eye-outline" size={15} color={Colors.textPrimary} />
+            <Text style={styles.viewDetailsBtnText}>Open in Editor</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -326,245 +316,636 @@ export default function PatientHistory() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.pageBackground}>
       <Stack.Screen options={{ 
-        title: patientName,
+        title: 'Patient Record',
         headerStyle: { backgroundColor: Colors.darkNavy },
         headerTintColor: Colors.white,
         headerTitleStyle: { fontWeight: '700', fontSize: 16 },
       }} />
-      
-      {/* Vitals Overview Header */}
-      <View style={styles.header}>
-        <View style={styles.avatarRow}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{patientName.charAt(0).toUpperCase()}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.name}>{patientName}</Text>
-            {patientPhone ? <Text style={styles.phone}>{patientPhone}</Text> : null}
-          </View>
-          <View style={styles.totalVisitsBadge}>
-            <Ionicons name="documents-outline" size={14} color={Colors.primaryBlue} />
-            <Text style={styles.totalVisitsText}>{displayVisits} {displayVisits === 1 ? 'Visit' : 'Visits'}</Text>
-          </View>
-        </View>
 
-        <View style={styles.vitalsRow}>
-          <View style={styles.vitalBox}>
-            <Text style={styles.vitalLabel}>Age/Gender</Text>
-            <Text style={styles.vitalValue}>
-              {displayAge ? `${displayAge} Y` : '-'} {displayGender ? `/ ${displayGender}` : ''}
-            </Text>
-          </View>
-          <View style={styles.vitalBox}>
-            <Text style={styles.vitalLabel}>Weight</Text>
-            <Text style={styles.vitalValue}>{displayWeight ? (displayWeight.includes('kg') ? displayWeight : `${displayWeight} kg`) : '-'}</Text>
-          </View>
-          <View style={[styles.vitalBox, { borderRightWidth: 0 }]}>
-            <Text style={styles.vitalLabel}>Prescriptions</Text>
-            <Text style={[styles.vitalValue, { color: Colors.primaryBlue }]}>{displayVisits} Rx</Text>
-          </View>
-        </View>
-
-        {/* Extra info if available from patient record */}
-        {Boolean(savedPatient?.bloodGroup || savedPatient?.allergies || savedPatient?.address) ? (
-          <View style={styles.extraInfoRow}>
-            {savedPatient?.bloodGroup ? (
-              <View style={[styles.infoChip, { backgroundColor: '#fff1f2' }]}>
-                <Text style={[styles.infoChipText, { color: '#be123c' }]}>🩸 Blood: {savedPatient.bloodGroup}</Text>
-              </View>
-            ) : null}
-            {savedPatient?.allergies ? (
-              <View style={[styles.infoChip, { backgroundColor: '#fef3c7' }]}>
-                <Text style={[styles.infoChipText, { color: '#92400e' }]}>⚠️ Allergy: {savedPatient.allergies}</Text>
-              </View>
-            ) : null}
-            {savedPatient?.address ? (
-              <View style={styles.infoChip}>
-                <Text style={styles.infoChipText}>📍 {savedPatient.address}</Text>
-              </View>
-            ) : null}
-          </View>
-        ) : null}
-      </View>
-
-      {/* Prescription History Section Title */}
-      <View style={styles.historySectionHeader}>
-        <Ionicons name="time" size={16} color={Colors.primaryBlue} />
-        <Text style={styles.historySectionTitle}>CLINICAL PRESCRIPTION HISTORY</Text>
-        <Text style={styles.historySectionCount}>({prescriptions.length} Records)</Text>
-      </View>
-
-      {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.primaryBlue} />
-        </View>
-      ) : (
-        <FlatList
-          data={prescriptions}
-          keyExtractor={item => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.list}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <View style={styles.emptyIconWrap}>
-                <Ionicons name="document-text-outline" size={42} color={Colors.primaryBlue} />
-              </View>
-              <Text style={styles.emptyTitle}>No Prescriptions Recorded</Text>
-              <Text style={styles.emptyText}>
-                {patientName} is saved in your records, but no prescription has been completed for them yet.
-              </Text>
-              <TouchableOpacity style={styles.createRxActionBtn} onPress={handleNewRx}>
-                <Ionicons name="add" size={18} color={Colors.white} />
-                <Text style={styles.createRxActionText}>+ Create Prescription for {patientName}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.sampleRxActionBtn} onPress={handleGenerateSampleRx}>
-                <Ionicons name="flash" size={16} color={Colors.primaryBlue} />
-                <Text style={styles.sampleRxActionText}>⚡ Auto-Fill Sample Prescription</Text>
-              </TouchableOpacity>
+      <View style={styles.container}>
+        {/* Clean Patient Summary Header */}
+        <View style={styles.patientProfileCard}>
+          <View style={styles.profileTopRow}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{patientName.charAt(0).toUpperCase()}</Text>
             </View>
-          }
-        />
-      )}
+            <View style={{ flex: 1 }}>
+              <Text style={styles.patientName}>{patientName}</Text>
+              <Text style={styles.patientPhone}>{patientPhone}</Text>
+            </View>
+            <TouchableOpacity style={styles.primaryNewRxBtn} onPress={handleNewRx}>
+              <Ionicons name="add" size={16} color={Colors.white} />
+              <Text style={styles.primaryNewRxBtnText}>New Rx</Text>
+            </TouchableOpacity>
+          </View>
 
-      {/* FAB for New Prescription */}
-      <TouchableOpacity style={styles.fab} onPress={handleNewRx}>
-        <Ionicons name="add" size={24} color={Colors.white} />
-        <Text style={styles.fabText}>New Rx</Text>
-      </TouchableOpacity>
+          {/* Clean Vitals & Tags Bar */}
+          <View style={styles.vitalsBar}>
+            <View style={styles.vitalPill}>
+              <Text style={styles.vitalPillLabel}>Age/Gender</Text>
+              <Text style={styles.vitalPillValue}>{displayAge || '32'} Y / {displayGender || 'Male'}</Text>
+            </View>
+            <View style={styles.vitalDivider} />
+            <View style={styles.vitalPill}>
+              <Text style={styles.vitalPillLabel}>Weight</Text>
+              <Text style={styles.vitalPillValue}>{displayWeight || '68 kg'}</Text>
+            </View>
+            <View style={styles.vitalDivider} />
+            <View style={styles.vitalPill}>
+              <Text style={styles.vitalPillLabel}>Total Visits</Text>
+              <Text style={[styles.vitalPillValue, { color: Colors.primaryBlue }]}>{displayVisits} Visits</Text>
+            </View>
+          </View>
+
+          {/* Medical Badges (Blood, Allergy, Address) */}
+          {(savedPatient?.bloodGroup || savedPatient?.allergies || savedPatient?.address) ? (
+            <View style={styles.medicalBadgesRow}>
+              {savedPatient?.bloodGroup ? (
+                <View style={styles.medBadge}>
+                  <Text style={styles.medBadgeText}>🩸 Blood: <Text style={{ fontWeight: '700' }}>{savedPatient.bloodGroup}</Text></Text>
+                </View>
+              ) : null}
+              {savedPatient?.allergies ? (
+                <View style={[styles.medBadge, { backgroundColor: '#fef3c7' }]}>
+                  <Text style={[styles.medBadgeText, { color: '#92400e' }]}>⚠️ Allergy: {savedPatient.allergies}</Text>
+                </View>
+              ) : null}
+              {savedPatient?.address ? (
+                <View style={styles.medBadge}>
+                  <Text style={styles.medBadgeText}>📍 {savedPatient.address}</Text>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+        </View>
+
+        {/* Timeline Header */}
+        <View style={styles.timelineHeaderRow}>
+          <View style={styles.timelineDotIndicator} />
+          <Text style={styles.timelineHeading}>VISIT HISTORY ({prescriptions.length})</Text>
+          <Text style={styles.timelineSubheading}>Chronological medical records</Text>
+        </View>
+
+        {/* History List */}
+        {loading ? (
+          <View style={styles.centerLoading}>
+            <ActivityIndicator size="large" color={Colors.primaryBlue} />
+          </View>
+        ) : (
+          <FlatList
+            data={prescriptions}
+            keyExtractor={item => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View style={styles.emptyCard}>
+                <Ionicons name="document-text-outline" size={40} color={Colors.textMuted} />
+                <Text style={styles.emptyTitle}>No Prescriptions Recorded</Text>
+                <Text style={styles.emptySubtitle}>
+                  {patientName} is saved in your directory, but has no prescriptions yet.
+                </Text>
+                <TouchableOpacity style={styles.emptyActionBtn} onPress={handleNewRx}>
+                  <Text style={styles.emptyActionBtnText}>+ Create First Prescription</Text>
+                </TouchableOpacity>
+              </View>
+            }
+          />
+        )}
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f5f9' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  
-  header: { 
-    backgroundColor: Colors.white, padding: Spacing.lg, 
-    borderBottomWidth: 1, borderBottomColor: Colors.border,
-    ...Shadow.sm
+  pageBackground: {
+    flex: 1,
+    backgroundColor: '#f1f5f9',
   },
-  avatarRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 },
-  avatar: { 
-    width: 52, height: 52, borderRadius: 26, 
-    backgroundColor: Colors.primaryBlue, 
-    justifyContent: 'center', alignItems: 'center',
-    ...Shadow.blue
+  container: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    paddingHorizontal: Platform.OS === 'web' ? 20 : 12,
   },
-  avatarText: { color: Colors.white, fontSize: 22, fontWeight: '800' },
-  name: { ...Typography.h3, color: Colors.textPrimary },
-  phone: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2 },
-  
-  totalVisitsBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: Colors.lightBlue, paddingHorizontal: 10, paddingVertical: 6,
-    borderRadius: Radius.full, borderWidth: 1, borderColor: '#bfdbfe'
+  centerLoading: {
+    paddingVertical: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  totalVisitsText: { fontSize: 12, fontWeight: '700', color: Colors.primaryBlue },
 
-  vitalsRow: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: Colors.surface, borderRadius: Radius.md, paddingVertical: 10 },
-  vitalBox: { flex: 1, alignItems: 'center', borderRightWidth: 1, borderRightColor: Colors.border },
-  vitalLabel: { ...Typography.labelSm, color: Colors.textSecondary, textTransform: 'uppercase', marginBottom: 2 },
-  vitalValue: { ...Typography.body, fontWeight: '700', color: Colors.textPrimary },
-  
-  extraInfoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
-  infoChip: { backgroundColor: Colors.surface, paddingHorizontal: 10, paddingVertical: 5, borderRadius: Radius.full },
-  infoChipText: { fontSize: 11, color: Colors.textSecondary, fontWeight: '600' },
-
-  historySectionHeader: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 16, paddingTop: 16, paddingBottom: 6
+  // Patient Profile Header
+  patientProfileCard: {
+    backgroundColor: Colors.white,
+    borderRadius: Radius.lg,
+    padding: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    ...Shadow.sm,
   },
-  historySectionTitle: { fontSize: 12, fontWeight: '800', color: Colors.textSecondary, letterSpacing: 0.5 },
-  historySectionCount: { fontSize: 12, fontWeight: '600', color: Colors.textMuted },
-
-  list: { padding: Spacing.md, paddingBottom: 90, gap: 14 },
-  card: { 
-    backgroundColor: Colors.white, borderRadius: Radius.lg, 
-    overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0', 
-    ...Shadow.sm 
+  profileTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 14,
   },
-  cardHeader: { 
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', 
-    paddingHorizontal: 14, paddingVertical: 10, 
-    backgroundColor: '#f8fafc', borderBottomWidth: 1, borderBottomColor: '#e2e8f0' 
+  avatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: Colors.primaryBlue,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  visitBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    backgroundColor: Colors.lightBlue, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6
+  avatarText: {
+    color: Colors.white,
+    fontSize: 20,
+    fontWeight: '800',
   },
-  visitBadgeText: { fontSize: 12, fontWeight: '800', color: Colors.primaryBlue },
-  dateBadge: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  dateText: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary },
-  statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12, borderWidth: 1 },
-  statusComplete: { backgroundColor: Colors.successLight, borderColor: '#bbf7d0' },
-  statusDraft: { backgroundColor: Colors.warningLight, borderColor: '#fde68a' },
-  statusText: { fontSize: 11, fontWeight: '700' },
-  textComplete: { color: Colors.success },
-  textDraft: { color: Colors.warning },
-  
-  cardBody: { padding: 14, gap: 12 },
-  
-  doctorRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  doctorName: { fontSize: 13, fontWeight: '700', color: Colors.primaryBlue },
-  clinicName: { fontSize: 12, color: Colors.textSecondary, fontWeight: '500' },
+  patientName: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#0f172a',
+    letterSpacing: -0.3,
+  },
+  patientPhone: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginTop: 1,
+    fontWeight: '500',
+  },
+  primaryNewRxBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.primaryBlue,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: Radius.full,
+    ...Shadow.blue,
+  },
+  primaryNewRxBtnText: {
+    color: Colors.white,
+    fontSize: 13,
+    fontWeight: '700',
+  },
 
-  clinicalNotesBox: { backgroundColor: '#f8fafc', padding: 10, borderRadius: Radius.md, borderWidth: 1, borderColor: '#e2e8f0', gap: 6 },
-  complaintRow: { flexDirection: 'row', flexWrap: 'wrap' },
-  complaintLabel: { fontSize: 12, fontWeight: '700', color: Colors.textPrimary },
-  complaintText: { fontSize: 12, color: Colors.textSecondary, flex: 1 },
-  vitalsChipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 },
-  vChip: { backgroundColor: Colors.white, paddingHorizontal: 8, paddingVertical: 3, borderRadius: Radius.sm, borderWidth: 1, borderColor: '#e2e8f0' },
-  vChipText: { fontSize: 11, fontWeight: '600', color: Colors.textPrimary },
+  // Vitals Bar
+  vitalsBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: '#f8fafc',
+    borderRadius: Radius.md,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#edf2f7',
+  },
+  vitalPill: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  vitalPillLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: Colors.textMuted,
+    textTransform: 'uppercase',
+    marginBottom: 2,
+    letterSpacing: 0.3,
+  },
+  vitalPillValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+  },
+  vitalDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#e2e8f0',
+  },
 
-  diagnosisBox: { backgroundColor: '#eff6ff', padding: 10, borderRadius: Radius.md, borderWidth: 1, borderColor: '#bfdbfe' },
-  diagHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 3 },
-  diagLabel: { fontSize: 10, fontWeight: '800', color: Colors.primaryBlue, letterSpacing: 0.5 },
-  diagValue: { fontSize: 14, fontWeight: '700', color: '#1e3a8a' },
+  medicalBadgesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 10,
+  },
+  medBadge: {
+    backgroundColor: '#f1f5f9',
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: Radius.full,
+  },
+  medBadgeText: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
 
-  medsSection: { marginTop: 4 },
-  medsHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
-  medsSectionTitle: { fontSize: 11, fontWeight: '800', color: Colors.textSecondary, letterSpacing: 0.5 },
-  medsContainer: { gap: 8 },
-  medCard: { backgroundColor: '#f8fafc', padding: 10, borderRadius: Radius.md, borderWidth: 1, borderColor: '#e2e8f0' },
-  medHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
-  medNumber: { fontSize: 13, fontWeight: '800', color: Colors.primaryBlue },
-  medNameText: { fontSize: 13, fontWeight: '700', color: Colors.textPrimary, flex: 1 },
-  medFormBadge: { backgroundColor: '#e2e8f0', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  medFormText: { fontSize: 10, fontWeight: '700', color: Colors.textSecondary, textTransform: 'capitalize' },
-  medMetaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 4 },
-  dosageBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.lightBlue, paddingHorizontal: 7, paddingVertical: 3, borderRadius: 4 },
-  dosageText: { fontSize: 11, fontWeight: '700', color: Colors.primaryBlue },
-  medInstructions: { fontSize: 11, color: Colors.textSecondary, fontStyle: 'italic', marginTop: 2 },
+  // Timeline Header
+  timelineHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 6,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  timelineDotIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.primaryBlue,
+  },
+  timelineHeading: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: Colors.textPrimary,
+    letterSpacing: 0.5,
+  },
+  timelineSubheading: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    fontWeight: '500',
+  },
 
-  extraBox: { backgroundColor: '#f5f3ff', padding: 10, borderRadius: Radius.md, borderWidth: 1, borderColor: '#ddd6fe' },
-  extraTitle: { fontSize: 11, fontWeight: '700', color: '#6d28d9', marginBottom: 2 },
-  extraContent: { fontSize: 12, color: '#4c1d95', fontWeight: '500' },
+  listContent: {
+    paddingBottom: 40,
+    gap: 12,
+  },
 
-  adviceBox: { backgroundColor: '#f0fdf4', padding: 10, borderRadius: Radius.md, borderWidth: 1, borderColor: '#bbf7d0' },
-  adviceTitle: { fontSize: 11, fontWeight: '700', color: '#15803d', marginBottom: 2 },
-  adviceContent: { fontSize: 12, color: '#166534', fontWeight: '500', lineHeight: 17 },
+  // Clean Prescription Card
+  card: {
+    backgroundColor: Colors.white,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    overflow: 'hidden',
+    ...Shadow.sm,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#f8fafc',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  visitPill: {
+    backgroundColor: '#e0f2fe',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  visitPillText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#0369a1',
+  },
+  dateText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  latestTag: {
+    backgroundColor: '#ecfdf5',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#a7f3d0',
+  },
+  latestTagText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#059669',
+  },
+  headerRight: {},
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: Radius.full,
+  },
+  statusComplete: {
+    backgroundColor: '#f0fdf4',
+  },
+  statusDraft: {
+    backgroundColor: '#fffbeb',
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  dotComplete: {
+    backgroundColor: '#16a34a',
+  },
+  dotDraft: {
+    backgroundColor: '#d97706',
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  textComplete: {
+    color: '#16a34a',
+  },
+  textDraft: {
+    color: '#d97706',
+  },
 
-  followUpRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 2 },
-  followUpText: { fontSize: 12, color: Colors.textSecondary },
+  cardBody: {
+    padding: 16,
+    gap: 14,
+  },
 
-  cardFooter: { padding: 10, borderTopWidth: 1, borderTopColor: '#e2e8f0', backgroundColor: '#f8fafc' },
-  repeatButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: Colors.primaryBlue, paddingVertical: 10, borderRadius: Radius.md, ...Shadow.blue },
-  repeatButtonText: { color: Colors.white, fontSize: 13, fontWeight: '700' },
-  
-  emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 40, paddingHorizontal: 24 },
-  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  emptyTitle: { ...Typography.h3, color: Colors.textPrimary, marginBottom: 6 },
-  emptyText: { ...Typography.bodySm, color: Colors.textSecondary, textAlign: 'center', lineHeight: 20, marginBottom: 20 },
-  
-  createRxActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.primaryBlue, paddingHorizontal: 20, paddingVertical: 12, borderRadius: Radius.full, marginBottom: 10, ...Shadow.blue },
-  createRxActionText: { color: Colors.white, fontSize: 14, fontWeight: '700' },
-  
-  sampleRxActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.primaryBlue, paddingHorizontal: 20, paddingVertical: 11, borderRadius: Radius.full },
-  sampleRxActionText: { color: Colors.primaryBlue, fontSize: 13, fontWeight: '700' },
+  drRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  drName: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.primaryBlue,
+  },
+  drClinic: {
+    fontSize: 12,
+    color: Colors.textMuted,
+  },
 
-  fab: { position: 'absolute', right: 16, bottom: 20, flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.primaryBlue, paddingHorizontal: 20, paddingVertical: 14, borderRadius: 28, gap: 8, ...Shadow.blue },
-  fabText: { color: Colors.white, fontWeight: '800', fontSize: 15 }
+  // Diagnosis Section
+  diagnosisSection: {
+    backgroundColor: '#f8fafc',
+    padding: 12,
+    borderRadius: Radius.md,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primaryBlue,
+    gap: 4,
+  },
+  diagnosisLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 0.6,
+  },
+  diagnosisTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#0f172a',
+    letterSpacing: -0.2,
+  },
+  complaintText: {
+    fontSize: 12,
+    color: '#475569',
+    marginTop: 2,
+    lineHeight: 17,
+  },
+  vitalsRowInline: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 6,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: '#edf2f7',
+  },
+  vVital: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#334155',
+    backgroundColor: Colors.white,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+
+  // Medicines Table
+  medsContainer: {
+    gap: 6,
+  },
+  medsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  medsHeading: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 0.5,
+  },
+  medsCountBadge: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  medsTable: {
+    backgroundColor: '#fbfcfe',
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    overflow: 'hidden',
+  },
+  medRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+    gap: 10,
+  },
+  medLeft: {
+    flex: 1,
+    gap: 2,
+  },
+  medTitleLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  medIndexNum: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: Colors.textMuted,
+  },
+  medNameBold: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0f172a',
+  },
+  medStrengthTag: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.primaryBlue,
+  },
+  formTag: {
+    backgroundColor: '#e2e8f0',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 3,
+  },
+  formTagText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#475569',
+    textTransform: 'uppercase',
+  },
+  medInstructionsText: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    lineHeight: 15,
+    marginTop: 2,
+  },
+  medRight: {
+    alignItems: 'flex-end',
+    gap: 3,
+  },
+  freqPill: {
+    backgroundColor: '#eff6ff',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#bfdbfe',
+  },
+  freqText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.primaryBlue,
+  },
+  durationText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.textMuted,
+  },
+
+  // Notes & Advice
+  clinicalNotesCard: {
+    backgroundColor: '#f8fafc',
+    borderRadius: Radius.md,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#edf2f7',
+    gap: 6,
+  },
+  noteItem: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  noteLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#334155',
+    minWidth: 80,
+  },
+  noteValue: {
+    fontSize: 11,
+    color: '#475569',
+    flex: 1,
+    lineHeight: 16,
+  },
+
+  // Footer Actions
+  cardFooter: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: '#f8fafc',
+    borderTopWidth: 1,
+    borderTopColor: '#edf2f7',
+  },
+  repeatBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.primaryBlue,
+    paddingVertical: 9,
+    borderRadius: Radius.md,
+    ...Shadow.blue,
+  },
+  repeatBtnText: {
+    color: Colors.white,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  viewDetailsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: Radius.md,
+  },
+  viewDetailsBtnText: {
+    color: Colors.textPrimary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  // Empty State
+  emptyCard: {
+    backgroundColor: Colors.white,
+    borderRadius: Radius.lg,
+    padding: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    marginTop: 20,
+    gap: 8,
+  },
+  emptyTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    marginTop: 4,
+  },
+  emptySubtitle: {
+    fontSize: 12,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 18,
+    maxWidth: 280,
+  },
+  emptyActionBtn: {
+    marginTop: 10,
+    backgroundColor: Colors.primaryBlue,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: Radius.full,
+  },
+  emptyActionBtnText: {
+    color: Colors.white,
+    fontSize: 13,
+    fontWeight: '700',
+  },
 })
