@@ -76,11 +76,14 @@ export default function PatientHistory() {
   const displayWeight = latestInfo.weight || savedPatient?.weight || ''
   const displayVisits = prescriptions.length > 0 ? prescriptions.length : (savedPatient?.visitCount || 0)
 
+  const patientName = name || savedPatient?.name || 'Patient'
+  const patientPhone = !isByName && (phone || savedPatient?.phone) ? (phone || savedPatient?.phone) : ''
+
   const handleNewRx = () => {
     router.push({
       pathname: '/editor',
       params: {
-        prefill_name: name,
+        prefill_name: patientName,
         prefill_phone: !isByName && phone ? phone : (savedPatient?.phone || ''),
         prefill_age: displayAge,
         prefill_gender: displayGender,
@@ -101,13 +104,13 @@ export default function PatientHistory() {
     try {
       const preset = matchingPreset
       await createPrescription({
-        title: `Rx: ${name}`,
+        title: `Rx: ${patientName}`,
         status: 'complete',
         mode: 'form',
         diagnosis: preset.patient.diagnosis,
         doctor_info: preset.doctor,
         patient_info: {
-          name,
+          name: patientName,
           phone: phone || preset.patient.phone || '',
           age: displayAge || preset.patient.age,
           gender: displayGender || preset.patient.gender,
@@ -126,7 +129,7 @@ export default function PatientHistory() {
         follow_up_date: preset.followUp,
       })
       await loadHistory()
-      Alert.alert('✅ Prescription Created', `Sample prescription for ${name} has been saved to records.`)
+      Alert.alert('✅ Prescription Created', `Sample prescription for ${patientName} has been saved to records.`)
     } catch (e: any) {
       Alert.alert('Error', e.message)
     } finally {
@@ -156,7 +159,7 @@ export default function PatientHistory() {
         </View>
 
         <View style={styles.cardBody}>
-          {!!item.diagnosis && (
+          {item.diagnosis ? (
             <View style={styles.infoRow}>
               <Ionicons name="medical" size={14} color={Colors.primaryBlue} style={{ marginTop: 2 }} />
               <View style={styles.infoCol}>
@@ -164,9 +167,9 @@ export default function PatientHistory() {
                 <Text style={styles.infoValue}>{item.diagnosis}</Text>
               </View>
             </View>
-          )}
+          ) : null}
 
-          {meds.length > 0 && (
+          {meds.length > 0 ? (
             <View style={[styles.infoRow, { marginTop: 12 }]}>
               <Ionicons name="bandage" size={14} color={Colors.primaryBlue} style={{ marginTop: 2 }} />
               <View style={styles.infoCol}>
@@ -177,13 +180,13 @@ export default function PatientHistory() {
                       <Text style={styles.tagText}>{m.name}</Text>
                     </View>
                   ))}
-                  {meds.length > 3 && (
+                  {meds.length > 3 ? (
                     <Text style={styles.moreText}>+{meds.length - 3} more</Text>
-                  )}
+                  ) : null}
                 </View>
               </View>
             </View>
-          )}
+          ) : null}
         </View>
 
         <View style={styles.cardFooter}>
@@ -202,7 +205,7 @@ export default function PatientHistory() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ 
-        title: name,
+        title: patientName,
         headerStyle: { backgroundColor: Colors.darkNavy },
         headerTintColor: Colors.white,
         headerTitleStyle: { fontWeight: '700', fontSize: 16 },
@@ -212,11 +215,11 @@ export default function PatientHistory() {
       <View style={styles.header}>
         <View style={styles.avatarRow}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{name.charAt(0).toUpperCase()}</Text>
+            <Text style={styles.avatarText}>{patientName.charAt(0).toUpperCase()}</Text>
           </View>
           <View>
-            <Text style={styles.name}>{name}</Text>
-            {!isByName && <Text style={styles.phone}>{phone || savedPatient?.phone}</Text>}
+            <Text style={styles.name}>{patientName}</Text>
+            {patientPhone ? <Text style={styles.phone}>{patientPhone}</Text> : null}
           </View>
         </View>
         <View style={styles.vitalsRow}>
@@ -237,25 +240,25 @@ export default function PatientHistory() {
         </View>
 
         {/* Extra info if available from patient record */}
-        {(savedPatient?.bloodGroup || savedPatient?.allergies || savedPatient?.address) && (
+        {Boolean(savedPatient?.bloodGroup || savedPatient?.allergies || savedPatient?.address) ? (
           <View style={styles.extraInfoRow}>
-            {savedPatient.bloodGroup ? (
+            {savedPatient?.bloodGroup ? (
               <View style={[styles.infoChip, { backgroundColor: '#fff1f2' }]}>
                 <Text style={[styles.infoChipText, { color: '#be123c' }]}>🩸 {savedPatient.bloodGroup}</Text>
               </View>
             ) : null}
-            {savedPatient.allergies ? (
+            {savedPatient?.allergies ? (
               <View style={[styles.infoChip, { backgroundColor: '#fef3c7' }]}>
                 <Text style={[styles.infoChipText, { color: '#92400e' }]}>⚠️ {savedPatient.allergies}</Text>
               </View>
             ) : null}
-            {savedPatient.address ? (
+            {savedPatient?.address ? (
               <View style={styles.infoChip}>
                 <Text style={styles.infoChipText}>📍 {savedPatient.address}</Text>
               </View>
             ) : null}
           </View>
-        )}
+        ) : null}
       </View>
 
       {loading ? (
@@ -275,11 +278,11 @@ export default function PatientHistory() {
               </View>
               <Text style={styles.emptyTitle}>No Prescriptions Recorded</Text>
               <Text style={styles.emptyText}>
-                {name} is saved in your records, but no prescription has been completed for them yet.
+                {patientName} is saved in your records, but no prescription has been completed for them yet.
               </Text>
               <TouchableOpacity style={styles.createRxActionBtn} onPress={handleNewRx}>
                 <Ionicons name="add" size={18} color={Colors.white} />
-                <Text style={styles.createRxActionText}>+ Create Prescription for {name}</Text>
+                <Text style={styles.createRxActionText}>+ Create Prescription for {patientName}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.sampleRxActionBtn} onPress={handleGenerateSampleRx}>
                 <Ionicons name="flash" size={16} color={Colors.primaryBlue} />
