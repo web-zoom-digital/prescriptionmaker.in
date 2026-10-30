@@ -34,12 +34,14 @@ type OfflineAction = {
 
 // Ensure the local cache is updated with the latest data
 async function setLocalCache(data: Prescription[]) {
-  if (Platform.OS === 'web') return
-  try { await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data)) } catch (e) {}
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  } catch (e) {
+    console.warn('Failed to set local prescription cache:', e)
+  }
 }
 
 async function getLocalCache(): Promise<Prescription[]> {
-  if (Platform.OS === 'web') return []
   try {
     const data = await AsyncStorage.getItem(STORAGE_KEY)
     return data ? JSON.parse(data) : []
@@ -50,7 +52,6 @@ async function getLocalCache(): Promise<Prescription[]> {
 
 // Add an action to the offline queue
 async function queueAction(action: OfflineAction) {
-  if (Platform.OS === 'web') return
   try {
     const q = await AsyncStorage.getItem(OFFLINE_QUEUE_KEY)
     const queue: OfflineAction[] = q ? JSON.parse(q) : []
@@ -61,7 +62,6 @@ async function queueAction(action: OfflineAction) {
 
 // Run pending offline actions
 export async function syncOfflineData() {
-  if (Platform.OS === 'web') return
   try {
     const q = await AsyncStorage.getItem(OFFLINE_QUEUE_KEY)
     if (!q) return
@@ -96,20 +96,31 @@ export async function syncOfflineData() {
 
 // ── API Methods ───────────────────────────────────────────────────
 
-// Get all prescriptions
+// Get all prescriptions (combines remote + local storage)
 export async function getPrescriptions(): Promise<Prescription[]> {
+  const local = await getLocalCache()
   try {
     const { data, error } = await supabase
       .from('prescriptions')
-      .select('id, title, status, mode, diagnosis, patient_info, doctor_info, medicines, created_at, updated_at')
+      .select('id, title, status, mode, diagnosis, patient_info, doctor_info, medicines, advice, follow_up_date, lab_tests, template_slug, created_at, updated_at')
       .order('created_at', { ascending: false })
 
-    if (error) throw new Error(error.message)
-    await setLocalCache(data || [])
-    return data ?? []
+    if (error) {
+      return local
+    }
+
+    if (data && data.length > 0) {
+      // Merge remote prescriptions with any unsynced local-only prescriptions
+      const remoteIds = new Set(data.map(p => p.id))
+      const localOnly = local.filter(p => !remoteIds.has(p.id))
+      const combined = [...data, ...localOnly]
+      await setLocalCache(combined)
+      return combined
+    }
+
+    return local
   } catch (err) {
-    console.warn('Network failed, falling back to local cache')
-    return await getLocalCache()
+    return local
   }
 }
 
@@ -122,7 +133,7 @@ export async function getPrescription(id: string): Promise<Prescription | null> 
       .eq('id', id)
       .single()
 
-    if (error) throw error
+    if (error || !data) throw error || new Error('Not found')
     return data
   } catch (err) {
     const cache = await getLocalCache()
@@ -152,19 +163,22 @@ async function autoSavePatient(patientInfo: any) {
   }
 }
 
-// Create new prescription
+// Create new prescription (offline-friendly, works even if not logged in)
 export async function createPrescription(payload: Partial<Prescription>) {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
-
   // Auto-sync patient
   if (payload.patient_info) {
     autoSavePatient(payload.patient_info)
   }
 
-  const tempId = Date.now().toString()
-  const newRx = {
-    user_id: user.id,
+  const tempId = `rx-${Date.now()}`
+  let user: any = null
+  try {
+    const authRes = await supabase.auth.getUser()
+    user = authRes.data?.user
+  } catch {}
+
+  const newRx: Prescription = {
+    id: tempId,
     title: payload.title ?? 'Untitled',
     status: payload.status ?? 'draft',
     mode: payload.mode ?? 'form',
@@ -180,32 +194,59 @@ export async function createPrescription(payload: Partial<Prescription>) {
     updated_at: new Date().toISOString()
   }
 
-  try {
-    const { data, error } = await supabase
-      .from('prescriptions')
-      .insert(newRx)
-      .select('id')
-      .single()
+  // 1. Always save to local cache optimistically
+  const cache = await getLocalCache()
+  await setLocalCache([newRx, ...cache.filter(p => p.id !== tempId)])
 
-    if (error) throw new Error(error.message)
-    return data
-  } catch (err) {
-    // Offline fallback
-    const fullPayload = { ...newRx, id: tempId }
-    await queueAction({ id: tempId, action: 'create', payload: newRx, timestamp: Date.now() })
-    
-    // Update local cache optimistically
-    const cache = await getLocalCache()
-    await setLocalCache([fullPayload as unknown as Prescription, ...cache])
-    
-    return { id: tempId }
+  // 2. If authenticated with Supabase, sync to remote
+  if (user?.id) {
+    try {
+      const { data, error } = await supabase
+        .from('prescriptions')
+        .insert({
+          user_id: user.id,
+          title: newRx.title,
+          status: newRx.status,
+          mode: newRx.mode,
+          diagnosis: newRx.diagnosis,
+          patient_info: newRx.patient_info,
+          doctor_info: newRx.doctor_info,
+          medicines: newRx.medicines,
+          template_slug: newRx.template_slug,
+          advice: newRx.advice,
+          follow_up_date: newRx.follow_up_date,
+          lab_tests: newRx.lab_tests,
+        })
+        .select('id')
+        .single()
+
+      if (!error && data?.id) {
+        newRx.id = data.id
+        const updatedCache = await getLocalCache()
+        await setLocalCache(updatedCache.map(p => p.id === tempId ? { ...p, id: data.id } : p))
+        return data
+      }
+    } catch (syncErr) {
+      console.warn('Supabase sync deferred:', syncErr)
+      await queueAction({ id: tempId, action: 'create', payload: newRx, timestamp: Date.now() })
+    }
   }
+
+  return { id: tempId }
 }
 
 // Update existing prescription
 export async function updatePrescription(id: string, payload: Partial<Prescription>) {
   if (payload.patient_info) {
     autoSavePatient(payload.patient_info)
+  }
+
+  // Optimistically update local cache
+  const cache = await getLocalCache()
+  const idx = cache.findIndex(p => p.id === id)
+  if (idx !== -1) {
+    cache[idx] = { ...cache[idx], ...payload, updated_at: new Date().toISOString() }
+    await setLocalCache(cache)
   }
 
   try {
@@ -216,39 +257,28 @@ export async function updatePrescription(id: string, payload: Partial<Prescripti
         status: payload.status,
         diagnosis: payload.diagnosis,
         patient_info: payload.patient_info,
+        doctor_info: payload.doctor_info,
         medicines: payload.medicines,
+        advice: payload.advice,
+        follow_up_date: payload.follow_up_date,
+        lab_tests: payload.lab_tests,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
 
     if (error) throw new Error(error.message)
   } catch (err) {
-    // Offline fallback
     await queueAction({ id, action: 'update', payload, timestamp: Date.now() })
-    
-    // Update local cache optimistically
-    const cache = await getLocalCache()
-    const idx = cache.findIndex(p => p.id === id)
-    if (idx !== -1) {
-      cache[idx] = { ...cache[idx], ...payload, updated_at: new Date().toISOString() }
-      await setLocalCache(cache)
-    }
   }
 }
 
 // Delete a prescription
 export async function deletePrescription(id: string) {
   try {
-    const { error } = await supabase
-      .from('prescriptions')
-      .delete()
-      .eq('id', id)
-
-    if (error) throw new Error(error.message)
+    await supabase.from('prescriptions').delete().eq('id', id)
   } catch (err) {
-    // Offline fallback
     await queueAction({ id, action: 'delete', timestamp: Date.now() })
-    
+  } finally {
     const cache = await getLocalCache()
     await setLocalCache(cache.filter(p => p.id !== id))
   }
